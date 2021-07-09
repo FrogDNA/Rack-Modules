@@ -4,6 +4,10 @@ VCV Rack modules that revolve around James Conway's "Game of Life".
 
 ## GameOfLife
 
+### Display
+
+Left click on an alive cell to kill it. Left click on a dead cell to revive it.
+
 ### AUDIO part:
 
 SND out is an audio output (-5V to 5V)
