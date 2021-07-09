@@ -1,0 +1,16 @@
+{
+  "slug": "FrogDNA",
+  "name": "FrogDNA",
+  "version": "0.0.0",
+  "license": "GPL-3.0-or-later",
+  "brand": "FrogDNA",
+  "author": "C\u00c3\u00a9line Alameda",
+  "authorEmail": "alamedaceline@gmail.com",
+  "authorUrl": "https://github.com/celine-alameda",
+  "pluginUrl": "https://github.com/celine-alameda/FrogDNA",
+  "manualUrl": "https://github.com/celine-alameda/FrogDNA",
+  "sourceUrl": "https://github.com/celine-alameda/FrogDNA",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": []
+}
