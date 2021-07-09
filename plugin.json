@@ -1,7 +1,7 @@
 {
   "slug": "FrogDNA",
   "name": "FrogDNA",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "GPL-3.0-or-later",
   "brand": "FrogDNA",
   "author": "C\u00c3\u00a9line Alameda",
@@ -12,5 +12,12 @@
   "sourceUrl": "https://github.com/celine-alameda/FrogDNA",
   "donateUrl": "",
   "changelogUrl": "",
-  "modules": []
+  "modules": [
+    {
+      "slug": "GameOfLife",
+      "name": "GameOfLife",
+      "description": "",
+      "tags": []
+    }
+  ]
 }
