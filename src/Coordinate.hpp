@@ -1,5 +1,5 @@
-#ifndef COORDINATES_H
-#define COORDINATES_H
+#ifndef COORDINATE_H
+#define COORDINATE_H
 
 class Coordinate {
   int x;
