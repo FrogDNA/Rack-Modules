@@ -6,14 +6,6 @@
 static const int NUMCELLSX = 30;
 static const int NUMCELLSY = 30;
 
-struct Coordinate {
-  int x;
-  int y;
-
-  Coordinate(int aX, int aY);
-  bool isEqual(Coordinate c);
-};
-
 struct GolCell : Widget {
 
   int x = -1;

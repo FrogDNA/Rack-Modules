@@ -1,14 +1,8 @@
 #include "GameOfLife.hpp"
+#include "Coordinate.hpp"
 #include "plugin.hpp"
 #include <unordered_map>
 #include <vector>
-
-Coordinate::Coordinate(int aX, int aY) {
-  x = aX;
-  y = aY;
-}
-
-bool Coordinate::isEqual(Coordinate c) { return (c.x == x && c.y == y); }
 
 struct GolState {
   std::vector<Coordinate> aliveCells;
@@ -82,7 +76,6 @@ struct GameOfLife : Module {
     float am = 1.0f;
     if (clock > 3.5f) {
       risingEdge = (clockUp == false ? true : false);
-      // clockUp == false ? risingEdge = true : risingEdge = false;
       clockUp = true;
     } else if (clock < 1.5f) {
       clockUp = false;
@@ -120,11 +113,12 @@ struct GameOfLife : Module {
     // printf("time %f \n", time);
     for (std::vector<Coordinate>::iterator it = alive.begin();
          it != alive.end(); ++it) {
-      float modulation =
-          (float)((*it).y - NUMCELLSY / 2) * tune / (float)NUMCELLSY;
+      float modulation = ((float)((*it).getY()) - (float)NUMCELLSY / 2) * tune /
+                         (float)NUMCELLSY;
       // base frequency
       float freq =
-          baseFreq * pow(2.0f, (float)((*it).x - NUMCELLSX / 2) / 12.0f + vOct);
+          baseFreq *
+          pow(2.0f, (float)((*it).getX() - NUMCELLSX / 2) / 12.0f + vOct);
       freq = freq * (1.0f + modulation);
       float partAudio = std::sin(2.0f * M_PI * freq * time);
       audio += partAudio;
@@ -136,52 +130,16 @@ struct GameOfLife : Module {
     // printf("audio return %f \n", audio);
     return audio;
   }
-  /**
-  returns float between 0 and 1
-  todo use lookup tables to avoid computing sin each time
-  */
-  /*float processAudio(std::vector<Coordinate> alive, float modIndex, float
-  vOct, float vOctFM) { float audio = 0.f; float count = 0.f;
-    // printf("time %f \n", time);
-    for (std::vector<Coordinate>::iterator it = alive.begin();
-         it != alive.end(); ++it) {
-      float modFreq =
-          baseFreq *
-          pow(2.0f, (float)((*it).y - NUMCELLSY / 2) / 12.0f + vOctFM);
-      // modulation
-      double intPart;
-      float remainder =
-          modf(modFreq * time + modulationPhase / (2.f * M_PI), &intPart);
-      int index = (int)(remainder * 1000000);
-      float modulation = modIndex * sinLut[index];
-      // base frequency
-      float freq =
-          baseFreq * pow(2.0f, (float)((*it).x - NUMCELLSX / 2) / 12.0f + vOct);
-      remainder = modf(time * (freq + modulation), &intPart);
-      index = floor(remainder * 1000000);
-      float partAudio = sinLut[index];
-      // printf("%i %i \n", (*it).x, (*it).y);
-      // printf("base %f mod %f \n", freq, modFreq);
-      // printf("partAudio %f audio %f \n", partAudio, audio);
-      audio += partAudio;
-      count += 1.f;
-    }
-    if (count != 0.f) {
-      audio = audio / count;
-    }
-    // printf("audio return %f \n", audio);
-    return audio;
-  }*/
 
   GolState addCell(Coordinate c) {
     std::vector<Coordinate> v1;
     std::vector<Coordinate> v2;
     v1.push_back(c);
-    for (int i = c.x - 1; i < c.x + 2; i++) {
+    for (int i = c.getX() - 1; i < c.getX() + 2; i++) {
       int im = (i + NUMCELLSX) % NUMCELLSX;
-      for (int j = c.y - 1; j < c.y + 2; j++) {
+      for (int j = c.getY() - 1; j < c.getY() + 2; j++) {
         int jm = (j + NUMCELLSY) % NUMCELLSY;
-        if (im != c.x || jm != c.y) {
+        if (im != c.getX() || jm != c.getY()) {
           v2.push_back(Coordinate(im, jm));
         }
       }
@@ -240,15 +198,15 @@ struct GameOfLife : Module {
       if (c.isEqual(*it)) {
         currentState = true;
       } else {
-        int itx = (*it).x;
-        int ity = (*it).y;
+        int itx = (*it).getX();
+        int ity = (*it).getY();
         int itxm = (itx - 1 + NUMCELLSX) % NUMCELLSX;
         int itxp = (itx + 1) % NUMCELLSX;
         int itym = (ity - 1 + NUMCELLSY) % NUMCELLSY;
         int ityp = (ity + 1) % NUMCELLSY;
         // case equal already accounted for
-        if ((itxm == c.x || itxp == c.x || itx == c.x) &&
-            (itym == c.y || ityp == c.y || ity == c.y)) {
+        if ((itxm == c.getX() || itxp == c.getX() || itx == c.getX()) &&
+            (itym == c.getY() || ityp == c.getY() || ity == c.getY())) {
           count++;
         }
       }
@@ -290,21 +248,17 @@ struct GameOfLife : Module {
     if (!contains) {
       gol.aliveCells.push_back(c);
     }
-    // todo factorize + implementation
-    for (std::vector<Coordinate>::iterator it1 =
-             addResult.toUpdateNextStep.begin();
-         it1 != addResult.toUpdateNextStep.end(); ++it1) {
-      bool contains = false;
-      for (std::vector<Coordinate>::iterator it2 = gol.toUpdateNextStep.begin();
-           it2 != gol.toUpdateNextStep.end(); ++it2) {
-        if ((*it2).isEqual((*it1))) {
-          contains = true;
-          break;
-        }
-      }
-      if (!contains) {
-        gol.toUpdateNextStep.push_back((*it1));
-      }
+    std::vector<Coordinate> intersection;
+    std::sort(addResult.toUpdateNextStep.begin(),
+              addResult.toUpdateNextStep.end());
+    std::sort(gol.toUpdateNextStep.begin(), gol.toUpdateNextStep.end());
+    std::set_intersection(
+        addResult.toUpdateNextStep.begin(), addResult.toUpdateNextStep.end(),
+        gol.toUpdateNextStep.begin(), gol.toUpdateNextStep.end(),
+        std::back_inserter(intersection));
+    for (std::vector<Coordinate>::iterator it = intersection.begin();
+         it != intersection.end(); ++it) {
+      gol.toUpdateNextStep.push_back(*it);
     }
   }
 
@@ -325,20 +279,17 @@ struct GameOfLife : Module {
       gol.aliveCells.erase(gol.aliveCells.begin() + position);
     }
     // todo factorize + implementation
-    for (std::vector<Coordinate>::iterator it1 =
-             addResult.toUpdateNextStep.begin();
-         it1 != addResult.toUpdateNextStep.end(); ++it1) {
-      bool contains = false;
-      for (std::vector<Coordinate>::iterator it2 = gol.toUpdateNextStep.begin();
-           it2 != gol.toUpdateNextStep.end(); ++it2) {
-        if ((*it2).isEqual((*it1))) {
-          contains = true;
-          break;
-        }
-      }
-      if (!contains) {
-        gol.toUpdateNextStep.push_back((*it1));
-      }
+    std::vector<Coordinate> intersection;
+    std::sort(addResult.toUpdateNextStep.begin(),
+              addResult.toUpdateNextStep.end());
+    std::sort(gol.toUpdateNextStep.begin(), gol.toUpdateNextStep.end());
+    std::set_intersection(
+        addResult.toUpdateNextStep.begin(), addResult.toUpdateNextStep.end(),
+        gol.toUpdateNextStep.begin(), gol.toUpdateNextStep.end(),
+        std::back_inserter(intersection));
+    for (std::vector<Coordinate>::iterator it = intersection.begin();
+         it != intersection.end(); ++it) {
+      gol.toUpdateNextStep.push_back(*it);
     }
   }
 };
@@ -405,14 +356,14 @@ struct GolDisplay : OpaqueWidget {
           break;
         }
         if (!stillAlive) {
-          aliveCells[cOld.x][cOld.y]->alive = false;
+          aliveCells[cOld.getX()][cOld.getY()]->alive = false;
         }
       }
     }
     for (std::vector<Coordinate>::iterator it = alive.begin();
          it != alive.end(); ++it) {
       Coordinate c = *it;
-      aliveCells[c.x][c.y]->alive = true;
+      aliveCells[c.getX()][c.getY()]->alive = true;
     }
 
     oldAliveCells = alive;
