@@ -164,7 +164,10 @@ void DrawableCell::draw(const DrawArgs &args) {
 
 void DrawableCell::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-    cell->setAlive(!cell->isAlive());
+    GolDisplay *gd = getAncestorOfType<GolDisplay>();
+    // dont just tell the cell its alive, tell the grid
+    gd->module->golGrid->setCellState(cell->getX(), cell->getY(),
+                                      !cell->isAlive());
     e.consume(this);
   }
   Widget::onButton(e);
