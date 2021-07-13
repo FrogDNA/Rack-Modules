@@ -24,7 +24,7 @@ class GameOfLifeGrid {
   std::set<Cell *> currentlyAlive;
   int steps = 0;
 
-  int countAlive(Cell *c);
+  int countAlive(std::set<Cell *> ca, Cell *c);
 
 public:
   GameOfLifeGrid();
