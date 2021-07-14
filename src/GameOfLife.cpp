@@ -1,5 +1,6 @@
 #include "GameOfLife.hpp"
 #include "Coordinate.hpp"
+#include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "plugin.hpp"
 #include <unordered_map>
@@ -7,6 +8,7 @@
 
 struct GameOfLife : Module {
   GameOfLifeGrid *golGrid;
+  DataSender *dataSender;
   int baseFreqPos = 10;
   float baseFreq = 440.0;              // todo modulate or configure this
   float enveloppeTotalDuration = .02f; // todo modulate or configure this
@@ -38,7 +40,10 @@ struct GameOfLife : Module {
   void process(const ProcessArgs &args) override {
     float clock = inputs[CLOCK_INPUT].getVoltage();
     float vOct = inputs[VOCT_INPUT].getVoltage();
+    float send = inputs[SEND_INPUT].getVoltage();
     float tune = params[TUNE_PARAM].getValue();
+    float dataOut = 0.f;
+    float ClockOut = 0.f;
     bool risingEdge = false;
     time += args.sampleTime;
     float am = 1.0f;
@@ -68,6 +73,21 @@ struct GameOfLife : Module {
       }
     }
     float audio = processAudio(golGrid->getCurrentlyAlive(), tune, vOct);
+    if (send > 3.5f) {
+      if (!dataSender) {
+        dataSender = new DataSender();
+      }
+      if (!dataSender->isTransferInProgress()) {
+        dataSender->init(golGrid->getCurrentlyAlive());
+      }
+    }
+    if (dataSender) {
+      dataSender->next();
+      dataOut = dataSender->getData();
+      ClockOut = dataSender->getClock();
+    }
+    outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
+    outputs[DATA_OUTPUT].setVoltage(dataOut);
     outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
     lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
   }
