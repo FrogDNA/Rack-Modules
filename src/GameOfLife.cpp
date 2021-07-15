@@ -7,8 +7,8 @@
 #include <vector>
 
 struct GameOfLife : Module {
-  GameOfLifeGrid *golGrid;
-  DataSender *dataSender;
+  GameOfLifeGrid *golGrid = NULL;
+  DataSender *dataSender = NULL;
   int baseFreqPos = 10;
   float baseFreq = 440.0;              // todo modulate or configure this
   float enveloppeTotalDuration = .02f; // todo modulate or configure this
@@ -35,6 +35,9 @@ struct GameOfLife : Module {
     clockUp = false;
     golGrid = new GameOfLifeGrid();
     golGrid->defaultInit();
+    dataSender = new DataSender();
+    // for debugging
+    // setbuf(stdout, NULL);
   }
 
   void process(const ProcessArgs &args) override {
@@ -74,22 +77,23 @@ struct GameOfLife : Module {
     }
     float audio = processAudio(golGrid->getCurrentlyAlive(), tune, vOct);
     if (send > 3.5f) {
-      if (!dataSender) {
-        dataSender = new DataSender();
-      }
       if (!dataSender->isTransferInProgress()) {
         dataSender->init(golGrid->getCurrentlyAlive());
       }
     }
-    if (dataSender) {
-      dataSender->next();
-      dataOut = dataSender->getData();
-      ClockOut = dataSender->getClock();
-    }
+    dataSender->next();
+    /*dataOut = dataSender->getData();
+    ClockOut = dataSender->getClock();*/
     outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
     outputs[DATA_OUTPUT].setVoltage(dataOut);
     outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
     lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
+    /*if (dataSender) {
+      lights[DATALIGHT_LIGHT].setBrightness(
+          dataSender->isTransferInProgress() ? 1.0f : 0.0f);
+    } else {
+      lights[DATALIGHT_LIGHT].setBrightness(0.0f);
+    }*/
   }
   /**
   returns float between 0 and 1
@@ -121,18 +125,18 @@ struct GameOfLife : Module {
 };
 
 struct GolDisplay : OpaqueWidget {
-  GameOfLife *module;
-  float offsetX;
-  float offsetY;
-  float sizeX;
-  float sizeY;
-  float cellSizeX;
-  float cellSizeY;
-  float cellSpaceX;
-  float cellSpaceY;
-  float numCellsX;
-  float numCellsY;
-  bool firstDraw;
+  GameOfLife *module = NULL;
+  float offsetX = 0.f;
+  float offsetY = 0.f;
+  float sizeX = 0.f;
+  float sizeY = 0.f;
+  float cellSizeX = 0.f;
+  float cellSizeY = 0.f;
+  float cellSpaceX = 0.f;
+  float cellSpaceY = 0.f;
+  float numCellsX = 0.f;
+  float numCellsY = 0.f;
+  bool firstDraw = true;
 
   GolDisplay() {
     // todo replace with static something

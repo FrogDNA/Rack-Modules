@@ -8,8 +8,10 @@ class DataSender {
   std::set<Cell *> aliveCells;
   std::set<Cell *>::iterator itr;
   bool transferInProgress;
+  bool sendX;
   float clock;
   float data;
+  int state;
 
 public:
   DataSender();
