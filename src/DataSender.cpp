@@ -15,6 +15,7 @@ void DataSender::init(std::set<Cell *> aliveCells) {
     state = 0;
     clock = 0.f;
     data = 0.f;
+    cycles = 0;
     if (itr != aliveCells.end()) {
       transferInProgress = true;
     } else {
@@ -47,12 +48,16 @@ void DataSender::next() {
     default:
       break;
     }
-    ++state;
-    state = state % 4;
-    if (state == 0) {
-      itr = std::next(itr);
-      if (itr == aliveCells.end()) {
-        transferInProgress = false;
+    ++cycles;
+    cycles = cycles % SEND_CLOCK_CYLES;
+    if (cycles == 0) {
+      ++state;
+      state = state % 4;
+      if (state == 0) {
+        itr = std::next(itr);
+        if (itr == aliveCells.end()) {
+          transferInProgress = false;
+        }
       }
     }
   }

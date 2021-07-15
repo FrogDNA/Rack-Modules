@@ -82,18 +82,18 @@ struct GameOfLife : Module {
       }
     }
     dataSender->next();
-    /*dataOut = dataSender->getData();
-    ClockOut = dataSender->getClock();*/
+    dataOut = dataSender->getData();
+    ClockOut = dataSender->getClock();
     outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
     outputs[DATA_OUTPUT].setVoltage(dataOut);
     outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
     lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
-    /*if (dataSender) {
+    if (dataSender) {
       lights[DATALIGHT_LIGHT].setBrightness(
           dataSender->isTransferInProgress() ? 1.0f : 0.0f);
     } else {
       lights[DATALIGHT_LIGHT].setBrightness(0.0f);
-    }*/
+    }
   }
   /**
   returns float between 0 and 1
