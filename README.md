@@ -18,4 +18,12 @@ WAY is how life finds a way ;) (the input port is 1V/oct, the parameter knob con
 
 ### DATA part:
 
-Work in progress...
+Send a High signal to LINK input. It triggers data sending.
+
+Data are written at low clock and can be read at high clock.
+
+Data indicate which cells were alive when LINK input was triggered. They are sent x first, then y. Sequence is as such :
+
+(x0, y0, x1, y1, ..., xn, yn)
+
+to decode the voltages as integers, divide the voltage by 5 and multiply it by 30 (number of cells). (positionX = voltage * NUMCELLSX / 5.0f )
