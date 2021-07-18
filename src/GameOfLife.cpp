@@ -1,5 +1,6 @@
 #include "GameOfLife.hpp"
 #include "Coordinate.hpp"
+#include "DataReceiver.hpp"
 #include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "plugin.hpp"
@@ -9,6 +10,7 @@
 struct GameOfLife : Module {
   GameOfLifeGrid *golGrid = NULL;
   DataSender *dataSender = NULL;
+  DataReceiver *dataReceiver = NULL;
   int baseFreqPos = 10;
   float baseFreq = 440.0;              // todo modulate or configure this
   float enveloppeTotalDuration = .02f; // todo modulate or configure this
@@ -18,12 +20,27 @@ struct GameOfLife : Module {
   bool isEnvelopeActive = false;
   bool golUpdateArmed = true;
   bool clockUp;
+  bool hasResetSend = true;
 
   enum ParamIds { TUNE_PARAM, NUM_PARAMS };
-  enum InputIds { SEND_INPUT, VOCT_INPUT, CLOCK_INPUT, NUM_INPUTS };
-  enum OutputIds { DATACLK_OUTPUT, DATA_OUTPUT, AUDIO_OUTPUT, NUM_OUTPUTS };
+  enum InputIds {
+    SEND_INPUT,
+    BUSYIN_INPUT,
+    DATACLKIN_INPUT,
+    DATAIN_INPUT,
+    VOCT_INPUT,
+    CLOCK_INPUT,
+    NUM_INPUTS
+  };
+  enum OutputIds {
+    BUSY_OUTPUT,
+    DATACLK_OUTPUT,
+    DATA_OUTPUT,
+    AUDIO_OUTPUT,
+    NUM_OUTPUTS
+  };
   enum LightIds {
-    DATALIGHT_LIGHT,
+    BUSYINLIGHT_LIGHT,
     AUDIOLIGHT_LIGHT,
     CLOCKLIGHT_LIGHT,
     NUM_LIGHTS
@@ -36,6 +53,7 @@ struct GameOfLife : Module {
     golGrid = new GameOfLifeGrid();
     golGrid->defaultInit();
     dataSender = new DataSender();
+    dataReceiver = new DataReceiver();
     // for debugging
     // setbuf(stdout, NULL);
   }
@@ -50,6 +68,11 @@ struct GameOfLife : Module {
     bool risingEdge = false;
     time += args.sampleTime;
     float am = 1.0f;
+    // data receive
+    if (dataReceiver->hasNewData()) {
+    }
+    /* clock and AM. */
+    /* todo check if AM really brings something */
     if (clock > 3.5f) {
       risingEdge = (clockUp == false ? true : false);
       clockUp = true;
@@ -75,25 +98,28 @@ struct GameOfLife : Module {
         golUpdateArmed = true;
       }
     }
+    // process audio
     float audio = processAudio(golGrid->getCurrentlyAlive(), tune, vOct);
-    if (send > 3.5f) {
+    // data send
+    if (send > 3.5f && hasResetSend) {
       if (!dataSender->isTransferInProgress()) {
         dataSender->init(golGrid->getCurrentlyAlive());
+        hasResetSend = false;
       }
+    }
+    if (send < 1.5f) {
+      hasResetSend = true;
     }
     dataSender->next();
     dataOut = dataSender->getData();
     ClockOut = dataSender->getClock();
+    // outputs
+    outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
+                                                                       : 0.f);
     outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
     outputs[DATA_OUTPUT].setVoltage(dataOut);
     outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
     lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
-    if (dataSender) {
-      lights[DATALIGHT_LIGHT].setBrightness(
-          dataSender->isTransferInProgress() ? 1.0f : 0.0f);
-    } else {
-      lights[DATALIGHT_LIGHT].setBrightness(0.0f);
-    }
   }
   /**
   returns float between 0 and 1
@@ -212,29 +238,36 @@ struct GameOfLifeWidget : ModuleWidget {
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(7.971, 99.698)), module, GameOfLife::TUNE_PARAM));
+        mm2px(Vec(7.971, 110.281)), module, GameOfLife::TUNE_PARAM));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.956, 47.826)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.956, 38.831)), module,
                                              GameOfLife::SEND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.971, 88.584)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.956, 64.231)), module,
+                                             GameOfLife::BUSYIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.869, 64.231)), module,
+                                             GameOfLife::DATACLKIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.869, 78.343)), module,
+                                             GameOfLife::DATAIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.971, 99.168)), module,
                                              GameOfLife::VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.913, 99.697)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.913, 110.28)), module,
                                              GameOfLife::CLOCK_INPUT));
 
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(35.869, 32.723)), module, GameOfLife::DATACLK_OUTPUT));
+        mm2px(Vec(11.956, 27.961)), module, GameOfLife::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(35.869, 47.826)), module, GameOfLife::DATA_OUTPUT));
+        mm2px(Vec(35.869, 27.961)), module, GameOfLife::DATACLK_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(39.854, 99.698)), module, GameOfLife::AUDIO_OUTPUT));
+        mm2px(Vec(35.869, 38.831)), module, GameOfLife::DATA_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(
+        mm2px(Vec(39.854, 110.281)), module, GameOfLife::AUDIO_OUTPUT));
 
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(11.956, 32.724)), module, GameOfLife::DATALIGHT_LIGHT));
+        mm2px(Vec(11.956, 78.343)), module, GameOfLife::BUSYINLIGHT_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(39.854, 88.056)), module, GameOfLife::AUDIOLIGHT_LIGHT));
+        mm2px(Vec(39.854, 98.639)), module, GameOfLife::AUDIOLIGHT_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(23.913, 88.584)), module, GameOfLife::CLOCKLIGHT_LIGHT));
-
+        mm2px(Vec(23.913, 99.168)), module, GameOfLife::CLOCKLIGHT_LIGHT));
     // mm2px(Vec(110.0, 110.0))
     GolDisplay *display = new GolDisplay();
     display->module = module;

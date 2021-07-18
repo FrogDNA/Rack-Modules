@@ -4,7 +4,6 @@
 DataSender::DataSender() {
   transferInProgress = false;
   sendX = true;
-  printf("constructor \n");
 }
 
 void DataSender::init(std::set<Cell *> aliveCells) {
@@ -60,6 +59,9 @@ void DataSender::next() {
         }
       }
     }
+  } else {
+    clock = 0.f;
+    data = 0.f;
   }
 }
 float DataSender::getClock() { return clock; }
