@@ -48,7 +48,7 @@ void DataSender::next() {
       break;
     }
     ++cycles;
-    cycles = cycles % SEND_CLOCK_CYLES;
+    cycles = cycles % SEND_SPEED;
     if (cycles == 0) {
       ++state;
       state = state % 4;

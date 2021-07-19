@@ -6,12 +6,15 @@
 #include <set>
 
 class DataReceiver {
-  Coordinate *data = NULL;
+  int x = 0;
+  int y = 0;
+  bool isXNext = true;
+  bool risingEdgeReceived = false;
 
 public:
   DataReceiver();
-  bool hasNewData();
-  Coordinate getData();
+  void checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
+                          GameOfLifeGrid *golGrid);
 };
 
 #endif

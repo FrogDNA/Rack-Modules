@@ -62,15 +62,18 @@ struct GameOfLife : Module {
     float clock = inputs[CLOCK_INPUT].getVoltage();
     float vOct = inputs[VOCT_INPUT].getVoltage();
     float send = inputs[SEND_INPUT].getVoltage();
+    float busyIn = inputs[BUSYIN_INPUT].getVoltage();
+    float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
+    float dataIn = inputs[DATAIN_INPUT].getVoltage();
     float tune = params[TUNE_PARAM].getValue();
+
     float dataOut = 0.f;
     float ClockOut = 0.f;
     bool risingEdge = false;
     time += args.sampleTime;
     float am = 1.0f;
     // data receive
-    if (dataReceiver->hasNewData()) {
-    }
+    dataReceiver->checkAndUpdateGrid(busyIn, clockIn, dataIn, golGrid);
     /* clock and AM. */
     /* todo check if AM really brings something */
     if (clock > 3.5f) {

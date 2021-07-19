@@ -4,7 +4,7 @@
 #include "GameOfLifeGrid.hpp"
 #include <set>
 
-const int SEND_CLOCK_CYLES = 10;
+const int SEND_SPEED = 1000;
 
 class DataSender {
   std::set<Cell *> aliveCells;
