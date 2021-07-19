@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "GPL-3.0-or-later",
   "brand": "FrogDNA",
-  "author": "C\u00c3\u00a9line Alameda",
+  "author": "Céline Alameda",
   "authorEmail": "alamedaceline@gmail.com",
   "authorUrl": "https://github.com/celine-alameda",
   "pluginUrl": "https://github.com/celine-alameda/FrogDNA",
@@ -14,10 +14,12 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "GameOfLife",
-      "name": "GameOfLife",
-      "description": "",
-      "tags": []
+      "slug": "Mitosis",
+      "name": "Mitosis",
+      "description": "Chaotic VCO inspired by Conway's Game of L Life",
+      "tags": [
+        "Oscillator", "Random"
+      ]
     }
   ]
 }

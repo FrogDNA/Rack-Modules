@@ -1,4 +1,4 @@
-#include "GameOfLife.hpp"
+#include "Mitosis.hpp"
 #include "Coordinate.hpp"
 #include "DataReceiver.hpp"
 #include "DataSender.hpp"
@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-struct GameOfLife : Module {
+struct Mitosis : Module {
   GameOfLifeGrid *golGrid = NULL;
   DataSender *dataSender = NULL;
   DataReceiver *dataReceiver = NULL;
@@ -24,29 +24,29 @@ struct GameOfLife : Module {
 
   enum ParamIds { TUNE_PARAM, NUM_PARAMS };
   enum InputIds {
-    SEND_INPUT,
+    CLOCK_INPUT,
+    VOCT_INPUT,
     BUSYIN_INPUT,
     DATACLKIN_INPUT,
+    SEND_INPUT,
     DATAIN_INPUT,
-    VOCT_INPUT,
-    CLOCK_INPUT,
     NUM_INPUTS
   };
   enum OutputIds {
+    AUDIO_OUTPUT,
     BUSY_OUTPUT,
     DATACLK_OUTPUT,
     DATA_OUTPUT,
-    AUDIO_OUTPUT,
     NUM_OUTPUTS
   };
   enum LightIds {
-    BUSYINLIGHT_LIGHT,
-    AUDIOLIGHT_LIGHT,
     CLOCKLIGHT_LIGHT,
+    EMPTYLIGHT_LIGHT,
+    BUSYINLIGHT_LIGHT,
     NUM_LIGHTS
   };
 
-  GameOfLife() {
+  Mitosis() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     configParam(TUNE_PARAM, -1.f, 1.f, 0.f, "");
     clockUp = false;
@@ -154,7 +154,7 @@ struct GameOfLife : Module {
 };
 
 struct GolDisplay : OpaqueWidget {
-  GameOfLife *module = NULL;
+  Mitosis *module = NULL;
   float offsetX = 0.f;
   float offsetY = 0.f;
   float sizeX = 0.f;
@@ -226,11 +226,11 @@ void DrawableCell::onButton(const event::Button &e) {
   Widget::onButton(e);
 }
 
-struct GameOfLifeWidget : ModuleWidget {
-  GameOfLifeWidget(GameOfLife *module) {
+struct MitosisWidget : ModuleWidget {
+  MitosisWidget(Mitosis *module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(
-        asset::plugin(pluginInstance, "res/GameOfLife.svg")));
+    setPanel(
+        APP->window->loadSvg(asset::plugin(pluginInstance, "res/Mitosis.svg")));
 
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(
@@ -240,37 +240,38 @@ struct GameOfLifeWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(7.971, 110.281)), module, GameOfLife::TUNE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(17.855, 38.076)),
+                                                 module, Mitosis::TUNE_PARAM));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.956, 38.831)), module,
-                                             GameOfLife::SEND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.956, 64.231)), module,
-                                             GameOfLife::BUSYIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.869, 64.231)), module,
-                                             GameOfLife::DATACLKIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.869, 78.343)), module,
-                                             GameOfLife::DATAIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.971, 99.168)), module,
-                                             GameOfLife::VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.913, 110.28)), module,
-                                             GameOfLife::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(115.716, 5.151)), module,
+                                             Mitosis::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.219, 26.704)), module,
+                                             Mitosis::VOCT_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.637, 104.157)),
+                                             module, Mitosis::BUSYIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.137, 104.157)),
+                                             module, Mitosis::DATACLKIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.637, 113.333)),
+                                             module, Mitosis::SEND_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.046, 113.333)),
+                                             module, Mitosis::DATAIN_INPUT));
 
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(156.461, 5.151)),
+                                               module, Mitosis::AUDIO_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
+                                               module, Mitosis::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(11.956, 27.961)), module, GameOfLife::BUSY_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(35.869, 27.961)), module, GameOfLife::DATACLK_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(35.869, 38.831)), module, GameOfLife::DATA_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(39.854, 110.281)), module, GameOfLife::AUDIO_OUTPUT));
+        mm2px(Vec(20.137, 104.157)), module, Mitosis::DATACLK_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.137, 113.333)),
+                                               module, Mitosis::DATA_OUTPUT));
 
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(11.956, 78.343)), module, GameOfLife::BUSYINLIGHT_LIGHT));
+        mm2px(Vec(124.711, 5.151)), module, Mitosis::CLOCKLIGHT_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(39.854, 98.639)), module, GameOfLife::AUDIOLIGHT_LIGHT));
+        mm2px(Vec(38.011, 31.03)), module, Mitosis::EMPTYLIGHT_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(23.913, 99.168)), module, GameOfLife::CLOCKLIGHT_LIGHT));
+        mm2px(Vec(29.637, 113.333)), module, Mitosis::BUSYINLIGHT_LIGHT));
+
     // mm2px(Vec(110.0, 110.0))
     GolDisplay *display = new GolDisplay();
     display->module = module;
@@ -281,5 +282,4 @@ struct GameOfLifeWidget : ModuleWidget {
   }
 };
 
-Model *modelGameOfLife =
-    createModel<GameOfLife, GameOfLifeWidget>("GameOfLife");
+Model *modelMitosis = createModel<Mitosis, MitosisWidget>("Mitosis");

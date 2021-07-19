@@ -1,8 +1,8 @@
 #include "GameOfLifeGrid.hpp"
 #include "plugin.hpp"
 
-#ifndef GAMEOFLIFE_H
-#define GAMEOFLIFE_H
+#ifndef MITOSIS_H
+#define MITOSIS_H
 
 // todo inherit from cell also
 struct DrawableCell : Widget {
