@@ -95,16 +95,18 @@ float Mitosis::processAudio(std::set<Cell *> alive, float tune, float vOct) {
   float count = 0.f;
   // printf("time %f \n", time);
   for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end(); ++it) {
-    float modulation = ((float)((*it)->getY()) - (float)NUMCELLSY / 2) * tune /
-                       (float)NUMCELLSY;
-    // base frequency
-    float freq =
-        baseFreq *
-        pow(2.0f, (float)((*it)->getX() - NUMCELLSX / 2) / 12.0f + vOct);
-    freq = freq * (1.0f + modulation);
-    float partAudio = std::sin(2.0f * M_PI * freq * time);
-    audio += partAudio;
-    count += 1.f;
+    Cell *c = *it;
+    if (c->isAudible()) {
+      float modulation =
+          ((float)(c->getY()) - (float)NUMCELLSY / 2) * tune / (float)NUMCELLSY;
+      // base frequency
+      float freq = baseFreq *
+                   pow(2.0f, (float)(c->getX() - NUMCELLSX / 2) / 12.0f + vOct);
+      freq = freq * (1.0f + modulation);
+      float partAudio = std::sin(2.0f * M_PI * freq * time);
+      audio += partAudio;
+      count += 1.f;
+    }
   }
   if (count != 0.f) {
     audio = audio / count;
