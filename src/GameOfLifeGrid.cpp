@@ -2,11 +2,17 @@
 #include <algorithm>
 #include <cstdio>
 
-Cell::Cell(int x, int y, bool alive) : Coordinate(x, y) { this->alive = alive; }
+Cell::Cell(int x, int y, bool alive) : Coordinate(x, y) {
+  this->alive = alive;
+  rowMuted = false;
+  colMuted = false;
+}
 
 bool Cell::isAlive() { return alive; }
 
 void Cell::setAlive(bool isAlive) { alive = isAlive; }
+
+bool Cell::isAudible() { return !(rowMuted || colMuted); }
 
 GameOfLifeGrid::GameOfLifeGrid() {
   for (int i = 0; i < NUMCELLSX; i++) {

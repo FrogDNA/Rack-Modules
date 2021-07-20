@@ -12,6 +12,15 @@ struct DrawableCell : Widget {
   void onButton(const event::Button &e) override;
 };
 
+struct LineHeader : Widget {
+  int coordinate;
+  bool isRow;
+  bool isActivated;
+  LineHeader(int coordinate, bool isLine);
+  void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
+};
+
 struct GolDisplay : OpaqueWidget {
   Mitosis *module = NULL;
   float offsetX = 0.f;
