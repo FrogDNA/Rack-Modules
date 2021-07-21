@@ -33,17 +33,13 @@ struct Mitosis : Module {
   };
   enum OutputIds {
     AUDIO_OUTPUT,
+    EMPTY_OUTPUT,
     BUSY_OUTPUT,
     DATACLK_OUTPUT,
     DATA_OUTPUT,
     NUM_OUTPUTS
   };
-  enum LightIds {
-    CLOCKLIGHT_LIGHT,
-    EMPTYLIGHT_LIGHT,
-    BUSYINLIGHT_LIGHT,
-    NUM_LIGHTS
-  };
+  enum LightIds { CLOCKLIGHT_LIGHT, BUSYINLIGHT_LIGHT, NUM_LIGHTS };
 
   Mitosis();
   void process(const ProcessArgs &args) override;

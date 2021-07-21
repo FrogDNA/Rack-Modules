@@ -36,6 +36,7 @@ public:
   std::set<Cell *> getCurrentlyAlive();
   void setCellState(int x, int y, bool state);
   Cell *getCell(int x, int y);
+  bool isEmpty();
 };
 
 #endif

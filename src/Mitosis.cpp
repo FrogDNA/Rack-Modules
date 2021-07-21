@@ -81,6 +81,7 @@ void Mitosis::process(const ProcessArgs &args) {
   // outputs
   outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
                                                                      : 0.f);
+  outputs[EMPTY_OUTPUT].setVoltage(golGrid->isEmpty() ? 10.f : 0.f);
   outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
@@ -97,15 +98,12 @@ float Mitosis::processAudio(std::set<Cell *> alive, float tune, float vOct) {
   for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end(); ++it) {
     Cell *c = *it;
     if (c->isAudible()) {
-      float modulation =
-          ((float)(c->getY()) - (float)NUMCELLSY / 2) * tune / (float)NUMCELLSY;
-      // base frequency
-      float freq = baseFreq *
+      float nHarmonic = (float)c->getY() + 1.0f;
+      float freq = (float)nHarmonic * baseFreq *
                    pow(2.0f, (float)(c->getX() - NUMCELLSX / 2) / 12.0f + vOct);
-      freq = freq * (1.0f + modulation);
-      float partAudio = std::sin(2.0f * M_PI * freq * time);
+      float partAudio = std::sin(2.0f * M_PI * freq * time) / nHarmonic;
       audio += partAudio;
-      count += 1.f;
+      count += 1;
     }
   }
   if (count != 0.f) {
@@ -147,6 +145,8 @@ struct MitosisWidget : ModuleWidget {
 
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(136.038, 5.151)),
                                                module, Mitosis::AUDIO_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.963, 48.73)),
+                                               module, Mitosis::EMPTY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
                                                module, Mitosis::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
@@ -156,8 +156,6 @@ struct MitosisWidget : ModuleWidget {
 
     addChild(createLightCentered<MediumLight<RedLight>>(
         mm2px(Vec(104.288, 5.151)), module, Mitosis::CLOCKLIGHT_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(36.963, 48.73)), module, Mitosis::EMPTYLIGHT_LIGHT));
     addChild(createLightCentered<MediumLight<RedLight>>(
         mm2px(Vec(29.637, 113.333)), module, Mitosis::BUSYINLIGHT_LIGHT));
 

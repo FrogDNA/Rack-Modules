@@ -96,3 +96,5 @@ int GameOfLifeGrid::countAlive(std::set<Cell *> ca, Cell *c) {
 Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
 
 std::set<Cell *> GameOfLifeGrid::getCurrentlyAlive() { return currentlyAlive; }
+
+bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }

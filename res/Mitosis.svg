@@ -41,10 +41,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.2721355"
-     inkscape:cx="245.14384"
-     inkscape:cy="53.473925"
+     inkscape:cx="242.94326"
+     inkscape:cy="88.683091"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      units="mm"
      inkscape:snap-bbox="true"
@@ -152,6 +152,13 @@
        height="30.535801"
        x="6.0962811"
        y="93.561325" />
+    <rect
+       style="display:inline;fill:#c2c2c2;fill-opacity:1;stroke:#6e6e6e;stroke-width:0.230229;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:11;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="rect280-5-2"
+       width="13.063867"
+       height="13.140639"
+       x="30.344046"
+       y="44.378227" />
     <rect
        style="display:inline;fill:#c2c2c2;fill-opacity:1;stroke:#6e6e6e;stroke-width:0.262152;stroke-opacity:1"
        id="rect847"
@@ -562,8 +569,8 @@
        cy="48.7295"
        cx="36.963188"
        id="circle4956-9-3-5"
-       style="display:inline;vector-effect:none;fill:#ff00ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
-       inkscape:label="emptyLight" />
+       style="display:inline;vector-effect:none;fill:#0000ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="empty" />
     <circle
        style="display:inline;vector-effect:none;fill:#0000ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        id="circle4958-1"
