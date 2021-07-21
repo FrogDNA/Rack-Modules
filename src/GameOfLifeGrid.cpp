@@ -32,8 +32,10 @@ void GameOfLifeGrid::defaultInit() {
   setCellState(NUMCELLSX / 2, NUMCELLSY / 2, true);
   setCellState(NUMCELLSX / 2 - 1, NUMCELLSY / 2, true);
   setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2, true);
-  setCellState(NUMCELLSX / 2, NUMCELLSY / 2 + 2, true);
-  setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2 + 1, true);
+  setCellState(NUMCELLSX / 2 - 1, NUMCELLSY / 2 - 1, true);
+  setCellState(NUMCELLSX / 2, NUMCELLSY / 2 + 1, true);
+  setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2 - 1, true);
+  setCellState(NUMCELLSX / 2 + 2, NUMCELLSY / 2 - 1, true);
 }
 
 void GameOfLifeGrid::setCellState(int x, int y, bool state) {
