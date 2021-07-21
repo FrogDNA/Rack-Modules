@@ -1,3 +1,4 @@
+#include "DSP.hpp"
 #include "DataReceiver.hpp"
 #include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
@@ -7,21 +8,19 @@
 #define MITOSIS_H
 
 struct Mitosis : Module {
+  DSP *dsp = NULL;
   GameOfLifeGrid *golGrid = NULL;
   DataSender *dataSender = NULL;
   DataReceiver *dataReceiver = NULL;
   int baseFreqPos = 10;
-  float baseFreq = 440.0;              // todo modulate or configure this
-  float enveloppeTotalDuration = .02f; // todo modulate or configure this
-  float modulationPhase = .0f;         // todo modulate or configure this
-  float time = 0.f;
+  float enveloppeTotalDuration = .02f;
   float envelopeTime = 0.f;
   bool isEnvelopeActive = false;
   bool golUpdateArmed = true;
   bool clockUp;
   bool hasResetSend = true;
 
-  enum ParamIds { TUNE_PARAM, NUM_PARAMS };
+  enum ParamIds { PROPHASE_PARAM, METAPHASE_PARAM, NUM_PARAMS };
   enum InputIds {
     CLOCK_INPUT,
     VOCT_INPUT,

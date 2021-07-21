@@ -10,12 +10,15 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-  configParam(TUNE_PARAM, -1.f, 1.f, 0.f, "");
+  configParam(PROPHASE_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
+  configParam(METAPHASE_PARAM, 0.f, 1.f, 0.f,
+              "Center of the harmonics amplitude distribution");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
   golGrid->defaultInit();
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
+  dsp = new DSP();
   // for debugging
   // setbuf(stdout, NULL);
 }
@@ -27,12 +30,11 @@ void Mitosis::process(const ProcessArgs &args) {
   float busyIn = inputs[BUSYIN_INPUT].getVoltage();
   float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
   float dataIn = inputs[DATAIN_INPUT].getVoltage();
-  float tune = params[TUNE_PARAM].getValue();
-
+  float prophase_wideness = params[PROPHASE_PARAM].getValue();
+  float metaphase_center = params[METAPHASE_PARAM].getValue();
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
-  time += args.sampleTime;
   float am = 1.0f;
   // data receive
   dataReceiver->checkAndUpdateGrid(busyIn, clockIn, dataIn, golGrid);
@@ -56,7 +58,6 @@ void Mitosis::process(const ProcessArgs &args) {
     if (envelopeTime >= (enveloppeTotalDuration / 2.f) && golUpdateArmed) {
       golUpdateArmed = false;
       golGrid->update();
-      time = 0.f;
     }
     if (envelopeTime >= enveloppeTotalDuration) {
       isEnvelopeActive = false;
@@ -64,7 +65,9 @@ void Mitosis::process(const ProcessArgs &args) {
     }
   }
   // process audio
-  float audio = processAudio(golGrid->getCurrentlyAlive(), tune, vOct);
+  dsp->paramValues(golGrid->getCurrentlyAlive(), prophase_wideness,
+                   metaphase_center, vOct);
+  float audio = dsp->nextValue(args.sampleTime);
   // data send
   if (send > 3.5f && hasResetSend) {
     if (!dataSender->isTransferInProgress()) {
@@ -87,31 +90,6 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
   lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
 }
-/**
-returns float between 0 and 1
-todo use lookup tables to avoid computing sin each time
-*/
-float Mitosis::processAudio(std::set<Cell *> alive, float tune, float vOct) {
-  float audio = 0.f;
-  float count = 0.f;
-  // printf("time %f \n", time);
-  for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end(); ++it) {
-    Cell *c = *it;
-    if (c->isAudible()) {
-      float nHarmonic = (float)c->getY() + 1.0f;
-      float freq = (float)nHarmonic * baseFreq *
-                   pow(2.0f, (float)(c->getX() - NUMCELLSX / 2) / 12.0f + vOct);
-      float partAudio = std::sin(2.0f * M_PI * freq * time) / nHarmonic;
-      audio += partAudio;
-      count += 1;
-    }
-  }
-  if (count != 0.f) {
-    audio = audio / count;
-  }
-  // printf("audio return %f \n", audio);
-  return audio;
-}
 
 struct MitosisWidget : ModuleWidget {
   MitosisWidget(Mitosis *module) {
@@ -127,8 +105,10 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.444, 65.894)),
-                                                 module, Mitosis::TUNE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(
+        mm2px(Vec(14.697, 56.461)), module, Mitosis::PROPHASE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(
+        mm2px(Vec(30.742, 73.129)), module, Mitosis::METAPHASE_PARAM));
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(95.292, 5.151)), module,
                                              Mitosis::CLOCK_INPUT));
