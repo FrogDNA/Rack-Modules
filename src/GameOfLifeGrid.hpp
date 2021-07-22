@@ -3,6 +3,7 @@
 
 #include "Coordinate.hpp"
 #include "plugin.hpp"
+#include "robin_hood.h"
 #include <set>
 #include <unordered_map>
 
@@ -22,7 +23,7 @@ public:
 };
 
 class GameOfLifeGrid {
-  std::unordered_map<int, std::unordered_map<int, Cell *>> allCells;
+  robin_hood::unordered_map<int, std::unordered_map<int, Cell *>> allCells;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;
   std::set<Cell *> oldAlive;

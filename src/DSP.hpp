@@ -2,6 +2,7 @@
 #define DSP_H
 
 #include "GameOfLifeGrid.hpp"
+#include "robin_hood.h"
 #include <set>
 #include <unordered_map>
 
@@ -15,10 +16,11 @@ class DSP {
   float wideness = -1.f;
   float center = -1.f;
   float vOct = 0.f;
-  std::unordered_map<int, int> harmonics;
-  std::unordered_map<int, std::unordered_map<int, float>> frequences;
-  std::unordered_map<int, std::unordered_map<int, float>> phases;
-  std::unordered_map<int, std::unordered_map<int, float>> harmonicAmplitudes;
+  robin_hood::unordered_map<int, int> harmonics;
+  robin_hood::unordered_map<int, std::unordered_map<int, float>> frequences;
+  robin_hood::unordered_map<int, std::unordered_map<int, float>> phases;
+  robin_hood::unordered_map<int, std::unordered_map<int, float>>
+      harmonicAmplitudes;
 
 public:
   DSP();

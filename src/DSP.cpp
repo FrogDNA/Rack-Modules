@@ -43,11 +43,11 @@ void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
       int x = harmonic.first;
       int h = harmonic.second;
       int hCenter = floor(center * (h - 1));
+      float f = pow(2.0f, (float)(x - NUMCELLSX / 2) / 12.0f + vOct);
       // printf("harmonic %i %i \n", x, h);
       for (int i = 0; i < h; i++) {
         // harmonic i+1 of freq x
-        float freq = BASE_FREQ * (float)(i + 1) *
-                     pow(2.0f, (float)(x - NUMCELLSX / 2) / 12.0f + vOct);
+        float freq = BASE_FREQ * (float)(i + 1) * f;
         frequences[x][i] = freq;
         phases[x][i] = 0.f;
         if (wideness != 1.f && wideness != 0.f) {
