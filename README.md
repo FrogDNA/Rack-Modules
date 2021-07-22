@@ -6,7 +6,7 @@ A VCV Rack module that revolve around James Conway's "Game of Life".
 
 Left click on an alive cell to kill it. Left click on a dead cell to revive it.
 
-TODO : click on a row or column header to mute all cells in this row/column
+Click on a row or column header to mute all cells in this row/column
 
 ## AUDIO part:
 
@@ -14,7 +14,11 @@ Audio out is an audio output (-5V to 5V)
 
 Audio clock in regulates the Game of Life evolution. Each rising front triggers an update.
 
-WAY is how life finds a way ;) (the input port is 1V/oct, the parameter knob controls a fine tuning)
+1V/oct is what you would expect
+
+PROPHASE / METAPHASE control the relative amplitude of the harmonics (PROPHASE is the slope of the amplitude curve in the frequency domain, METAPHASE is the center of this curve).
+
+DEAD sends a high signal whenever two successive evolution steps yield the same result, i.e. no more evolution occurs. (oscillations of period 2 or more do not trigger this output).
 
 ## DATA part:
 
