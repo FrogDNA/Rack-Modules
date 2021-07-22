@@ -6,8 +6,10 @@
 #include <unordered_map>
 
 const float BASE_FREQ = 440.f;
+const int LUT_SIZE = 1000000;
 
 class DSP {
+  std::vector<float> lut;
   float time = 0.f; // todo use a phase accumulation
   std::set<Cell *> alive;
   float wideness = -1.f;

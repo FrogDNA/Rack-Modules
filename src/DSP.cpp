@@ -1,6 +1,11 @@
 #include "DSP.hpp"
 
-DSP::DSP() {}
+DSP::DSP() {
+  for (int i = 0; i < LUT_SIZE; i++) {
+    float phase = (float)i / (float)LUT_SIZE;
+    lut.push_back(std::sin(2.0f * M_PI * phase));
+  }
+}
 
 void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
                       float vOct) {
@@ -77,7 +82,8 @@ float DSP::nextValue(float sampleTime) {
       float amplitude = harmonicAmplitudes[x][i];
       phases[x][i] = phases[x][i] += frequences[x][i] * sampleTime;
       phases[x][i] -= floor(phases[x][i]);
-      float partAudio = amplitude * std::sin(2.0f * M_PI * phases[x][i]);
+      int phaseInt = floor(LUT_SIZE * phases[x][i]);
+      float partAudio = amplitude * lut[phaseInt];
       audio += partAudio;
       ampSum += amplitude;
       // printf("audio x %i , %i / %i %f \n", x, i, h, amplitude);
