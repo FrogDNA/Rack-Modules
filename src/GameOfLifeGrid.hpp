@@ -25,7 +25,7 @@ class GameOfLifeGrid {
   std::unordered_map<int, std::unordered_map<int, Cell *>> allCells;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;
-  int steps = 0;
+  std::set<Cell *> oldAlive;
 
   int countAlive(std::set<Cell *> ca, Cell *c);
 
@@ -33,10 +33,12 @@ public:
   GameOfLifeGrid();
   void defaultInit();
   void update();
+  void emptyGrid();
   std::set<Cell *> getCurrentlyAlive();
   void setCellState(int x, int y, bool state);
   Cell *getCell(int x, int y);
   bool isEmpty();
+  bool isStillEvolving(); // return false if old is same as current
 };
 
 #endif

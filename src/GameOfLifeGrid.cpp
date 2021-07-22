@@ -59,9 +59,9 @@ void GameOfLifeGrid::setCellState(int x, int y, bool state) {
 }
 
 void GameOfLifeGrid::update() {
-  ++steps;
   std::set<Cell *> wl = watchList;
   std::set<Cell *> ca = currentlyAlive;
+  oldAlive = currentlyAlive;
   watchList.clear();
   for (std::set<Cell *>::iterator it = wl.begin(); it != wl.end(); ++it) {
     Cell *c = *it;
@@ -73,6 +73,14 @@ void GameOfLifeGrid::update() {
     } else {
       setCellState(c->getX(), c->getY(), false);
     }
+  }
+}
+
+void GameOfLifeGrid::emptyGrid() {
+  std::set<Cell *> ca = currentlyAlive;
+  for (std::set<Cell *>::iterator it = ca.begin(); it != ca.end(); ++it) {
+    Cell *c = *it;
+    setCellState(c->getX(), c->getY(), false);
   }
 }
 
@@ -100,3 +108,5 @@ Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
 std::set<Cell *> GameOfLifeGrid::getCurrentlyAlive() { return currentlyAlive; }
 
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }
+
+bool GameOfLifeGrid::isStillEvolving() { return !(currentlyAlive == oldAlive); }

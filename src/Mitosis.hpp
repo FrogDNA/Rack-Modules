@@ -32,7 +32,7 @@ struct Mitosis : Module {
   };
   enum OutputIds {
     AUDIO_OUTPUT,
-    EMPTY_OUTPUT,
+    DEAD_OUTPUT,
     BUSY_OUTPUT,
     DATACLK_OUTPUT,
     DATA_OUTPUT,

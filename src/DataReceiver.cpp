@@ -6,6 +6,9 @@ DataReceiver::DataReceiver() {}
 void DataReceiver::checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
                                       GameOfLifeGrid *golGrid) {
   if (busyIn > 3.5f) {
+    if (lastBusyIn < 1.5f) {
+      golGrid->emptyGrid();
+    }
     if (clockIn > 3.5f && !risingEdgeReceived) {
       risingEdgeReceived = true;
       if (isXNext) {
@@ -23,4 +26,5 @@ void DataReceiver::checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
     isXNext = true;
     risingEdgeReceived = false;
   }
+  lastBusyIn = busyIn;
 }

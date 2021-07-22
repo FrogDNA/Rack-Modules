@@ -8,6 +8,7 @@
 class DataReceiver {
   int x = 0;
   int y = 0;
+  float lastBusyIn = 0.f;
   bool isXNext = true;
   bool risingEdgeReceived = false;
 

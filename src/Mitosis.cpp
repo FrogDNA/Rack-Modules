@@ -40,16 +40,19 @@ void Mitosis::process(const ProcessArgs &args) {
   dataReceiver->checkAndUpdateGrid(busyIn, clockIn, dataIn, golGrid);
   /* clock and AM. */
   /* todo check if AM really brings something */
-  if (clock > 3.5f) {
-    risingEdge = (clockUp == false ? true : false);
-    clockUp = true;
-  } else if (clock < 1.5f) {
-    clockUp = false;
-    risingEdge = false;
-  }
-  if (risingEdge && !isEnvelopeActive) {
-    envelopeTime = 0.f;
-    isEnvelopeActive = true;
+  if (busyIn < 1.5f) {
+    // ignore clock if busyIn is high
+    if (clock > 3.5f) {
+      risingEdge = (clockUp == false ? true : false);
+      clockUp = true;
+    } else if (clock < 1.5f) {
+      clockUp = false;
+      risingEdge = false;
+    }
+    if (risingEdge && !isEnvelopeActive) {
+      envelopeTime = 0.f;
+      isEnvelopeActive = true;
+    }
   }
   if (isEnvelopeActive) {
     envelopeTime += args.sampleTime;
@@ -65,8 +68,16 @@ void Mitosis::process(const ProcessArgs &args) {
     }
   }
   // process audio
-  dsp->paramValues(golGrid->getCurrentlyAlive(), prophase_wideness,
-                   metaphase_center, vOct);
+  // audible cells
+  std::set<Cell *> audible;
+  std::set<Cell *> alive = golGrid->getCurrentlyAlive();
+  // todo do it only when clock or click
+  for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end(); ++it) {
+    if ((*it)->isAlive()) {
+      audible.insert(*it);
+    }
+  }
+  dsp->paramValues(audible, prophase_wideness, metaphase_center, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // data send
   if (send > 3.5f && hasResetSend) {
@@ -84,7 +95,7 @@ void Mitosis::process(const ProcessArgs &args) {
   // outputs
   outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
                                                                      : 0.f);
-  outputs[EMPTY_OUTPUT].setVoltage(golGrid->isEmpty() ? 10.f : 0.f);
+  outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
   outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
@@ -126,7 +137,7 @@ struct MitosisWidget : ModuleWidget {
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(136.038, 5.151)),
                                                module, Mitosis::AUDIO_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.963, 48.73)),
-                                               module, Mitosis::EMPTY_OUTPUT));
+                                               module, Mitosis::DEAD_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
                                                module, Mitosis::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
