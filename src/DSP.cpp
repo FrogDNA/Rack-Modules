@@ -7,7 +7,7 @@ DSP::DSP() {
   }
 }
 
-void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
+void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
                       float vOct) {
   bool sthChanged = false;
   if (this->wideness != wideness || this->center != center ||
@@ -20,7 +20,7 @@ void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
   if (this->alive != alive) {
     this->alive = alive;
     harmonics.clear();
-    for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end();
+    for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
       Cell *c = *it;
       int x = c->getX();
@@ -36,38 +36,43 @@ void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
     // compute gaussian
     // todo when wideness is 0 or 1
     // printf("something changed \n");
-    harmonicAmplitudes.clear();
-    frequences.clear();
+    amplitudes.clear();
+    frequencies.clear();
     phases.clear();
     for (auto harmonic : harmonics) {
       int x = harmonic.first;
       int h = harmonic.second;
       int hCenter = floor(center * (h - 1));
       float f = pow(2.0f, (float)(x - NUMCELLSX / 2) / 12.0f + vOct);
+      std::vector<float> fx;
+      std::vector<float> px;
+      std::vector<float> ax;
       // printf("harmonic %i %i \n", x, h);
       for (int i = 0; i < h; i++) {
         // harmonic i+1 of freq x
         float freq = BASE_FREQ * (float)(i + 1) * f;
-        frequences[x][i] = freq;
-        phases[x][i] = 0.f;
+        fx.push_back(freq);
+        px.push_back(0.f);
+        float amplitude = 1.f;
         if (wideness != 1.f && wideness != 0.f) {
           float iNormalized = (h == 1 ? 0.f : (float)i / (float)(h - 1));
           float sd = wideness / (1.f - wideness);
           float var = (iNormalized - center);
-          float amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
+          amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
           /*printf("x %i i %i, %f %f %f %f \n", x, i, iNormalized, sd, var,
                  amplitude);*/
-          harmonicAmplitudes[x][i] = amplitude;
-        } else if (wideness == 1.f) {
-          harmonicAmplitudes[x][i] = 1.f;
-        } else { // wideness == 0
+        } else if (wideness == 0.f) { // wideness == 0
           if (hCenter == i) {
-            harmonicAmplitudes[x][i] = 1.f;
+            amplitude = 1.f;
           } else {
-            harmonicAmplitudes[x][i] = 0.f;
+            amplitude = 0.f;
           }
-        }
+        } // else wideness == 1 and amplitude == 1
+        ax.push_back(amplitude);
       }
+      frequencies.push_back(fx);
+      phases.push_back(px);
+      amplitudes.push_back(ax);
     }
   }
 }
@@ -75,14 +80,16 @@ void DSP::paramValues(std::set<Cell *> alive, float wideness, float center,
 float DSP::nextValue(float sampleTime) {
   float audio = 0.f;
   float ampSum = 0.f;
-  for (auto harmonic : harmonics) {
-    int x = harmonic.first;
-    int h = harmonic.second;
-    for (int i = 0; i < h; i++) {
-      float amplitude = harmonicAmplitudes[x][i];
-      phases[x][i] = phases[x][i] += frequences[x][i] * sampleTime;
-      phases[x][i] -= floor(phases[x][i]);
-      int phaseInt = floor(LUT_SIZE * phases[x][i]);
+  for (unsigned int x = 0; x < frequencies.size(); x++) {
+    std::vector<float> fx = frequencies[x];
+    std::vector<float> ax = amplitudes[x];
+    std::vector<float> px = phases[x];
+    for (unsigned int i = 0; i < fx.size(); i++) {
+      float amplitude = ax[i];
+      float frequency = fx[i];
+      px[i] = px[i] += frequency * sampleTime;
+      px[i] -= floor(px[i]);
+      int phaseInt = floor(LUT_SIZE * px[i]);
       float partAudio = amplitude * lut[phaseInt];
       audio += partAudio;
       ampSum += amplitude;

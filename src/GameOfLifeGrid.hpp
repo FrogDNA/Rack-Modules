@@ -23,7 +23,8 @@ public:
 };
 
 class GameOfLifeGrid {
-  robin_hood::unordered_map<int, std::unordered_map<int, Cell *>> allCells;
+  robin_hood::unordered_map<int, robin_hood::unordered_map<int, Cell *>>
+      allCells;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;
   std::set<Cell *> oldAlive;
@@ -36,6 +37,7 @@ public:
   void update();
   void emptyGrid();
   std::set<Cell *> getCurrentlyAlive();
+  std::vector<Cell *> getCurrentlyAliveV();
   void setCellState(int x, int y, bool state);
   Cell *getCell(int x, int y);
   bool isEmpty();

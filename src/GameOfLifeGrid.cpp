@@ -107,6 +107,11 @@ Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
 
 std::set<Cell *> GameOfLifeGrid::getCurrentlyAlive() { return currentlyAlive; }
 
+std::vector<Cell *> GameOfLifeGrid::getCurrentlyAliveV() {
+  std::vector<Cell *> v(currentlyAlive.begin(), currentlyAlive.end());
+  return v;
+}
+
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }
 
 bool GameOfLifeGrid::isStillEvolving() { return !(currentlyAlive == oldAlive); }

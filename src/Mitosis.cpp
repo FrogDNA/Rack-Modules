@@ -69,12 +69,13 @@ void Mitosis::process(const ProcessArgs &args) {
   }
   // process audio
   // audible cells
-  std::set<Cell *> audible;
-  std::set<Cell *> alive = golGrid->getCurrentlyAlive();
+  std::vector<Cell *> audible;
+  std::vector<Cell *> alive = golGrid->getCurrentlyAliveV();
   // todo do it only when clock or click
-  for (std::set<Cell *>::iterator it = alive.begin(); it != alive.end(); ++it) {
+  for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
+       ++it) {
     if ((*it)->isAlive()) {
-      audible.insert(*it);
+      audible.push_back(*it);
     }
   }
   dsp->paramValues(audible, prophase_wideness, metaphase_center, vOct);

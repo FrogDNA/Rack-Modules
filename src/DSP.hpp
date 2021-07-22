@@ -3,8 +3,6 @@
 
 #include "GameOfLifeGrid.hpp"
 #include "robin_hood.h"
-#include <set>
-#include <unordered_map>
 
 const float BASE_FREQ = 440.f;
 const int LUT_SIZE = 1000000;
@@ -12,19 +10,18 @@ const int LUT_SIZE = 1000000;
 class DSP {
   std::vector<float> lut;
   float time = 0.f; // todo use a phase accumulation
-  std::set<Cell *> alive;
+  std::vector<Cell *> alive;
   float wideness = -1.f;
   float center = -1.f;
   float vOct = 0.f;
   robin_hood::unordered_map<int, int> harmonics;
-  robin_hood::unordered_map<int, std::unordered_map<int, float>> frequences;
-  robin_hood::unordered_map<int, std::unordered_map<int, float>> phases;
-  robin_hood::unordered_map<int, std::unordered_map<int, float>>
-      harmonicAmplitudes;
+  std::vector<std::vector<float>> frequencies;
+  std::vector<std::vector<float>> phases;
+  std::vector<std::vector<float>> amplitudes;
 
 public:
   DSP();
-  void paramValues(std::set<Cell *> alive, float wideness, float center,
+  void paramValues(std::vector<Cell *> alive, float wideness, float center,
                    float vOct);
   float nextValue(float sampleTime);
 };
