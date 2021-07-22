@@ -89,11 +89,11 @@ float DSP::nextValue(float sampleTime) {
       float frequency = fx[i];
       px[i] = px[i] += frequency * sampleTime;
       px[i] -= floor(px[i]);
+      phases[x] = px;
       int phaseInt = floor(LUT_SIZE * px[i]);
       float partAudio = amplitude * lut[phaseInt];
       audio += partAudio;
       ampSum += amplitude;
-      // printf("audio x %i , %i / %i %f \n", x, i, h, amplitude);
     }
   }
   if (ampSum != 0.f) {
