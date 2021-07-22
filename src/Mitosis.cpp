@@ -74,7 +74,7 @@ void Mitosis::process(const ProcessArgs &args) {
   // todo do it only when clock or click
   for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
        ++it) {
-    if ((*it)->isAlive()) {
+    if ((*it)->isAudible()) {
       audible.push_back(*it);
     }
   }
