@@ -1,4 +1,4 @@
-#include "GolDisplay.hpp"
+#include "GoLDisplay.hpp"
 #include "GameOfLifeGrid.hpp"
 
 GolDisplay::GolDisplay() {
