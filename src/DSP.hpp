@@ -18,6 +18,9 @@ class DSP {
   std::vector<std::vector<float>> frequencies;
   std::vector<std::vector<float>> phases;
   std::vector<std::vector<float>> amplitudes;
+  std::vector<std::vector<float>> futureFrequencies;
+  std::vector<std::vector<float>> futurePhases;
+  std::vector<std::vector<float>> futureAmplitudes;
 
 public:
   DSP();

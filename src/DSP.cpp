@@ -9,16 +9,22 @@ DSP::DSP() {
 
 void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
                       float vOct) {
-  bool sthChanged = false;
-  if (this->wideness != wideness || this->center != center ||
-      this->vOct != vOct || this->alive != alive) {
-    sthChanged = true;
+  bool harmonicsChanged = false;
+  bool frequencyChanged = false;
+  bool amplitudesChanged = false;
+  if (this->vOct != vOct) {
+    this->vOct = vOct;
+    frequencyChanged = true;
   }
-  this->wideness = wideness;
-  this->center = center;
-  this->vOct = vOct;
+  if (this->wideness != wideness || this->center != center) {
+    this->wideness = wideness;
+    this->center = center;
+    amplitudesChanged = true;
+  }
+
   if (this->alive != alive) {
     this->alive = alive;
+    harmonicsChanged = true;
     harmonics.clear();
     for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
@@ -31,7 +37,12 @@ void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
       }
     }
   }
-  if (sthChanged) {
+  // todo instead of clear keep and prepare futurePhases futureAmplitudes
+  // futureFrequencies
+  // then trigger AM
+  // todo make computation less demanding so that parameters can be adjusted in
+  // real time
+  if (harmonicsChanged) {
     // todo recompute harmonics
     // compute gaussian
     // todo when wideness is 0 or 1
