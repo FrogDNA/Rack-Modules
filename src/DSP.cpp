@@ -6,11 +6,15 @@ void AMGenerator::stopAndReset() {
   running = false;
 }
 
+void AMGenerator::start() { running = true; }
+
 float AMGenerator::nextValue(float sampleTime) {
-  running = true;
-  phase = phase + sampleTime / ENVELOPE_DURATION;
-  phase = phase - floor(phase);
-  float am = 0.5f + 0.5f * std::cos(phase * 2.f * M_PI / ENVELOPE_DURATION);
+  float am = 1.f;
+  if (running) {
+    phase = phase + sampleTime / ENVELOPE_DURATION;
+    phase = phase - floor(phase);
+    am = 0.5f + 0.5f * std::cos(phase * 2.f * M_PI / ENVELOPE_DURATION);
+  }
   return am;
 }
 bool AMGenerator::isRunning() { return running; }
@@ -91,8 +95,6 @@ void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
             float sd = wideness / (1.f - wideness);
             float var = (iNormalized - center);
             amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
-            /*printf("x %i i %i, %f %f %f %f \n", x, i, iNormalized, sd, var,
-                   amplitude);*/
           } else if (wideness == 0.f) { // wideness == 0
             if (hCenter == j) {
               amplitude = 1.f;

@@ -14,6 +14,7 @@ class AMGenerator {
 
 public:
   AMGenerator();
+  void start();
   void stopAndReset();
   bool isRunning();
   float nextValue(float sampleTime);
@@ -28,6 +29,7 @@ class DSP {
   float center = -1.f;
   float vOct = 0.f;
   std::vector<int> harmonics;
+  std::vector<int> futureHarmonics;
   std::vector<std::vector<float>> frequencies;
   std::vector<std::vector<float>> phases;
   std::vector<std::vector<float>> amplitudes;
