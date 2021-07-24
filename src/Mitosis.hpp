@@ -13,7 +13,6 @@ struct Mitosis : Module {
   DataSender *dataSender = NULL;
   DataReceiver *dataReceiver = NULL;
   int baseFreqPos = 10;
-  float enveloppeTotalDuration = .02f;
   float envelopeTime = 0.f;
   bool isEnvelopeActive = false;
   bool golUpdateArmed = true;

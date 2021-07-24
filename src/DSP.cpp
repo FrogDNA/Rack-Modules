@@ -1,12 +1,33 @@
 #include "DSP.hpp"
 
+AMGenerator::AMGenerator() {}
+void AMGenerator::stopAndReset() {
+  phase = 0.f;
+  running = false;
+}
+
+float AMGenerator::nextValue(float sampleTime) {
+  running = true;
+  phase = phase + sampleTime / ENVELOPE_DURATION;
+  phase = phase - floor(phase);
+  float am = 0.5f + 0.5f * std::cos(phase * 2.f * M_PI / ENVELOPE_DURATION);
+  return am;
+}
+bool AMGenerator::isRunning() { return running; }
+
 DSP::DSP() {
+  am = new AMGenerator();
   for (int i = 0; i < LUT_SIZE; i++) {
     float phase = (float)i / (float)LUT_SIZE;
     lut.push_back(std::sin(2.0f * M_PI * phase));
   }
+  harmonics.reserve(NUMCELLSX);
+  for (int i = 0; i < NUMCELLSX; ++i) {
+    harmonics[i] = 0;
+  }
 }
 
+// todo change to split between the three
 void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
                       float vOct) {
   bool harmonicsChanged = false;
@@ -26,64 +47,67 @@ void DSP::paramValues(std::vector<Cell *> alive, float wideness, float center,
     this->alive = alive;
     harmonicsChanged = true;
     harmonics.clear();
+    harmonics.reserve(NUMCELLSX);
+    for (int i = 0; i < NUMCELLSX; ++i) {
+      harmonics[i] = 0;
+    }
     for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
       Cell *c = *it;
       int x = c->getX();
-      if (harmonics.find(c->getX()) == harmonics.end()) {
-        harmonics[x] = 1;
-      } else {
-        ++(harmonics[x]);
-      }
+      ++(harmonics[x]);
     }
   }
   // todo instead of clear keep and prepare futurePhases futureAmplitudes
-  // futureFrequencies
+  // futureFrequencies ???
+  // todo trigger AM instead of resetting phases to remove crackling
   // then trigger AM
-  // todo make computation less demanding so that parameters can be adjusted in
-  // real time
-  if (harmonicsChanged) {
-    // todo recompute harmonics
-    // compute gaussian
-    // todo when wideness is 0 or 1
-    // printf("something changed \n");
+  if (harmonicsChanged || amplitudesChanged || frequencyChanged) {
     amplitudes.clear();
     frequencies.clear();
-    phases.clear();
-    for (auto harmonic : harmonics) {
-      int x = harmonic.first;
-      int h = harmonic.second;
-      int hCenter = floor(center * (h - 1));
-      float f = pow(2.0f, (float)(x - NUMCELLSX / 2) / 12.0f + vOct);
-      std::vector<float> fx;
-      std::vector<float> px;
-      std::vector<float> ax;
-      // printf("harmonic %i %i \n", x, h);
-      for (int i = 0; i < h; i++) {
-        // harmonic i+1 of freq x
-        float freq = BASE_FREQ * (float)(i + 1) * f;
-        fx.push_back(freq);
-        px.push_back(0.f);
-        float amplitude = 1.f;
-        if (wideness != 1.f && wideness != 0.f) {
-          float iNormalized = (h == 1 ? 0.f : (float)i / (float)(h - 1));
-          float sd = wideness / (1.f - wideness);
-          float var = (iNormalized - center);
-          amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
-          /*printf("x %i i %i, %f %f %f %f \n", x, i, iNormalized, sd, var,
-                 amplitude);*/
-        } else if (wideness == 0.f) { // wideness == 0
-          if (hCenter == i) {
-            amplitude = 1.f;
-          } else {
-            amplitude = 0.f;
+    if (harmonicsChanged) {
+      phases.clear();
+    }
+
+    for (int i = 0; i < NUMCELLSX; ++i) {
+      if (harmonics[i] != 0) {
+        int h = harmonics[i];
+        int hCenter = floor(center * (h - 1));
+        float f = pow(2.0f, (float)(i - NUMCELLSX / 2) / 12.0f + vOct);
+        std::vector<float> fx;
+        std::vector<float> px;
+        std::vector<float> ax;
+        // printf("harmonic %i %i \n", x, h);
+        for (int j = 0; j < h; j++) {
+          // harmonic i+1 of freq x
+          float freq = BASE_FREQ * (float)(j + 1) * f;
+          fx.push_back(freq);
+          if (harmonicsChanged) {
+            px.push_back(0.f);
           }
-        } // else wideness == 1 and amplitude == 1
-        ax.push_back(amplitude);
+          float amplitude = 1.f;
+          if (wideness != 1.f && wideness != 0.f) {
+            float iNormalized = (h == 1 ? 0.f : (float)j / (float)(h - 1));
+            float sd = wideness / (1.f - wideness);
+            float var = (iNormalized - center);
+            amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
+            /*printf("x %i i %i, %f %f %f %f \n", x, i, iNormalized, sd, var,
+                   amplitude);*/
+          } else if (wideness == 0.f) { // wideness == 0
+            if (hCenter == j) {
+              amplitude = 1.f;
+            } else {
+              amplitude = 0.f;
+            }
+          } // else wideness == 1 and amplitude == 1
+          ax.push_back(amplitude);
+        }
+        frequencies.push_back(fx);
+        if (harmonicsChanged) {
+          phases.push_back(px);
+        }
+        amplitudes.push_back(ax);
       }
-      frequencies.push_back(fx);
-      phases.push_back(px);
-      amplitudes.push_back(ax);
     }
   }
 }

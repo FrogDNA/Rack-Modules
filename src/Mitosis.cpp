@@ -49,22 +49,8 @@ void Mitosis::process(const ProcessArgs &args) {
       clockUp = false;
       risingEdge = false;
     }
-    if (risingEdge && !isEnvelopeActive) {
-      envelopeTime = 0.f;
-      isEnvelopeActive = true;
-    }
-  }
-  if (isEnvelopeActive) {
-    envelopeTime += args.sampleTime;
-    am = 0.5f +
-         0.5f * std::cos(envelopeTime * 2.f * M_PI / enveloppeTotalDuration);
-    if (envelopeTime >= (enveloppeTotalDuration / 2.f) && golUpdateArmed) {
-      golUpdateArmed = false;
+    if (risingEdge) {
       golGrid->update();
-    }
-    if (envelopeTime >= enveloppeTotalDuration) {
-      isEnvelopeActive = false;
-      golUpdateArmed = true;
     }
   }
   // process audio

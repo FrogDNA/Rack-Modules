@@ -4,17 +4,30 @@
 #include "GameOfLifeGrid.hpp"
 #include "robin_hood.h"
 
+const float ENVELOPE_DURATION = 0.2f;
 const float BASE_FREQ = 440.f;
 const int LUT_SIZE = 1000000;
 
+class AMGenerator {
+  float phase = 0.f;
+  bool running = false;
+
+public:
+  AMGenerator();
+  void stopAndReset();
+  bool isRunning();
+  float nextValue(float sampleTime);
+};
+
 class DSP {
+  AMGenerator *am = NULL;
   std::vector<float> lut;
   float time = 0.f; // todo use a phase accumulation
   std::vector<Cell *> alive;
   float wideness = -1.f;
   float center = -1.f;
   float vOct = 0.f;
-  robin_hood::unordered_map<int, int> harmonics;
+  std::vector<int> harmonics;
   std::vector<std::vector<float>> frequencies;
   std::vector<std::vector<float>> phases;
   std::vector<std::vector<float>> amplitudes;
