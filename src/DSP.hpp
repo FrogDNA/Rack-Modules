@@ -8,12 +8,12 @@ const float ENVELOPE_DURATION = 0.2f;
 const float BASE_FREQ = 440.f;
 const int LUT_SIZE = 1000000;
 
-class AMGenerator {
+class EnvelopeGenerator {
   float phase = 0.f;
   bool running = false;
 
 public:
-  AMGenerator();
+  EnvelopeGenerator();
   void start();
   void stopAndReset();
   bool isRunning();
@@ -21,7 +21,7 @@ public:
 };
 
 class DSP {
-  AMGenerator *am = NULL;
+  EnvelopeGenerator *eg = NULL;
   std::vector<float> lut;
   float time = 0.f; // todo use a phase accumulation
   std::vector<Cell *> alive;

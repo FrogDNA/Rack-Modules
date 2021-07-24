@@ -1,14 +1,15 @@
 #include "DSP.hpp"
 
-AMGenerator::AMGenerator() {}
-void AMGenerator::stopAndReset() {
+EnvelopeGenerator::EnvelopeGenerator() {}
+
+void EnvelopeGenerator::stopAndReset() {
   phase = 0.f;
   running = false;
 }
 
-void AMGenerator::start() { running = true; }
+void EnvelopeGenerator::start() { running = true; }
 
-float AMGenerator::nextValue(float sampleTime) {
+float EnvelopeGenerator::nextValue(float sampleTime) {
   float am = 1.f;
   if (running) {
     phase = phase + sampleTime / ENVELOPE_DURATION;
@@ -17,10 +18,10 @@ float AMGenerator::nextValue(float sampleTime) {
   }
   return am;
 }
-bool AMGenerator::isRunning() { return running; }
+bool EnvelopeGenerator::isRunning() { return running; }
 
 DSP::DSP() {
-  am = new AMGenerator();
+  eg = new EnvelopeGenerator();
   for (int i = 0; i < LUT_SIZE; i++) {
     float phase = (float)i / (float)LUT_SIZE;
     lut.push_back(std::sin(2.0f * M_PI * phase));
