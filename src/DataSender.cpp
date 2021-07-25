@@ -6,7 +6,7 @@ DataSender::DataSender() {
   sendX = true;
 }
 
-void DataSender::init(std::set<Cell *> aliveCells) {
+void DataSender::init(std::vector<Cell *> aliveCells) {
   // do not init if a transfer is in progress
   if (!transferInProgress) {
     this->aliveCells = aliveCells;

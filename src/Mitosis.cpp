@@ -35,7 +35,6 @@ void Mitosis::process(const ProcessArgs &args) {
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
-  float am = 1.0f;
   // data receive
   dataReceiver->checkAndUpdateGrid(busyIn, clockIn, dataIn, golGrid);
   /* clock and AM. */
@@ -54,22 +53,16 @@ void Mitosis::process(const ProcessArgs &args) {
     }
   }
   // process audio
-  // audible cells
-  std::vector<Cell *> audible;
-  std::vector<Cell *> alive = golGrid->getCurrentlyAliveV();
+  GridState gs = golGrid->getCurrentlyAlive();
+  golGrid->resetModified();
   // todo do it only when clock or click
-  for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
-       ++it) {
-    if ((*it)->isAudible()) {
-      audible.push_back(*it);
-    }
-  }
-  dsp->paramValues(audible, prophase_wideness, metaphase_center, vOct);
+  dsp->paramValues(gs, prophase_wideness, metaphase_center, vOct);
   float audio = dsp->nextValue(args.sampleTime);
+  // printf("audioReturn %f \n", audio);
   // data send
   if (send > 3.5f && hasResetSend) {
     if (!dataSender->isTransferInProgress()) {
-      dataSender->init(golGrid->getCurrentlyAlive());
+      dataSender->init(golGrid->getCurrentlyAlive().currentlyAlive);
       hasResetSend = false;
     }
   }
@@ -85,7 +78,7 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
   outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
   outputs[DATA_OUTPUT].setVoltage(dataOut);
-  outputs[AUDIO_OUTPUT].setVoltage(5.f * am * audio);
+  outputs[AUDIO_OUTPUT].setVoltage(5.f * audio);
   lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
 }
 

@@ -42,9 +42,13 @@ void GameOfLifeGrid::setCellState(int x, int y, bool state) {
   if (state) {
     // becomes alive
     currentlyAlive.insert(allCells[x][y]);
+    added.insert(allCells[x][y]);
+    // we could check if it was previously in removed, but the logic will be
+    // different to save time
   } else {
     // becomes dead
     currentlyAlive.erase(allCells[x][y]);
+    removed.insert(allCells[x][y]);
   }
   // set cell state
   allCells[x][y]->setAlive(state);
@@ -105,11 +109,16 @@ int GameOfLifeGrid::countAlive(std::set<Cell *> ca, Cell *c) {
 
 Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
 
-std::set<Cell *> GameOfLifeGrid::getCurrentlyAlive() { return currentlyAlive; }
-
-std::vector<Cell *> GameOfLifeGrid::getCurrentlyAliveV() {
+GridState GameOfLifeGrid::getCurrentlyAlive() {
   std::vector<Cell *> v(currentlyAlive.begin(), currentlyAlive.end());
-  return v;
+  std::vector<Cell *> a(added.begin(), added.end());
+  std::vector<Cell *> r(removed.begin(), removed.end());
+  return GridState(v, a, r);
+}
+
+void GameOfLifeGrid::resetModified() {
+  added.clear();
+  removed.clear();
 }
 
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }

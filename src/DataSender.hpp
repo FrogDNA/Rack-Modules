@@ -7,8 +7,8 @@
 const int SEND_SPEED = 1000;
 
 class DataSender {
-  std::set<Cell *> aliveCells;
-  std::set<Cell *>::iterator itr;
+  std::vector<Cell *> aliveCells;
+  std::vector<Cell *>::iterator itr;
   bool transferInProgress = false;
   bool sendX = true;
   float clock = 0.f;
@@ -18,7 +18,7 @@ class DataSender {
 
 public:
   DataSender();
-  void init(std::set<Cell *> aliveCells);
+  void init(std::vector<Cell *> aliveCells);
   void next();
   float getClock();
   float getData();

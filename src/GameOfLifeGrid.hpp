@@ -22,12 +22,26 @@ public:
   bool isAudible();
 };
 
+struct GridState {
+  std::vector<Cell *> currentlyAlive;
+  std::vector<Cell *> added;
+  std::vector<Cell *> removed;
+  GridState(std::vector<Cell *> v, std::vector<Cell *> a,
+            std::vector<Cell *> r) {
+    this->currentlyAlive = v;
+    this->added = a;
+    this->removed = r;
+  }
+};
+
 class GameOfLifeGrid {
   robin_hood::unordered_map<int, robin_hood::unordered_map<int, Cell *>>
       allCells;
+  std::set<Cell *> oldAlive;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;
-  std::set<Cell *> oldAlive;
+  std::set<Cell *> added;
+  std::set<Cell *> removed;
 
   int countAlive(std::set<Cell *> ca, Cell *c);
 
@@ -36,8 +50,8 @@ public:
   void defaultInit();
   void update();
   void emptyGrid();
-  std::set<Cell *> getCurrentlyAlive();
-  std::vector<Cell *> getCurrentlyAliveV();
+  GridState getCurrentlyAlive();
+  void resetModified();
   void setCellState(int x, int y, bool state);
   Cell *getCell(int x, int y);
   bool isEmpty();

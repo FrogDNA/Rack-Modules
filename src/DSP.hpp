@@ -4,43 +4,45 @@
 #include "GameOfLifeGrid.hpp"
 #include "robin_hood.h"
 
-const float ENVELOPE_DURATION = 0.2f;
+const float ENVELOPE_DURATION = 0.1f;
 const float BASE_FREQ = 440.f;
-const int LUT_SIZE = 1000000;
+const int SIN_LUT_SIZE = 1000000;
 
-class EnvelopeGenerator {
+class AudibleCell {
+
+  float baseFrequency = 440.0f;
+  float amplitude = 1.0f;
+  float envelope = 1.0f;
   float phase = 0.f;
-  bool running = false;
+
+  void nextEnvelopeValue(float sampleTime);
 
 public:
-  EnvelopeGenerator();
-  void start();
-  void stopAndReset();
-  bool isRunning();
-  float nextValue(float sampleTime);
+  bool raising = true;
+  bool decaying = false;
+  float envelopePhase = 0.f;
+  float x = 0.f;
+  float harmonicNumber = 1.f;
+  AudibleCell(float x, float baseFrequency, float harmonicNumber,
+              float amplitude);
+  float nextValue(float sampleTime, float vOct);
+  float currentAmplitude();
 };
 
 class DSP {
-  EnvelopeGenerator *eg = NULL;
-  std::vector<float> lut;
-  float time = 0.f; // todo use a phase accumulation
+  std::vector<float> baseFreqLut;
   std::vector<Cell *> alive;
+  std::vector<AudibleCell *> audibles;
+  std::vector<AudibleCell *> oldAudibles;
   float wideness = -1.f;
   float center = -1.f;
   float vOct = 0.f;
-  std::vector<int> harmonics;
-  std::vector<int> futureHarmonics;
-  std::vector<std::vector<float>> frequencies;
-  std::vector<std::vector<float>> phases;
-  std::vector<std::vector<float>> amplitudes;
-  std::vector<std::vector<float>> futureFrequencies;
-  std::vector<std::vector<float>> futurePhases;
-  std::vector<std::vector<float>> futureAmplitudes;
 
 public:
+  static std::vector<float> sinLut;
+  static std::vector<float> initSinLut();
   DSP();
-  void paramValues(std::vector<Cell *> alive, float wideness, float center,
-                   float vOct);
+  void paramValues(GridState gs, float wideness, float center, float vOct);
   float nextValue(float sampleTime);
 };
 

@@ -12,9 +12,6 @@ struct Mitosis : Module {
   GameOfLifeGrid *golGrid = NULL;
   DataSender *dataSender = NULL;
   DataReceiver *dataReceiver = NULL;
-  int baseFreqPos = 10;
-  float envelopeTime = 0.f;
-  bool isEnvelopeActive = false;
   bool golUpdateArmed = true;
   bool clockUp;
   bool hasResetSend = true;
