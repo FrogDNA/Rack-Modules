@@ -19,39 +19,17 @@ AudibleCell::AudibleCell(float x, float baseFrequency, float harmonicNumber,
   this->amplitude = amplitude;
 }
 
-float AudibleCell::nextValue(float sampleTime, float vOct) {
-  nextEnvelopeValue(sampleTime);
-  float f = baseFrequency * harmonicNumber * pow(2.0, vOct);
+float AudibleCell::nextValue(float sampleTime) {
+  float f = baseFrequency * harmonicNumber * freqMultiplicator;
   phase = phase + f * sampleTime;
   phase = phase - floor(phase);
   int phaseInt = floor(SIN_LUT_SIZE * phase);
   float rawVal = sinLut[phaseInt];
-  float amp = amplitude * envelope;
+  float amp = amplitude;
   return rawVal * amp;
 }
 
-void AudibleCell::nextEnvelopeValue(float sampleTime) {
-  if ((raising && !decaying) || (!raising && decaying)) {
-    envelopePhase = envelopePhase + (sampleTime / ENVELOPE_DURATION);
-    if (raising) {
-      if (envelopePhase > 1.0f) {
-        envelope = 1.0f;
-        raising = false;
-      } else {
-        envelope = std::sin(M_PI * envelopePhase / 2.0f);
-      }
-    } else { // decaying
-      if (envelopePhase > 1.0f) {
-        envelope = 0.0f;
-        decaying = false;
-      } else {
-        envelope = 1 - std::sin(M_PI * envelopePhase / 2.0f);
-      }
-    }
-  }
-}
-
-float AudibleCell::currentAmplitude() { return amplitude * envelope; }
+float AudibleCell::currentAmplitude() { return amplitude; }
 
 DSP::DSP() {
   baseFreqLut.reserve(NUMCELLSX);
@@ -63,9 +41,21 @@ DSP::DSP() {
 // todo change to split between the three
 void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
-  std::vector<Cell *> alive = state.currentlyAlive;
+  // todo take into account muted rows
+  std::vector<Cell *> alive;
+  for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
+       it != state.currentlyAlive.end(); ++it) {
+    if ((*it)->isAudible()) {
+      alive.push_back(*it);
+    }
+  }
   if (this->vOct != vOct) {
     this->vOct = vOct;
+    float mult = pow(2.0f, vOct);
+    for (std::vector<AudibleCell *>::iterator it = audibles.begin();
+         it != audibles.end(); ++it) {
+      (*it)->freqMultiplicator = mult;
+    }
   }
   if (this->wideness != wideness || this->roundness != roundness ||
       this->limitH != limitH) {
@@ -89,12 +79,6 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
 
   if (this->alive != alive) {
     this->alive = alive;
-    oldAudibles = audibles;
-    for (std::vector<AudibleCell *>::iterator it = oldAudibles.begin();
-         it != oldAudibles.end(); ++it) {
-      (*it)->decaying = true;
-      (*it)->envelopePhase = 0.f;
-    }
     audibles.clear();
     std::vector<int> harmonics;
     harmonics.reserve(NUMCELLSX);
@@ -122,16 +106,10 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
 float DSP::nextValue(float sampleTime) {
   float audio = 0.f;
   float ampSum = 0.f;
-  for (std::vector<AudibleCell *>::iterator it = oldAudibles.begin();
-       it != oldAudibles.end(); ++it) {
-    audio += (*it)->nextValue(sampleTime, vOct);
-    ampSum += (*it)->currentAmplitude();
-  }
   for (std::vector<AudibleCell *>::iterator it = audibles.begin();
        it != audibles.end(); ++it) {
-    float val = (*it)->nextValue(sampleTime, vOct);
+    float val = (*it)->nextValue(sampleTime);
     float amp = (*it)->currentAmplitude();
-    // printf("val %f amp %f \n", val, amp);
     audio += val;
     ampSum += amp;
   }

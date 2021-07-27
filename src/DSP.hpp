@@ -10,19 +10,15 @@ const int SIN_LUT_SIZE = 1000000;
 
 class AudibleCell {
 
-  void nextEnvelopeValue(float sampleTime);
-  bool raising = true;
-  bool decaying = false;
-  float envelopePhase = 0.f;
   float x = 0.f;
   float harmonicNumber = 1.f;
   float baseFrequency = 440.0f;
   float amplitude = 1.0f;
-  float envelope = 1.0f;
   float phase = 0.f;
+  float freqMultiplicator = 1.0f;
   AudibleCell(float x, float baseFrequency, float harmonicNumber,
               float amplitude);
-  float nextValue(float sampleTime, float vOct);
+  float nextValue(float sampleTime);
   float currentAmplitude();
   friend class DSP;
 };
@@ -31,7 +27,6 @@ class DSP {
   std::vector<float> baseFreqLut;
   std::vector<Cell *> alive;
   std::vector<AudibleCell *> audibles;
-  std::vector<AudibleCell *> oldAudibles;
   float wideness = -1.f;
   float roundness = -1.f;
   float limitH = -1.f;
