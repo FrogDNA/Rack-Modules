@@ -10,9 +10,10 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-  configParam(PROPHASE_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
-  configParam(METAPHASE_PARAM, 0.f, 1.f, 0.f,
-              "Center of the harmonics amplitude distribution");
+  configParam(TEMP_PARAM, 1.f, (float)NUMCELLSX, 1.f,
+              "Wideness of the harmonics range");
+  configParam(FOOD_PARAM, 0.f, 1.f, 0.5f,
+              "Roundness of the harmonic amplitude decay function");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
   golGrid->defaultInit();
@@ -30,8 +31,8 @@ void Mitosis::process(const ProcessArgs &args) {
   float busyIn = inputs[BUSYIN_INPUT].getVoltage();
   float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
   float dataIn = inputs[DATAIN_INPUT].getVoltage();
-  float prophase_wideness = params[PROPHASE_PARAM].getValue();
-  float metaphase_center = params[METAPHASE_PARAM].getValue();
+  float temp_wideness = params[TEMP_PARAM].getValue();
+  float food_roundness = params[FOOD_PARAM].getValue();
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
@@ -56,7 +57,7 @@ void Mitosis::process(const ProcessArgs &args) {
   GridState gs = golGrid->getCurrentlyAlive();
   golGrid->resetModified();
   // todo do it only when clock or click
-  dsp->paramValues(gs, prophase_wideness, metaphase_center, vOct);
+  dsp->paramValues(gs, temp_wideness, food_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // printf("audioReturn %f \n", audio);
   // data send
@@ -96,10 +97,10 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(14.697, 56.461)), module, Mitosis::PROPHASE_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(30.742, 73.129)), module, Mitosis::METAPHASE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.368, 56.297)),
+                                                 module, Mitosis::TEMP_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.505, 71.012)),
+                                                 module, Mitosis::FOOD_PARAM));
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(95.292, 5.151)), module,
                                              Mitosis::CLOCK_INPUT));

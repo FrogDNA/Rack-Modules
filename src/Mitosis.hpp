@@ -16,7 +16,7 @@ struct Mitosis : Module {
   bool clockUp;
   bool hasResetSend = true;
 
-  enum ParamIds { PROPHASE_PARAM, METAPHASE_PARAM, NUM_PARAMS };
+  enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
   enum InputIds {
     CLOCK_INPUT,
     VOCT_INPUT,

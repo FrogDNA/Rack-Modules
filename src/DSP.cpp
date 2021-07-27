@@ -61,16 +61,30 @@ DSP::DSP() {
 }
 
 // todo change to split between the three
-void DSP::paramValues(GridState state, float wideness, float center,
+void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
   std::vector<Cell *> alive = state.currentlyAlive;
   if (this->vOct != vOct) {
     this->vOct = vOct;
   }
-  if (this->wideness != wideness || this->center != center) {
+  if (this->wideness != wideness || this->roundness != roundness ||
+      this->limitH != limitH) {
     this->wideness = wideness;
-    this->center = center;
-    // todo modify those parameters for cells on the fly
+    this->roundness = roundness;
+    this->limitH = limitH;
+    // todo put into separate function
+    // todo do the same with oldAudibles
+    for (std::vector<AudibleCell *>::iterator it = audibles.begin();
+         it != audibles.end(); ++it) {
+      AudibleCell *c = *it;
+      float numHarmonic = c->harmonicNumber;
+      // amplitude
+      float iNormalized = (numHarmonic - 1) / (wideness * wideness);
+      float roundness_adapt = pow(100.f, 0.5f - roundness);
+      float amplitude =
+          std::max(1.f - (float)pow(iNormalized, roundness_adapt), 0.f);
+      c->amplitude = amplitude;
+    }
   }
 
   if (this->alive != alive) {
@@ -92,30 +106,15 @@ void DSP::paramValues(GridState state, float wideness, float center,
       Cell *c = *it;
       int x = c->getX();
       ++(harmonics[x]);
-    }
-    for (int x = 0; x < NUMCELLSX; ++x) {
-      int h = harmonics[x];
-      int hCenter = floor(center * (h - 1));
       float baseFrequency = baseFreqLut[x];
       float numHarmonic = harmonics[x];
       // amplitude
-      for (int j = 0; j < h; ++j) {
-        float amplitude = 1.f;
-        if (wideness != 1.f && wideness != 0.f) {
-          float iNormalized = (h == 1 ? 0.f : (float)j / (float)(h - 1));
-          float sd = wideness / (1.f - wideness);
-          float var = (iNormalized - center);
-          amplitude = std::exp(-(var * var) / (2.0 * sd * sd));
-        } else if (wideness == 0.f) { // wideness == 0
-          if (hCenter == j) {
-            amplitude = 1.f;
-          } else {
-            amplitude = 0.f;
-          }
-        } // else wideness == 1 and amplitude == 1
-        audibles.push_back(
-            new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
-      }
+      float iNormalized = (numHarmonic - 1) / (wideness * wideness);
+      float roundness_adapt = pow(10.f, roundness - 0.5f);
+      float amplitude =
+          std::max(1.f - (float)pow(iNormalized, roundness_adapt), 0.f);
+      audibles.push_back(
+          new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
     }
   }
 }
