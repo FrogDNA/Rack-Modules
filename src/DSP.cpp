@@ -41,6 +41,8 @@ DSP::DSP() {
 // todo change to split between the three
 void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
+  roundness = pow(10.f, roundness - 0.5f);
+  wideness = wideness * (float)(NUMCELLSY - 1) + 1.f;
   // todo take into account muted rows
   std::vector<Cell *> alive;
   for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
@@ -69,10 +71,7 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
       AudibleCell *c = *it;
       float numHarmonic = c->harmonicNumber;
       // amplitude
-      float iNormalized = (numHarmonic - 1) / (wideness * wideness);
-      float roundness_adapt = pow(100.f, 0.5f - roundness);
-      float amplitude =
-          std::max(1.f - (float)pow(iNormalized, roundness_adapt), 0.f);
+      float amplitude = computeAmplitude(wideness, roundness, numHarmonic);
       c->amplitude = amplitude;
     }
   }
@@ -85,6 +84,7 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
     for (int x = 0; x < NUMCELLSX; ++x) {
       harmonics[x] = 0;
     }
+
     for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
       Cell *c = *it;
@@ -93,10 +93,7 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
       float baseFrequency = baseFreqLut[x];
       float numHarmonic = harmonics[x];
       // amplitude
-      float iNormalized = (numHarmonic - 1) / (wideness * wideness);
-      float roundness_adapt = pow(10.f, roundness - 0.5f);
-      float amplitude =
-          std::max(1.f - (float)pow(iNormalized, roundness_adapt), 0.f);
+      float amplitude = computeAmplitude(wideness, roundness, numHarmonic);
       audibles.push_back(
           new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
     }
@@ -117,4 +114,11 @@ float DSP::nextValue(float sampleTime) {
     audio = audio / ampSum;
   }
   return audio;
+}
+
+float DSP::computeAmplitude(float wideness, float roundness,
+                            float numHarmonic) {
+  float iNormalized = (numHarmonic - 1) / (wideness * wideness);
+  float amplitude = std::max(1.f - (float)pow(iNormalized, roundness), 0.f);
+  return amplitude;
 }

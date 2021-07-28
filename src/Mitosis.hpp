@@ -39,6 +39,8 @@ struct Mitosis : Module {
   Mitosis();
   void process(const ProcessArgs &args) override;
   float processAudio(std::set<Cell *> alive, float tune, float vOct);
+  json_t *dataToJson() override;
+  void dataFromJson(json_t *rootJ) override;
 };
 
 #endif

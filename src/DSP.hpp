@@ -31,6 +31,7 @@ class DSP {
   float roundness = -1.f;
   float limitH = -1.f;
   float vOct = 0.f;
+  float computeAmplitude(float wideness, float roundness, float numHarmonic);
 
 public:
   static std::vector<float> sinLut;

@@ -10,10 +10,9 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-  configParam(TEMP_PARAM, 1.f, (float)NUMCELLSX, 1.f,
-              "Wideness of the harmonics range");
-  configParam(FOOD_PARAM, 0.f, 1.f, 0.5f,
+  configParam(TEMP_PARAM, 0.f, 1.f, 0.5f,
               "Roundness of the harmonic amplitude decay function");
+  configParam(FOOD_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
   golGrid->defaultInit();
@@ -31,8 +30,8 @@ void Mitosis::process(const ProcessArgs &args) {
   float busyIn = inputs[BUSYIN_INPUT].getVoltage();
   float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
   float dataIn = inputs[DATAIN_INPUT].getVoltage();
-  float temp_wideness = params[TEMP_PARAM].getValue();
-  float food_roundness = params[FOOD_PARAM].getValue();
+  float temp_roundness = params[TEMP_PARAM].getValue();
+  float food_wideness = params[FOOD_PARAM].getValue();
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
@@ -57,7 +56,7 @@ void Mitosis::process(const ProcessArgs &args) {
   GridState gs = golGrid->getCurrentlyAlive();
   golGrid->resetModified();
   // todo do it only when clock or click
-  dsp->paramValues(gs, temp_wideness, food_roundness, vOct);
+  dsp->paramValues(gs, food_wideness, temp_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // printf("audioReturn %f \n", audio);
   // data send
@@ -81,6 +80,33 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * audio);
   lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
+}
+
+json_t *Mitosis::dataToJson() {
+
+  json_t *rootJ = json_object();
+  json_t *gridJ = json_array();
+  for (int i = 0; i < NUMCELLSX; i++) {
+    for (int j = 0; j < NUMCELLSY; j++) {
+      json_array_append_new(gridJ,
+                            json_boolean(golGrid->getCell(i, j)->isAlive()));
+    }
+  }
+  json_object_set_new(rootJ, "golGrid", gridJ);
+  return rootJ;
+}
+
+void Mitosis::dataFromJson(json_t *rootJ) {
+  // running
+  json_t *recorderJ = json_object_get(rootJ, "golGrid");
+  if (recorderJ) {
+    for (int i = 0; i < NUMCELLSX; i++) {
+      for (int j = 0; j < NUMCELLSY; j++) {
+        bool value = json_is_true(json_array_get(recorderJ, NUMCELLSX * i + j));
+        golGrid->setCellState(i, j, value);
+      }
+    }
+  }
 }
 
 struct MitosisWidget : ModuleWidget {
