@@ -22,11 +22,15 @@ void GolDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
     firstDraw = false;
     for (int i = 0; i < NUMCELLSX; i++) {
-      LineHeader *lh = new LineHeader(i, true);
+      bool activate = module->golGrid->getCell(i, 0)->rowMuted;
+      LineHeader *lh = new LineHeader(i, true, activate);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
       lh->box.size = Vec(cellSizeX, cellSizeY);
       addChild(lh);
-      lh = new LineHeader(i, false);
+    }
+    for (int i = 0; i < NUMCELLSY; i++) {
+      bool activate = module->golGrid->getCell(0, i)->colMuted;
+      LineHeader *lh = new LineHeader(i, false, activate);
       lh->box.pos = Vec(0, (i + 1) * (cellSizeX + cellSpaceX));
       lh->box.size = Vec(cellSizeX, cellSizeY);
       addChild(lh);
@@ -45,10 +49,10 @@ void GolDisplay::draw(const DrawArgs &args) {
   OpaqueWidget::draw(args);
 }
 
-LineHeader::LineHeader(int coordinate, bool isLine) {
+LineHeader::LineHeader(int coordinate, bool isLine, bool activate) {
   this->coordinate = coordinate;
   this->isRow = isLine;
-  this->isActivated = false;
+  this->isActivated = activate;
 }
 
 void LineHeader::draw(const DrawArgs &args) {
@@ -66,20 +70,17 @@ void LineHeader::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     this->isActivated = !this->isActivated;
     GolDisplay *gd = getAncestorOfType<GolDisplay>();
-    for (int i = 0; i < NUMCELLSX; i++) {
-      Cell *c;
-      if (this->isRow) {
-        c = gd->module->golGrid->getCell(this->coordinate, i);
-      } else {
-        c = gd->module->golGrid->getCell(i, this->coordinate);
-      }
-      if (this->isRow) {
+    if (this->isRow) {
+      for (int i = 0; i < NUMCELLSY; i++) {
+        Cell *c = gd->module->golGrid->getCell(this->coordinate, i);
         c->rowMuted = !c->rowMuted;
-      } else {
+      }
+    } else {
+      for (int i = 0; i < NUMCELLSX; i++) {
+        Cell *c = gd->module->golGrid->getCell(i, this->coordinate);
         c->colMuted = !c->colMuted;
       }
     }
-
     e.consume(this);
   }
   Widget::onButton(e);

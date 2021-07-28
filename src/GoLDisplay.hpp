@@ -16,7 +16,7 @@ struct LineHeader : Widget {
   int coordinate;
   bool isRow;
   bool isActivated;
-  LineHeader(int coordinate, bool isLine);
+  LineHeader(int coordinate, bool isLine, bool activate);
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };

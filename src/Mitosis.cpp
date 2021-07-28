@@ -86,24 +86,40 @@ json_t *Mitosis::dataToJson() {
 
   json_t *rootJ = json_object();
   json_t *gridJ = json_array();
+  json_t *rowMutedJ = json_array();
+  json_t *colMutedJ = json_array();
   for (int i = 0; i < NUMCELLSX; i++) {
     for (int j = 0; j < NUMCELLSY; j++) {
       json_array_append_new(gridJ,
                             json_boolean(golGrid->getCell(i, j)->isAlive()));
+      json_array_append_new(rowMutedJ,
+                            json_boolean(golGrid->getCell(i, j)->rowMuted));
+      json_array_append_new(colMutedJ,
+                            json_boolean(golGrid->getCell(i, j)->colMuted));
     }
   }
   json_object_set_new(rootJ, "golGrid", gridJ);
+  json_object_set_new(rootJ, "rowMuted", rowMutedJ);
+  json_object_set_new(rootJ, "colMuted", colMutedJ);
   return rootJ;
 }
 
 void Mitosis::dataFromJson(json_t *rootJ) {
   // running
-  json_t *recorderJ = json_object_get(rootJ, "golGrid");
-  if (recorderJ) {
+  json_t *gridJ = json_object_get(rootJ, "golGrid");
+  json_t *rowMutedJ = json_object_get(rootJ, "rowMuted");
+  json_t *colMutedJ = json_object_get(rootJ, "colMuted");
+  if (gridJ && rowMutedJ && colMutedJ) {
     for (int i = 0; i < NUMCELLSX; i++) {
       for (int j = 0; j < NUMCELLSY; j++) {
-        bool value = json_is_true(json_array_get(recorderJ, NUMCELLSX * i + j));
+        bool value = json_is_true(json_array_get(gridJ, NUMCELLSX * i + j));
+        bool rowMuted =
+            json_is_true(json_array_get(rowMutedJ, NUMCELLSX * i + j));
+        bool colMuted =
+            json_is_true(json_array_get(colMutedJ, NUMCELLSX * i + j));
         golGrid->setCellState(i, j, value);
+        golGrid->getCell(i, j)->rowMuted = rowMuted;
+        golGrid->getCell(i, j)->colMuted = colMuted;
       }
     }
   }
