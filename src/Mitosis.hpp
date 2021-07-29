@@ -15,6 +15,8 @@ struct Mitosis : Module {
   bool golUpdateArmed = true;
   bool clockUp;
   bool hasResetSend = true;
+  float vOctOut = 0.f;
+  float lastDspLowestFreq = 0.f;
 
   enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
   enum InputIds {
@@ -28,6 +30,7 @@ struct Mitosis : Module {
   };
   enum OutputIds {
     AUDIO_OUTPUT,
+    VOCTOUT_OUTPUT,
     DEAD_OUTPUT,
     BUSY_OUTPUT,
     DATACLK_OUTPUT,

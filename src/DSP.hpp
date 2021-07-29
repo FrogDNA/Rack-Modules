@@ -29,8 +29,9 @@ class DSP {
   std::vector<AudibleCell *> audibles;
   float wideness = -1.f;
   float roundness = -1.f;
-  float limitH = -1.f;
   float vOct = 0.f;
+  float lowestFreq =
+      7902.13f; // B8 - for optimization purposes, but is it the right place ?
   float computeAmplitude(float wideness, float roundness, float numHarmonic);
 
 public:
@@ -39,6 +40,7 @@ public:
   DSP();
   void paramValues(GridState gs, float wideness, float roundness, float vOct);
   float nextValue(float sampleTime);
+  float getLowestFreq();
 };
 
 #endif

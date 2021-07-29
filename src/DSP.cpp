@@ -38,12 +38,10 @@ DSP::DSP() {
   }
 }
 
-// todo change to split between the three
 void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
   roundness = pow(10.f, roundness - 0.5f);
   wideness = wideness * (float)(NUMCELLSY - 1) + 1.f;
-  // todo take into account muted rows
   std::vector<Cell *> alive;
   for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
        it != state.currentlyAlive.end(); ++it) {
@@ -59,11 +57,9 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
       (*it)->freqMultiplicator = mult;
     }
   }
-  if (this->wideness != wideness || this->roundness != roundness ||
-      this->limitH != limitH) {
+  if (this->wideness != wideness || this->roundness != roundness) {
     this->wideness = wideness;
     this->roundness = roundness;
-    this->limitH = limitH;
     // todo put into separate function
     // todo do the same with oldAudibles
     for (std::vector<AudibleCell *>::iterator it = audibles.begin();
@@ -84,19 +80,28 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
     for (int x = 0; x < NUMCELLSX; ++x) {
       harmonics[x] = 0;
     }
-
+    float lf;
+    if (alive.begin() != alive.end()) {
+      lf = 7902.13f;
+    } else {
+      lf = lowestFreq;
+    }
     for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
       Cell *c = *it;
       int x = c->getX();
       ++(harmonics[x]);
       float baseFrequency = baseFreqLut[x];
+      if (baseFrequency < lf) {
+        lf = baseFrequency;
+      }
       float numHarmonic = harmonics[x];
       // amplitude
       float amplitude = computeAmplitude(wideness, roundness, numHarmonic);
       audibles.push_back(
           new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
     }
+    lowestFreq = lf;
   }
 }
 
@@ -122,3 +127,5 @@ float DSP::computeAmplitude(float wideness, float roundness,
   float amplitude = std::max(1.f - (float)pow(iNormalized, roundness), 0.f);
   return amplitude;
 }
+
+float DSP::getLowestFreq() { return lowestFreq; }

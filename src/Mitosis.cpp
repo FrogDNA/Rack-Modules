@@ -58,7 +58,6 @@ void Mitosis::process(const ProcessArgs &args) {
   // todo do it only when clock or click
   dsp->paramValues(gs, food_wideness, temp_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
-  // printf("audioReturn %f \n", audio);
   // data send
   if (send > 3.5f && hasResetSend) {
     if (!dataSender->isTransferInProgress()) {
@@ -72,6 +71,13 @@ void Mitosis::process(const ProcessArgs &args) {
   dataSender->next();
   dataOut = dataSender->getData();
   ClockOut = dataSender->getClock();
+  // vOctOut
+  float lf = dsp->getLowestFreq();
+  if (lastDspLowestFreq != lf) {
+    lastDspLowestFreq = lf;
+    vOctOut = log2(lf / 16.35f) + vOct;
+    vOctOut = clamp(vOctOut, 0.f, 10.f);
+  }
   // outputs
   outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
                                                                      : 0.f);
@@ -79,6 +85,7 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * audio);
+  outputs[VOCTOUT_OUTPUT].setVoltage(vOctOut);
   lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
 }
 
@@ -139,9 +146,9 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.368, 56.297)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.824, 44.604)),
                                                  module, Mitosis::TEMP_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.505, 71.012)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.824, 66.829)),
                                                  module, Mitosis::FOOD_PARAM));
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(95.292, 5.151)), module,
@@ -159,7 +166,9 @@ struct MitosisWidget : ModuleWidget {
 
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(136.038, 5.151)),
                                                module, Mitosis::AUDIO_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.963, 48.73)),
+    addOutput(createOutputCentered<PJ301MPort>(
+        mm2px(Vec(34.095, 24.885)), module, Mitosis::VOCTOUT_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.976, 49.788)),
                                                module, Mitosis::DEAD_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
                                                module, Mitosis::BUSY_OUTPUT));
