@@ -52,10 +52,15 @@ void Mitosis::process(const ProcessArgs &args) {
       golGrid->update();
     }
   }
-  // process audio
+  // check if GUI has some messages
+  if (!clickedCells.empty()) {
+    Coordinate *c = clickedCells.shift();
+    bool alive = golGrid->getCell(c->getX(), c->getY())->isAlive();
+    golGrid->setCellState(c->getX(), c->getY(), !alive);
+  }
+  // *** PROCESS AUDIO ***
   GridState gs = golGrid->getCurrentlyAlive();
   golGrid->resetModified();
-  // todo do it only when clock or click
   dsp->paramValues(gs, food_wideness, temp_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // data send

@@ -70,6 +70,7 @@ void LineHeader::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     this->isActivated = !this->isActivated;
     GolDisplay *gd = getAncestorOfType<GolDisplay>();
+    // not thread safe. Warning if something else could mute and unmute
     if (this->isRow) {
       for (int i = 0; i < NUMCELLSY; i++) {
         Cell *c = gd->module->golGrid->getCell(this->coordinate, i);
@@ -106,9 +107,10 @@ void DrawableCell::draw(const DrawArgs &args) {
 void DrawableCell::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     GolDisplay *gd = getAncestorOfType<GolDisplay>();
-    // dont just tell the cell its alive, tell the grid
-    gd->module->golGrid->setCellState(cell->getX(), cell->getY(),
-                                      !cell->isAlive());
+    // thread safe
+    if (!gd->module->clickedCells.full()) {
+      gd->module->clickedCells.push(new Coordinate(cell->getX(), cell->getY()));
+    }
     e.consume(this);
   }
   Widget::onButton(e);

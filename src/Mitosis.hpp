@@ -17,6 +17,7 @@ struct Mitosis : Module {
   bool hasResetSend = true;
   float vOctOut = 0.f;
   float lastDspLowestFreq = 0.f;
+  dsp::RingBuffer<Coordinate *, 1> clickedCells;
 
   enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
   enum InputIds {
