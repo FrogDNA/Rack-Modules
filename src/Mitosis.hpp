@@ -18,8 +18,14 @@ struct Mitosis : Module {
   float vOctOut = 0.f;
   float lastDspLowestFreq = 0.f;
   dsp::RingBuffer<Coordinate *, 1> clickedCells;
-
-  enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
+  enum ParamIds {
+    TEMP_PARAM,
+    FOOD_PARAM,
+    DISPLAYX_PARAM,
+    DISPLAYY_PARAM,
+    DISPLAYSCALE_PARAM,
+    NUM_PARAMS
+  };
   enum InputIds {
     CLOCK_INPUT,
     VOCT_INPUT,

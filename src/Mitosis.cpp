@@ -13,6 +13,9 @@ Mitosis::Mitosis() {
   configParam(TEMP_PARAM, 0.f, 1.f, 0.5f,
               "Roundness of the harmonic amplitude decay function");
   configParam(FOOD_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
+  configParam(DISPLAYX_PARAM, 0.f, 1.f, 0.f, "");
+  configParam(DISPLAYY_PARAM, 0.f, 1.f, 0.f, "");
+  configParam(DISPLAYSCALE_PARAM, 0.f, 1.f, 0.f, "");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
   golGrid->init();
@@ -161,10 +164,16 @@ struct MitosisWidget : ModuleWidget {
                                                  module, Mitosis::TEMP_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.824, 66.829)),
                                                  module, Mitosis::FOOD_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(
+        mm2px(Vec(7.941, 83.26)), module, Mitosis::DISPLAYX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(
+        mm2px(Vec(25.474, 83.26)), module, Mitosis::DISPLAYY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(
+        mm2px(Vec(41.878, 83.26)), module, Mitosis::DISPLAYSCALE_PARAM));
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(95.292, 5.151)), module,
                                              Mitosis::CLOCK_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.966, 33.225)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.082, 27.636)), module,
                                              Mitosis::VOCT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.637, 104.157)),
                                              module, Mitosis::BUSYIN_INPUT));
@@ -178,8 +187,8 @@ struct MitosisWidget : ModuleWidget {
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(136.038, 5.151)),
                                                module, Mitosis::AUDIO_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(34.095, 24.885)), module, Mitosis::VOCTOUT_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.976, 49.788)),
+        mm2px(Vec(8.244, 45.613)), module, Mitosis::VOCTOUT_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.229, 66.789)),
                                                module, Mitosis::DEAD_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
                                                module, Mitosis::BUSY_OUTPUT));
