@@ -47,7 +47,8 @@ class GameOfLifeGrid {
 
 public:
   GameOfLifeGrid();
-  void defaultInit();
+  void init();
+  void init(std::vector<Cell *> alive);
   void update();
   void emptyGrid();
   GridState getCurrentlyAlive();

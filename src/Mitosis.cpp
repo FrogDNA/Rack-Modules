@@ -15,7 +15,7 @@ Mitosis::Mitosis() {
   configParam(FOOD_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
-  golGrid->defaultInit();
+  golGrid->init();
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
   dsp = new DSP();
@@ -36,7 +36,7 @@ void Mitosis::process(const ProcessArgs &args) {
   float ClockOut = 0.f;
   bool risingEdge = false;
   // data receive
-  dataReceiver->checkAndUpdateGrid(busyIn, clockIn, dataIn, golGrid);
+  dataReceiver->check(busyIn, clockIn, dataIn);
   /* clock and AM. */
   /* todo check if AM really brings something */
   if (busyIn < 1.5f) {
@@ -49,7 +49,13 @@ void Mitosis::process(const ProcessArgs &args) {
       risingEdge = false;
     }
     if (risingEdge) {
-      golGrid->update();
+      if (dataReceiver->isNewGridReady()) {
+        std::vector<Cell *> v =
+            dataReceiver->getGrid()->getCurrentlyAlive().currentlyAlive;
+        golGrid->init(v);
+      } else {
+        golGrid->update();
+      }
     }
   }
   // check if GUI has some messages

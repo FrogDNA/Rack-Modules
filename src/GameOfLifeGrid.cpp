@@ -22,12 +22,8 @@ GameOfLifeGrid::GameOfLifeGrid() {
   }
 }
 
-void GameOfLifeGrid::defaultInit() {
-  for (int i = 0; i < NUMCELLSX; i++) {
-    for (int j = 0; j < NUMCELLSY; j++) {
-      allCells[i][j]->setAlive(false);
-    }
-  }
+void GameOfLifeGrid::init() {
+  emptyGrid();
   // optional
   setCellState(NUMCELLSX / 2, NUMCELLSY / 2, true);
   setCellState(NUMCELLSX / 2 - 1, NUMCELLSY / 2, true);
@@ -36,6 +32,15 @@ void GameOfLifeGrid::defaultInit() {
   setCellState(NUMCELLSX / 2, NUMCELLSY / 2 + 1, true);
   setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2 - 1, true);
   setCellState(NUMCELLSX / 2 + 2, NUMCELLSY / 2 - 1, true);
+}
+
+void GameOfLifeGrid::init(std::vector<Cell *> alive) {
+  emptyGrid();
+  for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
+       ++it) {
+    Cell *c = *it;
+    setCellState(c->getX(), c->getY(), true);
+  }
 }
 
 void GameOfLifeGrid::setCellState(int x, int y, bool state) {

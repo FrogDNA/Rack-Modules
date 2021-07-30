@@ -11,11 +11,14 @@ class DataReceiver {
   float lastBusyIn = 0.f;
   bool isXNext = true;
   bool risingEdgeReceived = false;
+  GameOfLifeGrid *gridInPreparation;
+  bool gridReady = false;
 
 public:
   DataReceiver();
-  void checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
-                          GameOfLifeGrid *golGrid);
+  void check(float busyIn, float clockIn, float dataIn);
+  bool isNewGridReady();
+  GameOfLifeGrid *getGrid();
 };
 
 #endif

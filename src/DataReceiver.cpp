@@ -3,11 +3,11 @@
 
 DataReceiver::DataReceiver() {}
 
-void DataReceiver::checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
-                                      GameOfLifeGrid *golGrid) {
+void DataReceiver::check(float busyIn, float clockIn, float dataIn) {
   if (busyIn > 3.5f) {
     if (lastBusyIn < 1.5f) {
-      golGrid->emptyGrid();
+      gridReady = false;
+      gridInPreparation = new GameOfLifeGrid();
     }
     if (clockIn > 3.5f && !risingEdgeReceived) {
       risingEdgeReceived = true;
@@ -16,7 +16,7 @@ void DataReceiver::checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
         isXNext = false;
       } else {
         y = (int)((dataIn / 10.f) * NUMCELLSY);
-        golGrid->setCellState(x, y, true);
+        gridInPreparation->setCellState(x, y, true);
         isXNext = true;
       }
     } else if (clockIn < 1.5f && risingEdgeReceived) {
@@ -25,6 +25,16 @@ void DataReceiver::checkAndUpdateGrid(float busyIn, float clockIn, float dataIn,
   } else {
     isXNext = true;
     risingEdgeReceived = false;
+    if (lastBusyIn > 3.5f) {
+      gridReady = true;
+    }
   }
   lastBusyIn = busyIn;
+}
+
+bool DataReceiver::isNewGridReady() { return gridReady; }
+
+GameOfLifeGrid *DataReceiver::getGrid() {
+  gridReady = false;
+  return gridInPreparation;
 }
