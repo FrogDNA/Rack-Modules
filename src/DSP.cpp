@@ -33,8 +33,14 @@ float AudibleCell::currentAmplitude() { return amplitude; }
 
 DSP::DSP() {
   baseFreqLut.reserve(NUMCELLSX);
-  for (int i = 0; i < NUMCELLSX; ++i) {
+  audibleCols.reserve(NUMCELLSX);
+  audibleRows.reserve(NUMCELLSY);
+  for (int i = 0; i < NUMCELLSX; i++) {
     baseFreqLut[i] = BASE_FREQ * pow(2.0f, (float)(i - NUMCELLSX / 2) / 12.0f);
+    audibleCols[i] = true;
+  }
+  for (int i = 0; i < NUMCELLSY; i++) {
+    audibleRows[i] = true;
   }
 }
 
@@ -45,7 +51,7 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
   std::vector<Cell *> alive;
   for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
        it != state.currentlyAlive.end(); ++it) {
-    if ((*it)->isAudible()) {
+    if (isCellAudible(*it)) {
       alive.push_back(*it);
     }
   }
@@ -129,3 +135,35 @@ float DSP::computeAmplitude(float wideness, float roundness,
 }
 
 float DSP::getLowestFreq() { return lowestFreq; }
+
+void DSP::muteUnmuteCol(int x, bool muted) {
+  if (x < 0 || x > NUMCELLSX) {
+    return;
+  }
+  audibleCols[x] = muted;
+}
+
+void DSP::muteUnmuteRow(int y, bool muted) {
+  if (y < 0 || y > NUMCELLSY) {
+    return;
+  }
+  audibleRows[y] = muted;
+}
+
+bool DSP::isColAudible(int x) {
+  if (x < 0 || x > NUMCELLSX) {
+    return false;
+  }
+  return audibleCols[x];
+}
+
+bool DSP::isRowAudible(int y) {
+  if (y < 0 || y > NUMCELLSY) {
+    return false;
+  }
+  return audibleRows[y];
+}
+
+bool DSP::isCellAudible(Cell *c) {
+  return (audibleRows[c->getY()] && audibleCols[c->getX()]);
+}

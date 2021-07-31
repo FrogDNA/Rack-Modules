@@ -1,14 +1,41 @@
 #include "ScaleButton.hpp"
 #include "Consts.hpp"
+#include "DSP.hpp"
+#include "Mitosis.hpp"
 
 void ScaleButton::draw(const DrawArgs &args) {
+  // if status == 2 (activated), check if all rows are still mute.
+  // else, move to status 1
+  bool oneMuted = false;
+  bool oneUnmuted = false;
+  if (module) {
+    DSP *dsp = module->dsp;
+    for (int i = semitone; i < NUMCELLSX; i += 12) {
+      if (dsp->isColAudible(i)) {
+        oneUnmuted = true;
+      } else {
+        oneMuted = true;
+      }
+      if (oneUnmuted && oneMuted) {
+        break; // dont go further
+      }
+    }
+    if (oneMuted && !oneUnmuted) {
+      status = 2;
+    } else if (oneUnmuted && !oneMuted) {
+      status = 0;
+    } else {
+      status = 1;
+    }
+  }
+  // if all cols are unmuted, move to status 0
   if (status == 1) {
     nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
     nvgFill(args.vg);
   } else if (status == 2) {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0xba, 0x00, 0x6e));
+    nvgFillColor(args.vg, nvgRGBA(0xba, 0x00, 0x00, 0x6e));
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
     nvgFill(args.vg);

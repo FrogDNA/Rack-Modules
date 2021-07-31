@@ -12,12 +12,9 @@ class Cell : public Coordinate {
   bool alive;
 
 public:
-  bool rowMuted;
-  bool colMuted;
   Cell(int x, int y, bool alive);
   bool isAlive();
   void setAlive(bool isAlive);
-  bool isAudible();
 };
 
 struct GridState {

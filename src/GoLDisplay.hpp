@@ -15,9 +15,8 @@ struct DrawableCell : Widget {
 struct LineHeader : Widget {
   int coordinate;
   bool isRow;
-  bool isActivated;
   dsp::RingBuffer<int, 64> *rb;
-  LineHeader(int coordinate, bool isLine, bool activate);
+  LineHeader(int coordinate, bool isLine);
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };

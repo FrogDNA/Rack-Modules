@@ -1,9 +1,11 @@
 #ifndef SCALEBUTTON_H
 #define SCALEBUTTON_H
 
+#include "Mitosis.hpp"
 #include "plugin.hpp"
 
 struct ScaleButton : OpaqueWidget {
+  Mitosis *module;
   int semitone = 0;
   int status = 0;
   dsp::RingBuffer<int, 64> *muteRb;

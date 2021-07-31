@@ -24,6 +24,8 @@ class AudibleCell {
 };
 
 class DSP {
+  std::vector<bool> audibleCols;
+  std::vector<bool> audibleRows;
   std::vector<float> baseFreqLut;
   std::vector<Cell *> alive;
   std::vector<AudibleCell *> audibles;
@@ -41,6 +43,11 @@ public:
   void paramValues(GridState gs, float wideness, float roundness, float vOct);
   float nextValue(float sampleTime);
   float getLowestFreq();
+  void muteUnmuteCol(int x, bool muted);
+  void muteUnmuteRow(int y, bool muted);
+  bool isCellAudible(Cell *c);
+  bool isColAudible(int x);
+  bool isRowAudible(int y);
 };
 
 #endif

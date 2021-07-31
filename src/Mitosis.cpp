@@ -71,15 +71,19 @@ void Mitosis::process(const ProcessArgs &args) {
   }
   while (!muteColsBuffer.empty()) {
     int col = muteColsBuffer.shift();
-    for (int i = 0; i < NUMCELLSX; i++) {
-      golGrid->getCell(col, i)->colMuted = true;
-    }
+    dsp->muteUnmuteCol(col, false);
   }
   while (!unmuteColsBuffer.empty()) {
     int col = unmuteColsBuffer.shift();
-    for (int i = 0; i < NUMCELLSX; i++) {
-      golGrid->getCell(col, i)->colMuted = false;
-    }
+    dsp->muteUnmuteCol(col, true);
+  }
+  while (!muteUnmuteColsBuffer.empty()) {
+    int col = muteUnmuteColsBuffer.shift();
+    dsp->muteUnmuteCol(col, !dsp->isColAudible(col));
+  }
+  while (!muteUnmuteRowsBuffer.empty()) {
+    int row = muteUnmuteRowsBuffer.shift();
+    dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
   }
   // *** PROCESS AUDIO ***
   GridState gs = golGrid->getCurrentlyAlive();
@@ -120,46 +124,47 @@ json_t *Mitosis::dataToJson() {
 
   json_t *rootJ = json_object();
   json_t *gridJ = json_array();
-  json_t *rowMutedJ = json_array();
-  json_t *colMutedJ = json_array();
+  json_t *colAudibleJ = json_array();
+  json_t *rowAudibleJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
   for (int i = 0; i < NUMCELLSX; i++) {
     for (int j = 0; j < NUMCELLSY; j++) {
       json_array_append_new(gridJ,
                             json_boolean(golGrid->getCell(i, j)->isAlive()));
-      json_array_append_new(rowMutedJ,
-                            json_boolean(golGrid->getCell(i, j)->rowMuted));
-      json_array_append_new(colMutedJ,
-                            json_boolean(golGrid->getCell(i, j)->colMuted));
     }
   }
+  for (int i = 0; i < NUMCELLSX; i++) {
+    json_array_append_new(colAudibleJ, json_boolean(dsp->isColAudible(i)));
+  }
+  for (int i = 0; i < NUMCELLSY; i++) {
+    json_array_append_new(rowAudibleJ, json_boolean(dsp->isRowAudible(i)));
+  }
   json_object_set_new(rootJ, "golGrid", gridJ);
-  json_object_set_new(rootJ, "rowMuted", rowMutedJ);
-  json_object_set_new(rootJ, "colMuted", colMutedJ);
-  // json_object_set_new(rootJ, "gridParams", gridParams);
+  json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
+  json_object_set_new(rootJ, "colAudible", colAudibleJ);
   return rootJ;
 }
 
 void Mitosis::dataFromJson(json_t *rootJ) {
   // running
   json_t *gridJ = json_object_get(rootJ, "golGrid");
-  json_t *rowMutedJ = json_object_get(rootJ, "rowMuted");
-  json_t *colMutedJ = json_object_get(rootJ, "colMuted");
-  // json_t *gridParams = json_object_get(rootJ, "gridParams");
-  // loop = json_is_true(json_array_get(gridParams, 0));
-  if (gridJ && rowMutedJ && colMutedJ) {
+  json_t *rowAudibleJ = json_object_get(rootJ, "rowAudible");
+  json_t *colAudibleJ = json_object_get(rootJ, "colAudible");
+  if (gridJ && rowAudibleJ && colAudibleJ) {
     for (int i = 0; i < NUMCELLSX; i++) {
       for (int j = 0; j < NUMCELLSY; j++) {
         bool value = json_is_true(json_array_get(gridJ, NUMCELLSY * i + j));
-        bool rowMuted =
-            json_is_true(json_array_get(rowMutedJ, NUMCELLSY * i + j));
-        bool colMuted =
-            json_is_true(json_array_get(colMutedJ, NUMCELLSY * i + j));
         golGrid->setCellState(i, j, value);
-        golGrid->getCell(i, j)->rowMuted = rowMuted;
-        golGrid->getCell(i, j)->colMuted = colMuted;
       }
+    }
+    for (int i = 0; i < NUMCELLSX; i++) {
+      bool colAudible = json_is_true(json_array_get(colAudibleJ, i));
+      dsp->muteUnmuteCol(i, colAudible);
+    }
+    for (int i = 0; i < NUMCELLSY; i++) {
+      bool rowAudible = json_is_true(json_array_get(rowAudibleJ, i));
+      dsp->muteUnmuteRow(i, rowAudible);
     }
   }
 }
@@ -250,6 +255,7 @@ struct MitosisWidget : ModuleWidget {
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 3; j++) {
         ScaleButton *button = new ScaleButton();
+        button->module = module;
         button->box.pos = mm2px(Vec(xs[i], ys[j]));
         button->box.size = mm2px(Vec(8.0, 4.0));
         button->semitone = j * 4 + i;
