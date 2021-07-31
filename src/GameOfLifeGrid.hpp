@@ -7,8 +7,8 @@
 #include <set>
 #include <unordered_map>
 
-static const int NUMCELLSX = 30;
-static const int NUMCELLSY = 30;
+static const int NUMCELLSX = 40;
+static const int NUMCELLSY = 40;
 
 class Cell : public Coordinate {
   bool alive;

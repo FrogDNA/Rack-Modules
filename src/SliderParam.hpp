@@ -6,8 +6,7 @@
 
 struct SliderParam : TransparentWidget {
   bool switchedOn = false;
-  dsp::RingBuffer<bool, 1> *rb = NULL;
-  SliderParam(bool switchOn, dsp::RingBuffer<bool, 1> *rb);
+  Mitosis *module = NULL;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };

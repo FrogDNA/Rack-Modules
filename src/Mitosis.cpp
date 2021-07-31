@@ -203,11 +203,11 @@ struct MitosisWidget : ModuleWidget {
     display->box.size = mm2px(Vec(110.0, 110.0));
     addChild(display);
 
-    SliderParam *loopParam =
-        new SliderParam(module->loop, &(module->loopParam));
-    loopParam->box.pos = mm2px(Vec(75.061, 3.6));
-    loopParam->box.size = mm2px(Vec(7.8, 3.8));
-    addChild(loopParam);
+    SliderParam *lpWidget = new SliderParam();
+    lpWidget->module = module;
+    lpWidget->box.pos = mm2px(Vec(75.061, 3.6));
+    lpWidget->box.size = mm2px(Vec(7.8, 3.8));
+    addChild(lpWidget);
   }
 };
 

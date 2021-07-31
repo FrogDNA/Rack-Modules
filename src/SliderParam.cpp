@@ -1,11 +1,6 @@
 #include "SliderParam.hpp"
 #include "plugin.hpp"
 
-SliderParam::SliderParam(bool switchOn, dsp::RingBuffer<bool, 1> *rb) {
-  this->rb = rb;
-  switchedOn = switchOn;
-}
-
 void SliderParam::draw(const DrawArgs &args) {
   // draw the button
   nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
@@ -22,9 +17,9 @@ void SliderParam::draw(const DrawArgs &args) {
 void SliderParam::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     // thread safe
-    if (!rb->full()) {
+    if (!module->loopParam.full()) {
       switchedOn = !switchedOn;
-      rb->push(switchedOn);
+      module->loopParam.push(switchedOn);
     }
     e.consume(this);
   }
