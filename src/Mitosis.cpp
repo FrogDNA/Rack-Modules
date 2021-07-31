@@ -165,41 +165,69 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.89, 30.936)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.89, 28.819)),
                                                  module, Mitosis::TEMP_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.67, 31.094)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.67, 28.977)),
                                                  module, Mitosis::FOOD_PARAM));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.67, 46.969)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.67, 44.323)), module,
                                              Mitosis::VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.89, 47.869)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.89, 45.223)), module,
                                              Mitosis::CLOCK_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.57, 93.917)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.57, 100.267)), module,
                                              Mitosis::SEND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.633, 111.122)),
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.633, 113.239)),
                                              module, Mitosis::DATAIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.927, 111.961)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.927, 114.077)), module,
                                              Mitosis::BUSYIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.78, 111.961)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.78, 114.078)), module,
                                              Mitosis::DATACLKIN_INPUT));
 
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.927, 69.686)),
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.927, 81.327)),
                                                module, Mitosis::DEAD_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(23.78, 69.686)), module, Mitosis::VOCTOUT_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(37.633, 69.686)),
+        mm2px(Vec(23.78, 81.327)), module, Mitosis::VOCTOUT_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(37.633, 81.327)),
                                                module, Mitosis::AUDIO_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.71, 93.917)),
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.71, 100.267)),
                                                module, Mitosis::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(27.85, 93.917)), module, Mitosis::DATACLK_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.99, 93.917)),
+        mm2px(Vec(27.85, 100.267)), module, Mitosis::DATACLK_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.99, 100.267)),
                                                module, Mitosis::DATA_OUTPUT));
 
-    // mm2px(Vec(110.0, 110.0))
+    // mm2px(Vec(7.786, 3.786))
+    // infinity
+    // addChild(createWidget<Widget>(mm2px(Vec(134.446, 3.607))));
+    // mm2px(Vec(7.985, 3.985))
+    /*
+    addChild(createWidget<Widget>(mm2px(Vec(4.202, 56.819))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(14.592, 56.82))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(24.982, 56.82))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(35.372, 56.82))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(4.202, 62.05))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(14.592, 62.05))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(24.982, 62.05))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(35.372, 62.05))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(4.202, 67.28))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(14.592, 67.28))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(24.982, 67.28))));
+    // mm2px(Vec(7.985, 3.985))
+    addChild(createWidget<Widget>(mm2px(Vec(35.372, 67.28))));
+*/
     GolDisplay *display = new GolDisplay();
     display->module = module;
-    display->box.pos = mm2px(Vec(49.288, 11.674));
+    display->box.pos = mm2px(Vec(49.06, 12.5));
     display->box.size = mm2px(Vec(110.0, 110.0));
     addChild(display);
 
