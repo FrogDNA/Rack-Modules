@@ -43,13 +43,13 @@ class GameOfLifeGrid {
   std::set<Cell *> added;
   std::set<Cell *> removed;
 
-  int countAlive(std::set<Cell *> ca, Cell *c);
+  int countAlive(std::set<Cell *> ca, Cell *c, bool loop);
 
 public:
   GameOfLifeGrid();
   void init();
   void init(std::vector<Cell *> alive);
-  void update();
+  void update(bool loop);
   void emptyGrid();
   GridState getCurrentlyAlive();
   void resetModified();

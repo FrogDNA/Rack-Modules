@@ -55,7 +55,7 @@ void Mitosis::process(const ProcessArgs &args) {
             dataReceiver->getGrid()->getCurrentlyAlive().currentlyAlive;
         golGrid->init(v);
       } else {
-        golGrid->update();
+        golGrid->update(loop);
       }
     }
   }
