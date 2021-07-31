@@ -1,5 +1,6 @@
 #include "GoLDisplay.hpp"
-#include "GameOfLifeGrid.hpp"
+#include "Consts.hpp"
+#include "Mitosis.hpp"
 
 GolDisplay::GolDisplay() {
   // todo replace with static something
@@ -26,6 +27,7 @@ void GolDisplay::draw(const DrawArgs &args) {
       LineHeader *lh = new LineHeader(i, true, activate);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
       lh->box.size = Vec(cellSizeX, cellSizeY);
+      lh->rb = &(module->muteUnmuteRowsBuffer);
       addChild(lh);
     }
     for (int i = 0; i < NUMCELLSY; i++) {
@@ -33,6 +35,7 @@ void GolDisplay::draw(const DrawArgs &args) {
       LineHeader *lh = new LineHeader(i, false, activate);
       lh->box.pos = Vec(0, (i + 1) * (cellSizeX + cellSpaceX));
       lh->box.size = Vec(cellSizeX, cellSizeY);
+      lh->rb = &(module->muteUnmuteColsBuffer);
       addChild(lh);
     }
     for (int i = 0; i < NUMCELLSX; i++) {

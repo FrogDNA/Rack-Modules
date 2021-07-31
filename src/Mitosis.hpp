@@ -1,11 +1,11 @@
+#ifndef MITOSIS_H
+#define MITOSIS_H
+
 #include "DSP.hpp"
 #include "DataReceiver.hpp"
 #include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "plugin.hpp"
-
-#ifndef MITOSIS_H
-#define MITOSIS_H
 
 struct Mitosis : Module {
   DSP *dsp = NULL;
@@ -22,6 +22,11 @@ struct Mitosis : Module {
   // loopParam
   dsp::RingBuffer<bool, 1> loopParam;
   bool loop = false;
+  // mute columns and rows
+  dsp::RingBuffer<int, 64> muteUnmuteColsBuffer;
+  dsp::RingBuffer<int, 64> muteUnmuteRowsBuffer;
+  dsp::RingBuffer<int, 64> muteColsBuffer;
+  dsp::RingBuffer<int, 64> unmuteColsBuffer;
 
   enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
   enum InputIds {

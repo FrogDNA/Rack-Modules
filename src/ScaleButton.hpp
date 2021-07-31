@@ -4,8 +4,10 @@
 #include "plugin.hpp"
 
 struct ScaleButton : OpaqueWidget {
-  int semitone;
-  int status;
+  int semitone = 0;
+  int status = 0;
+  dsp::RingBuffer<int, 64> *muteRb;
+  dsp::RingBuffer<int, 64> *unmuteRb;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };

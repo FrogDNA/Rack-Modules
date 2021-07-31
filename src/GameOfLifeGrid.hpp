@@ -1,14 +1,12 @@
 #ifndef GOLGRID_H
 #define GOLGRID_H
 
+#include "Consts.hpp"
 #include "Coordinate.hpp"
 #include "plugin.hpp"
 #include "robin_hood.h"
 #include <set>
 #include <unordered_map>
-
-static const int NUMCELLSX = 40;
-static const int NUMCELLSY = 40;
 
 class Cell : public Coordinate {
   bool alive;

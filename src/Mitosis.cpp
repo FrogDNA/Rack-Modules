@@ -1,9 +1,10 @@
 #include "Mitosis.hpp"
-#include "Coordinate.hpp"
+#include "DSP.hpp"
 #include "DataReceiver.hpp"
 #include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "GoLDisplay.hpp"
+#include "ScaleButton.hpp"
 #include "SliderParam.hpp"
 #include "plugin.hpp"
 #include <unordered_map>
@@ -67,6 +68,18 @@ void Mitosis::process(const ProcessArgs &args) {
   }
   if (!loopParam.empty()) {
     loop = loopParam.shift();
+  }
+  while (!muteColsBuffer.empty()) {
+    int col = muteColsBuffer.shift();
+    for (int i = 0; i < NUMCELLSX; i++) {
+      golGrid->getCell(col, i)->colMuted = true;
+    }
+  }
+  while (!unmuteColsBuffer.empty()) {
+    int col = unmuteColsBuffer.shift();
+    for (int i = 0; i < NUMCELLSX; i++) {
+      golGrid->getCell(col, i)->colMuted = false;
+    }
   }
   // *** PROCESS AUDIO ***
   GridState gs = golGrid->getCurrentlyAlive();
@@ -138,11 +151,11 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   if (gridJ && rowMutedJ && colMutedJ) {
     for (int i = 0; i < NUMCELLSX; i++) {
       for (int j = 0; j < NUMCELLSY; j++) {
-        bool value = json_is_true(json_array_get(gridJ, NUMCELLSX * i + j));
+        bool value = json_is_true(json_array_get(gridJ, NUMCELLSY * i + j));
         bool rowMuted =
-            json_is_true(json_array_get(rowMutedJ, NUMCELLSX * i + j));
+            json_is_true(json_array_get(rowMutedJ, NUMCELLSY * i + j));
         bool colMuted =
-            json_is_true(json_array_get(colMutedJ, NUMCELLSX * i + j));
+            json_is_true(json_array_get(colMutedJ, NUMCELLSY * i + j));
         golGrid->setCellState(i, j, value);
         golGrid->getCell(i, j)->rowMuted = rowMuted;
         golGrid->getCell(i, j)->colMuted = colMuted;
@@ -225,12 +238,26 @@ struct MitosisWidget : ModuleWidget {
     // mm2px(Vec(7.985, 3.985))
     addChild(createWidget<Widget>(mm2px(Vec(35.372, 67.28))));
 */
-    /*std::vector<float> xs;
+    std::vector<float> xs;
     std::vector<float> ys;
     xs.push_back(4.202);
     xs.push_back(14.592);
     xs.push_back(24.982);
-    xs.push_back(35.372);*/
+    xs.push_back(35.372);
+    ys.push_back(56.82);
+    ys.push_back(62.05);
+    ys.push_back(67.28);
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 3; j++) {
+        ScaleButton *button = new ScaleButton();
+        button->box.pos = mm2px(Vec(xs[i], ys[j]));
+        button->box.size = mm2px(Vec(8.0, 4.0));
+        button->semitone = j * 4 + i;
+        button->muteRb = &(module->muteColsBuffer);
+        button->unmuteRb = &(module->unmuteColsBuffer);
+        addChild(button);
+      }
+    }
     GolDisplay *display = new GolDisplay();
     display->module = module;
     display->box.pos = mm2px(Vec(49.06, 12.5));

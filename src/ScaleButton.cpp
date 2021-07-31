@@ -1,4 +1,5 @@
 #include "ScaleButton.hpp"
+#include "Consts.hpp"
 
 void ScaleButton::draw(const DrawArgs &args) {
   if (status == 1) {
@@ -16,11 +17,36 @@ void ScaleButton::draw(const DrawArgs &args) {
 void ScaleButton::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     // thread safe
-    // logic
     if (status < 2) {
-      status = 2;
+      bool isFull = false;
+      for (int i = semitone; i < NUMCELLSY; i += 12) {
+        if (!muteRb->full()) {
+          muteRb->push(i);
+        } else {
+          isFull = true;
+          break;
+        }
+      }
+      if (!isFull) {
+        status = 2;
+      } else {
+        status = 1;
+      }
     } else {
-      status = 0;
+      bool isFull = false;
+      for (int i = semitone; i < NUMCELLSY; i += 12) {
+        if (!unmuteRb->full()) {
+          unmuteRb->push(i);
+        } else {
+          isFull = true;
+          break;
+        }
+      }
+      if (!isFull) {
+        status = 0;
+      } else {
+        status = 1;
+      }
     }
     e.consume(this);
   }

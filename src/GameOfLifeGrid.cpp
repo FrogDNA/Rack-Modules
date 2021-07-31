@@ -1,4 +1,5 @@
 #include "GameOfLifeGrid.hpp"
+#include "Consts.hpp"
 #include <algorithm>
 #include <cstdio>
 
