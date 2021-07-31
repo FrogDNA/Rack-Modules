@@ -17,34 +17,32 @@ struct Mitosis : Module {
   bool hasResetSend = true;
   float vOctOut = 0.f;
   float lastDspLowestFreq = 0.f;
+
   dsp::RingBuffer<Coordinate *, 1> clickedCells;
-  enum ParamIds {
-    TEMP_PARAM,
-    FOOD_PARAM,
-    DISPLAYX_PARAM,
-    DISPLAYY_PARAM,
-    DISPLAYSCALE_PARAM,
-    NUM_PARAMS
-  };
+  // loopParam
+  dsp::RingBuffer<bool, 1> loopParam;
+  bool loop = false;
+
+  enum ParamIds { TEMP_PARAM, FOOD_PARAM, NUM_PARAMS };
   enum InputIds {
-    CLOCK_INPUT,
     VOCT_INPUT,
-    BUSYIN_INPUT,
-    DATACLKIN_INPUT,
+    CLOCK_INPUT,
     SEND_INPUT,
     DATAIN_INPUT,
+    BUSYIN_INPUT,
+    DATACLKIN_INPUT,
     NUM_INPUTS
   };
   enum OutputIds {
-    AUDIO_OUTPUT,
-    VOCTOUT_OUTPUT,
     DEAD_OUTPUT,
+    VOCTOUT_OUTPUT,
+    AUDIO_OUTPUT,
     BUSY_OUTPUT,
     DATACLK_OUTPUT,
     DATA_OUTPUT,
     NUM_OUTPUTS
   };
-  enum LightIds { CLOCKLIGHT_LIGHT, BUSYINLIGHT_LIGHT, NUM_LIGHTS };
+  enum LightIds { NUM_LIGHTS };
 
   Mitosis();
   void process(const ProcessArgs &args) override;

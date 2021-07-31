@@ -4,6 +4,7 @@
 #include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "GoLDisplay.hpp"
+#include "SliderParam.hpp"
 #include "plugin.hpp"
 #include <unordered_map>
 #include <vector>
@@ -13,9 +14,6 @@ Mitosis::Mitosis() {
   configParam(TEMP_PARAM, 0.f, 1.f, 0.5f,
               "Roundness of the harmonic amplitude decay function");
   configParam(FOOD_PARAM, 0.f, 1.f, 0.f, "Wideness of the harmonics range");
-  configParam(DISPLAYX_PARAM, 0.f, 1.f, 0.f, "");
-  configParam(DISPLAYY_PARAM, 0.f, 1.f, 0.f, "");
-  configParam(DISPLAYSCALE_PARAM, 0.f, 1.f, 0.f, "");
   clockUp = false;
   golGrid = new GameOfLifeGrid();
   golGrid->init();
@@ -67,6 +65,9 @@ void Mitosis::process(const ProcessArgs &args) {
     bool alive = golGrid->getCell(c->getX(), c->getY())->isAlive();
     golGrid->setCellState(c->getX(), c->getY(), !alive);
   }
+  if (!loopParam.empty()) {
+    loop = loopParam.shift();
+  }
   // *** PROCESS AUDIO ***
   GridState gs = golGrid->getCurrentlyAlive();
   golGrid->resetModified();
@@ -100,7 +101,6 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * audio);
   outputs[VOCTOUT_OUTPUT].setVoltage(vOctOut);
-  lights[CLOCKLIGHT_LIGHT].setBrightness(clockUp == true ? 1.0f : 0.0f);
 }
 
 json_t *Mitosis::dataToJson() {
@@ -109,6 +109,8 @@ json_t *Mitosis::dataToJson() {
   json_t *gridJ = json_array();
   json_t *rowMutedJ = json_array();
   json_t *colMutedJ = json_array();
+  // json_t *gridParams = json_array();
+  // json_array_append_new(gridParams, json_boolean(loop));
   for (int i = 0; i < NUMCELLSX; i++) {
     for (int j = 0; j < NUMCELLSY; j++) {
       json_array_append_new(gridJ,
@@ -122,6 +124,7 @@ json_t *Mitosis::dataToJson() {
   json_object_set_new(rootJ, "golGrid", gridJ);
   json_object_set_new(rootJ, "rowMuted", rowMutedJ);
   json_object_set_new(rootJ, "colMuted", colMutedJ);
+  // json_object_set_new(rootJ, "gridParams", gridParams);
   return rootJ;
 }
 
@@ -130,6 +133,8 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   json_t *gridJ = json_object_get(rootJ, "golGrid");
   json_t *rowMutedJ = json_object_get(rootJ, "rowMuted");
   json_t *colMutedJ = json_object_get(rootJ, "colMuted");
+  // json_t *gridParams = json_object_get(rootJ, "gridParams");
+  // loop = json_is_true(json_array_get(gridParams, 0));
   if (gridJ && rowMutedJ && colMutedJ) {
     for (int i = 0; i < NUMCELLSX; i++) {
       for (int j = 0; j < NUMCELLSY; j++) {
@@ -160,47 +165,36 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.824, 44.604)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.89, 30.936)),
                                                  module, Mitosis::TEMP_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.824, 66.829)),
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(35.67, 31.094)),
                                                  module, Mitosis::FOOD_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(7.941, 83.26)), module, Mitosis::DISPLAYX_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(25.474, 83.26)), module, Mitosis::DISPLAYY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(
-        mm2px(Vec(41.878, 83.26)), module, Mitosis::DISPLAYSCALE_PARAM));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(95.292, 5.151)), module,
-                                             Mitosis::CLOCK_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.082, 27.636)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(35.67, 46.969)), module,
                                              Mitosis::VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.637, 104.157)),
-                                             module, Mitosis::BUSYIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.137, 104.157)),
-                                             module, Mitosis::DATACLKIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.637, 113.333)),
-                                             module, Mitosis::SEND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.046, 113.333)),
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.89, 47.869)), module,
+                                             Mitosis::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.57, 93.917)), module,
+                                             Mitosis::SEND_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(39.633, 111.122)),
                                              module, Mitosis::DATAIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.927, 111.961)), module,
+                                             Mitosis::BUSYIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.78, 111.961)), module,
+                                             Mitosis::DATACLKIN_INPUT));
 
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(136.038, 5.151)),
-                                               module, Mitosis::AUDIO_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(8.244, 45.613)), module, Mitosis::VOCTOUT_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.229, 66.789)),
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.927, 69.686)),
                                                module, Mitosis::DEAD_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.637, 104.157)),
+    addOutput(createOutputCentered<PJ301MPort>(
+        mm2px(Vec(23.78, 69.686)), module, Mitosis::VOCTOUT_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(37.633, 69.686)),
+                                               module, Mitosis::AUDIO_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.71, 93.917)),
                                                module, Mitosis::BUSY_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(20.137, 104.157)), module, Mitosis::DATACLK_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.137, 113.333)),
+        mm2px(Vec(27.85, 93.917)), module, Mitosis::DATACLK_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.99, 93.917)),
                                                module, Mitosis::DATA_OUTPUT));
-
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(104.288, 5.151)), module, Mitosis::CLOCKLIGHT_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(29.637, 113.333)), module, Mitosis::BUSYINLIGHT_LIGHT));
 
     // mm2px(Vec(110.0, 110.0))
     GolDisplay *display = new GolDisplay();
@@ -208,7 +202,12 @@ struct MitosisWidget : ModuleWidget {
     display->box.pos = mm2px(Vec(49.288, 11.674));
     display->box.size = mm2px(Vec(110.0, 110.0));
     addChild(display);
-    // addChild(createWidget<Widget>(mm2px(Vec(49.288, 11.674))));
+
+    SliderParam *loopParam =
+        new SliderParam(module->loop, &(module->loopParam));
+    loopParam->box.pos = mm2px(Vec(75.061, 3.6));
+    loopParam->box.size = mm2px(Vec(7.8, 3.8));
+    addChild(loopParam);
   }
 };
 
