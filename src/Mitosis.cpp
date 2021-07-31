@@ -225,6 +225,12 @@ struct MitosisWidget : ModuleWidget {
     // mm2px(Vec(7.985, 3.985))
     addChild(createWidget<Widget>(mm2px(Vec(35.372, 67.28))));
 */
+    /*std::vector<float> xs;
+    std::vector<float> ys;
+    xs.push_back(4.202);
+    xs.push_back(14.592);
+    xs.push_back(24.982);
+    xs.push_back(35.372);*/
     GolDisplay *display = new GolDisplay();
     display->module = module;
     display->box.pos = mm2px(Vec(49.06, 12.5));
@@ -232,7 +238,7 @@ struct MitosisWidget : ModuleWidget {
     addChild(display);
 
     SliderParam *lpWidget = new SliderParam();
-    lpWidget->module = module;
+    lpWidget->rb = &(module->loopParam);
     lpWidget->box.pos = mm2px(Vec(75.061, 3.6));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     addChild(lpWidget);

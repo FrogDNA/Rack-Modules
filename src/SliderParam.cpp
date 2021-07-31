@@ -26,13 +26,15 @@ void SliderParam::draw(const DrawArgs &args) {
 }
 
 void SliderParam::onButton(const event::Button &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-    // thread safe
-    if (!module->loopParam.full()) {
-      switchedOn = !switchedOn;
-      module->loopParam.push(switchedOn);
+  if (rb) {
+    if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+      // thread safe
+      if (!rb->full()) {
+        switchedOn = !switchedOn;
+        rb->push(switchedOn);
+      }
+      e.consume(this);
     }
-    e.consume(this);
+    Widget::onButton(e);
   }
-  Widget::onButton(e);
 }
