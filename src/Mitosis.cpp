@@ -52,8 +52,7 @@ void Mitosis::process(const ProcessArgs &args) {
     }
     if (risingEdge) {
       if (dataReceiver->isNewGridReady()) {
-        std::vector<Cell *> v =
-            dataReceiver->getGrid()->getCurrentlyAlive().currentlyAlive;
+        std::vector<Cell *> v = dataReceiver->getGrid()->getCurrentlyAlive();
         golGrid->init(v);
       } else {
         golGrid->update(loop);
@@ -86,14 +85,13 @@ void Mitosis::process(const ProcessArgs &args) {
     dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
   }
   // *** PROCESS AUDIO ***
-  GridState gs = golGrid->getCurrentlyAlive();
-  golGrid->resetModified();
-  dsp->paramValues(gs, food_wideness, temp_roundness, vOct);
+  std::vector<Cell *> state = golGrid->getCurrentlyAlive();
+  dsp->paramValues(state, food_wideness, temp_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // data send
   if (send > 3.5f && hasResetSend) {
     if (!dataSender->isTransferInProgress()) {
-      dataSender->init(golGrid->getCurrentlyAlive().currentlyAlive);
+      dataSender->init(golGrid->getCurrentlyAlive());
       hasResetSend = false;
     }
   }

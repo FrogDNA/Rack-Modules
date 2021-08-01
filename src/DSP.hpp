@@ -14,39 +14,31 @@ struct SoundParams {
   SoundParams(float wideness, float roundness);
 };
 
-class AudibleCell {
-
-  float x = 0.f;
-  float harmonicNumber = 1.f;
-  float baseFrequency = 440.0f;
-  float amplitude = 1.0f;
-  float phase = 0.f;
-  float freqMultiplicator = 1.0f;
-  AudibleCell(float x, float baseFrequency, float harmonicNumber,
-              float amplitude);
-  float nextValue(float sampleTime);
-  float currentAmplitude();
-  friend class DSP;
-};
-
 class DSP {
   std::vector<bool> audibleCols;
   std::vector<bool> audibleRows;
   std::vector<float> baseFreqLut;
   std::vector<Cell *> alive;
-  std::vector<AudibleCell *> audibles;
+  std::vector<float> baseFrequencies;
+  std::vector<float> harmonicNumbers;
+  std::vector<float> amplitudes;
+  std::vector<float> phases;
+  bool audibilityChanged = false;
+  int vSize = 0;
   float wideness = -1.f;
   float roundness = -1.f;
   float vOct = 0.f;
-  float lowestFreq =
-      7902.13f; // B8 - for optimization purposes, but is it the right place ?
+  float vOctMult = 1.f;
+  float lowestFreq = 7902.13f; // B8 - for optimization purposes, but is
+                               // it the right place ?
   float computeAmplitude(SoundParams *sp, float numHarmonic);
 
 public:
   static std::vector<float> sinLut;
   static std::vector<float> initSinLut();
   DSP();
-  void paramValues(GridState gs, float wideness, float roundness, float vOct);
+  void paramValues(std::vector<Cell *> state, float wideness, float roundness,
+                   float vOct);
   float nextValue(float sampleTime);
   float getLowestFreq();
   void muteUnmuteCol(int x, bool muted);

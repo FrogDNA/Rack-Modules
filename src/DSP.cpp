@@ -9,27 +9,7 @@ std::vector<float> DSP::initSinLut() {
   }
   return sinLut;
 }
-std::vector<float> sinLut = DSP::initSinLut();
-
-AudibleCell::AudibleCell(float x, float baseFrequency, float harmonicNumber,
-                         float amplitude) {
-  this->x = x;
-  this->baseFrequency = baseFrequency;
-  this->harmonicNumber = harmonicNumber;
-  this->amplitude = amplitude;
-}
-
-float AudibleCell::nextValue(float sampleTime) {
-  float f = baseFrequency * harmonicNumber * freqMultiplicator;
-  phase = phase + f * sampleTime;
-  phase = phase - floor(phase);
-  int phaseInt = floor(SIN_LUT_SIZE * phase);
-  float rawVal = sinLut[phaseInt];
-  float amp = amplitude;
-  return rawVal * amp;
-}
-
-float AudibleCell::currentAmplitude() { return amplitude; }
+const std::vector<float> SIN_LUT = DSP::initSinLut();
 
 DSP::DSP() {
   baseFreqLut.reserve(NUMCELLS_X);
@@ -46,35 +26,36 @@ DSP::DSP() {
   }
 }
 
-void DSP::paramValues(GridState state, float wideness, float roundness,
-                      float vOct) {
+void DSP::paramValues(std::vector<Cell *> state, float wideness,
+                      float roundness, float vOct) {
   if (this->vOct != vOct) {
     this->vOct = vOct;
-    float mult = pow(2.0f, vOct);
-    for (std::vector<AudibleCell *>::iterator it = audibles.begin();
-         it != audibles.end(); ++it) {
-      (*it)->freqMultiplicator = mult;
-    }
+    vOctMult = pow(2.0f, vOct);
   }
   if (this->wideness != wideness || this->roundness != roundness) {
     this->wideness = wideness;
     this->roundness = roundness;
     SoundParams sp = SoundParams(wideness, roundness);
-    for (std::vector<AudibleCell *>::iterator it = audibles.begin();
-         it != audibles.end(); ++it) {
-      AudibleCell *c = *it;
-      float numHarmonic = c->harmonicNumber;
+    for (int i = 0; i < vSize; i++) {
+      float numHarmonic = harmonicNumbers[i];
       // amplitude
       float amplitude = computeAmplitude(&sp, numHarmonic);
-      c->amplitude = amplitude;
+      amplitudes[i] = amplitude;
     }
   }
 
-  if (this->alive != state.currentlyAlive) {
-    this->alive = state.currentlyAlive;
-    audibles.clear();
+  if (this->alive != state || audibilityChanged) {
+    this->alive = state;
     std::vector<int> harmonics;
     harmonics.reserve(NUMCELLS_X);
+    baseFrequencies.clear();
+    harmonicNumbers.clear();
+    amplitudes.clear();
+    vSize = 0;
+    baseFrequencies.reserve(NUMCELLS_X * NUMCELLS_Y); // worst case scenario
+    harmonicNumbers.reserve(NUMCELLS_X * NUMCELLS_Y);
+    amplitudes.reserve(NUMCELLS_X * NUMCELLS_Y);
+    phases.reserve(NUMCELLS_X * NUMCELLS_Y);
     for (int x = 0; x < NUMCELLS_X; ++x) {
       harmonics[x] = 0;
     }
@@ -85,6 +66,7 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
       if (isCellAudible(*it)) {
         int x = c->getX();
         ++(harmonics[x]);
+        ++vSize;
         float baseFrequency = baseFreqLut[x];
         if (baseFrequency < lf) {
           lf = baseFrequency;
@@ -93,8 +75,10 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
         // amplitude
         SoundParams sp = SoundParams(wideness, roundness);
         float amplitude = computeAmplitude(&sp, numHarmonic);
-        audibles.push_back(
-            new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
+        amplitudes.push_back(amplitude);
+        harmonicNumbers.push_back(harmonics[x]);
+        baseFrequencies.push_back(baseFrequency);
+        phases.push_back(0.f);
       }
     }
     if (lf != HIGHEST_FREQUENCY + 1.f) {
@@ -106,12 +90,19 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
 float DSP::nextValue(float sampleTime) {
   float audio = 0.f;
   float ampSum = 0.f;
-  for (std::vector<AudibleCell *>::iterator it = audibles.begin();
-       it != audibles.end(); ++it) {
-    float val = (*it)->nextValue(sampleTime);
-    float amp = (*it)->currentAmplitude();
+  for (int i = 0; i < vSize; i++) {
+    float baseFrequency = baseFrequencies[i];
+    float harmonicNumber = harmonicNumbers[i];
+    float amplitude = amplitudes[i];
+    float phase = phases[i];
+    float f = baseFrequency * harmonicNumber * vOctMult;
+    phases[i] = phase + f * sampleTime;
+    phase = phase - floor(phase);
+    int phaseInt = floor(SIN_LUT_SIZE * phase);
+    float rawVal = SIN_LUT[phaseInt];
+    float val = amplitude * rawVal;
     audio += val;
-    ampSum += amp;
+    ampSum += amplitude;
   }
   if (ampSum != 0.f) {
     audio = audio / ampSum;
