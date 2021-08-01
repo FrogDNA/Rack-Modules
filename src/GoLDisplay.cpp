@@ -4,8 +4,8 @@
 
 GolDisplay::GolDisplay() {
   // todo replace with static something
-  numCellsX = (float)(NUMCELLSX + 1); // take into account lineheaders
-  numCellsY = (float)(NUMCELLSY + 1); // take into account lineheaders
+  numCellsX = (float)(NUMCELLS_DISPLAY_X + 1); // take into account lineheaders
+  numCellsY = (float)(NUMCELLS_DISPLAY_Y + 1); // take into account lineheaders
   float sizeXmm = 110.0;
   float sizeYmm = 110.0;
   sizeX = mm2px(Vec(110.0, 110.0)).x;
@@ -22,23 +22,25 @@ GolDisplay::GolDisplay() {
 void GolDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
     firstDraw = false;
-    for (int i = 0; i < NUMCELLSY; i++) {
-      LineHeader *lh = new LineHeader(i, true);
-      lh->box.pos = Vec(0, (i + 1) * (cellSizeY + cellSpaceY));
-      lh->box.size = Vec(cellSizeX, cellSizeY);
-      lh->rb = &(module->muteUnmuteRowsBuffer);
-      addChild(lh);
-    }
-    for (int i = 0; i < NUMCELLSX; i++) {
-      LineHeader *lh = new LineHeader(i, false);
+    int display_x0 = REFERENCE_POS - NUMCELLS_DISPLAY_X / 2;
+    int display_y0 = REFERENCE_POS - NUMCELLS_DISPLAY_Y / 2;
+    for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
+      LineHeader *lh = new LineHeader(i + display_x0, false);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
       lh->box.size = Vec(cellSizeX, cellSizeY);
       lh->rb = &(module->muteUnmuteColsBuffer);
       addChild(lh);
     }
-    for (int i = 0; i < NUMCELLSX; i++) {
-      for (int j = 0; j < NUMCELLSY; j++) {
-        Cell *c = module->golGrid->getCell(i, j);
+    for (int i = 0; i < NUMCELLS_DISPLAY_Y; i++) {
+      LineHeader *lh = new LineHeader(i + display_y0, true);
+      lh->box.pos = Vec(0, (i + 1) * (cellSizeY + cellSpaceY));
+      lh->box.size = Vec(cellSizeX, cellSizeY);
+      lh->rb = &(module->muteUnmuteRowsBuffer);
+      addChild(lh);
+    }
+    for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
+      for (int j = 0; j < NUMCELLS_DISPLAY_Y; j++) {
+        Cell *c = module->golGrid->getCell(i + display_x0, j + display_y0);
         DrawableCell *golCell = new DrawableCell(c);
         golCell->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX),
                                (j + 1) * (cellSizeY + cellSpaceY));

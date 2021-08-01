@@ -29,7 +29,7 @@ void DataSender::next() {
     case 0: {
       clock = 0.f;
       int x = (*itr)->getX();
-      float xData = 10.0f * (float)(x) / (float)NUMCELLSX;
+      float xData = 10.0f * (float)(x) / (float)NUMCELLS_X;
       data = xData;
     } break;
     case 1:
@@ -38,7 +38,7 @@ void DataSender::next() {
     case 2: {
       clock = 0.f;
       int y = (*itr)->getY();
-      float yData = 10.0f * (float)(y) / (float)NUMCELLSY;
+      float yData = 10.0f * (float)(y) / (float)NUMCELLS_Y;
       data = yData;
     } break;
     case 3:

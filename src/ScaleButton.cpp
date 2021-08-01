@@ -10,7 +10,7 @@ void ScaleButton::draw(const DrawArgs &args) {
   bool oneUnmuted = false;
   if (module) {
     DSP *dsp = module->dsp;
-    for (int i = semitone; i < NUMCELLSX; i += 12) {
+    for (int i = semitone; i < NUMCELLS_X; i += 12) {
       if (dsp->isColAudible(i)) {
         oneUnmuted = true;
       } else {
@@ -46,7 +46,7 @@ void ScaleButton::onButton(const event::Button &e) {
     // thread safe
     if (status < 2) {
       bool isFull = false;
-      for (int i = semitone; i < NUMCELLSY; i += 12) {
+      for (int i = semitone; i < NUMCELLS_X; i += 12) {
         if (!muteRb->full()) {
           muteRb->push(i);
         } else {
@@ -61,7 +61,7 @@ void ScaleButton::onButton(const event::Button &e) {
       }
     } else {
       bool isFull = false;
-      for (int i = semitone; i < NUMCELLSY; i += 12) {
+      for (int i = semitone; i < NUMCELLS_X; i += 12) {
         if (!unmuteRb->full()) {
           unmuteRb->push(i);
         } else {

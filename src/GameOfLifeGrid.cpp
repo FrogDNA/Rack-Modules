@@ -10,8 +10,8 @@ bool Cell::isAlive() { return alive; }
 void Cell::setAlive(bool isAlive) { alive = isAlive; }
 
 GameOfLifeGrid::GameOfLifeGrid() {
-  for (int i = 0; i < NUMCELLSX; i++) {
-    for (int j = 0; j < NUMCELLSY; j++) {
+  for (int i = 0; i < NUMCELLS_X; i++) {
+    for (int j = 0; j < NUMCELLS_Y; j++) {
       allCells[i][j] = new Cell(i, j, false);
     }
   }
@@ -19,14 +19,44 @@ GameOfLifeGrid::GameOfLifeGrid() {
 
 void GameOfLifeGrid::init() {
   emptyGrid();
-  // optional
-  setCellState(NUMCELLSX / 2, NUMCELLSY / 2, true);
-  setCellState(NUMCELLSX / 2 - 1, NUMCELLSY / 2, true);
-  setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2, true);
-  setCellState(NUMCELLSX / 2 - 1, NUMCELLSY / 2 - 1, true);
-  setCellState(NUMCELLSX / 2, NUMCELLSY / 2 + 1, true);
-  setCellState(NUMCELLSX / 2 + 1, NUMCELLSY / 2 - 1, true);
-  setCellState(NUMCELLSX / 2 + 2, NUMCELLSY / 2 - 1, true);
+  // optional, interesting to test all manner of things
+  //(Gosper Glider Gun)
+  setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS - 19, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS - 18, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS - 18, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS - 9, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS - 9, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS - 9, REFERENCE_POS + 2, true);
+  setCellState(REFERENCE_POS - 8, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS - 8, REFERENCE_POS + 3, true);
+  setCellState(REFERENCE_POS - 7, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS - 7, REFERENCE_POS + 4, true);
+  setCellState(REFERENCE_POS - 6, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS - 6, REFERENCE_POS + 4, true);
+  setCellState(REFERENCE_POS - 5, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS - 4, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS - 4, REFERENCE_POS + 3, true);
+  setCellState(REFERENCE_POS - 3, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS - 3, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS - 3, REFERENCE_POS + 2, true);
+  setCellState(REFERENCE_POS - 2, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS + 1, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS + 1, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS + 1, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS + 2, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS + 2, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS + 2, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS + 3, REFERENCE_POS - 3, true);
+  setCellState(REFERENCE_POS + 3, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS + 5, REFERENCE_POS - 3, true);
+  setCellState(REFERENCE_POS + 5, REFERENCE_POS + 1, true);
+  setCellState(REFERENCE_POS + 5, REFERENCE_POS - 4, true);
+  setCellState(REFERENCE_POS + 5, REFERENCE_POS + 2, true);
+  setCellState(REFERENCE_POS + 15, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS + 15, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 1, true);
+  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
 }
 
 void GameOfLifeGrid::init(std::vector<Cell *> alive) {
@@ -54,9 +84,9 @@ void GameOfLifeGrid::setCellState(int x, int y, bool state) {
   allCells[x][y]->setAlive(state);
   // in all cases insert neighbouring cells into watchlist
   for (int i = x - 1; i < x + 2; i++) {
-    int ci = (i + NUMCELLSX) % NUMCELLSX;
+    int ci = (i + NUMCELLS_X) % NUMCELLS_X;
     for (int j = y - 1; j < y + 2; j++) {
-      int cj = (j + NUMCELLSY) % NUMCELLSY;
+      int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
       watchList.insert(allCells[ci][cj]);
     }
   }
@@ -94,9 +124,9 @@ int GameOfLifeGrid::countAlive(std::set<Cell *> ca, Cell *c, bool loop) {
   int y = c->getY();
   if (loop) {
     for (int i = x - 1; i < x + 2; i++) {
-      int ci = (i + NUMCELLSX) % NUMCELLSX;
+      int ci = (i + NUMCELLS_X) % NUMCELLS_X;
       for (int j = y - 1; j < y + 2; j++) {
-        int cj = (j + NUMCELLSY) % NUMCELLSY;
+        int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
         if (i != x || j != y) {
           bool is_in = ca.find(allCells[ci][cj]) != ca.end();
           if (is_in) {
@@ -106,8 +136,8 @@ int GameOfLifeGrid::countAlive(std::set<Cell *> ca, Cell *c, bool loop) {
       }
     }
   } else {
-    for (int i = std::max(x - 1, 0); i < std::min(x + 2, NUMCELLSX); i++) {
-      for (int j = std::max(y - 1, 0); j < std::min(y + 2, NUMCELLSY); j++) {
+    for (int i = std::max(x - 1, 0); i < std::min(x + 2, NUMCELLS_X); i++) {
+      for (int j = std::max(y - 1, 0); j < std::min(y + 2, NUMCELLS_Y); j++) {
         if (i != x || j != y) {
           bool is_in = ca.find(allCells[i][j]) != ca.end();
           if (is_in) {

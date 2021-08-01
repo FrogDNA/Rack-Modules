@@ -12,10 +12,10 @@ void DataReceiver::check(float busyIn, float clockIn, float dataIn) {
     if (clockIn > 3.5f && !risingEdgeReceived) {
       risingEdgeReceived = true;
       if (isXNext) {
-        x = (int)((dataIn / 10.f) * NUMCELLSX);
+        x = (int)((dataIn / 10.f) * NUMCELLS_X);
         isXNext = false;
       } else {
-        y = (int)((dataIn / 10.f) * NUMCELLSY);
+        y = (int)((dataIn / 10.f) * NUMCELLS_Y);
         gridInPreparation->setCellState(x, y, true);
         isXNext = true;
       }

@@ -32,22 +32,22 @@ float AudibleCell::nextValue(float sampleTime) {
 float AudibleCell::currentAmplitude() { return amplitude; }
 
 DSP::DSP() {
-  baseFreqLut.reserve(NUMCELLSX);
-  audibleCols.reserve(NUMCELLSX);
-  audibleRows.reserve(NUMCELLSY);
-  for (int i = 0; i < NUMCELLSX; i++) {
-    baseFreqLut[i] = BASE_FREQ * pow(2.0f, (float)(i - NUMCELLSX / 2) / 12.0f);
+  baseFreqLut.reserve(NUMCELLS_X);
+  audibleCols.reserve(NUMCELLS_X);
+  audibleRows.reserve(NUMCELLS_Y);
+  for (int i = 0; i < NUMCELLS_X; i++) {
+    baseFreqLut[i] =
+        REFERENCE_FREQ * pow(2.0f, (float)(i - REFERENCE_POS) / 12.0f);
+    // nothing to do with before, but use the same for loop to gain time
     audibleCols[i] = true;
   }
-  for (int i = 0; i < NUMCELLSY; i++) {
+  for (int i = 0; i < NUMCELLS_Y; i++) {
     audibleRows[i] = true;
   }
 }
 
 void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
-  roundness = pow(10.f, roundness - 0.5f);
-  wideness = wideness * (float)(NUMCELLSY - 1) + 1.f;
   std::vector<Cell *> alive;
   for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
        it != state.currentlyAlive.end(); ++it) {
@@ -66,14 +66,13 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
   if (this->wideness != wideness || this->roundness != roundness) {
     this->wideness = wideness;
     this->roundness = roundness;
-    // todo put into separate function
-    // todo do the same with oldAudibles
+    SoundParams sp = SoundParams(wideness, roundness);
     for (std::vector<AudibleCell *>::iterator it = audibles.begin();
          it != audibles.end(); ++it) {
       AudibleCell *c = *it;
       float numHarmonic = c->harmonicNumber;
       // amplitude
-      float amplitude = computeAmplitude(wideness, roundness, numHarmonic);
+      float amplitude = computeAmplitude(&sp, numHarmonic);
       c->amplitude = amplitude;
     }
   }
@@ -82,13 +81,13 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
     this->alive = alive;
     audibles.clear();
     std::vector<int> harmonics;
-    harmonics.reserve(NUMCELLSX);
-    for (int x = 0; x < NUMCELLSX; ++x) {
+    harmonics.reserve(NUMCELLS_X);
+    for (int x = 0; x < NUMCELLS_X; ++x) {
       harmonics[x] = 0;
     }
     float lf;
     if (alive.begin() != alive.end()) {
-      lf = 7902.13f;
+      lf = HIGHEST_FREQUENCY;
     } else {
       lf = lowestFreq;
     }
@@ -103,7 +102,8 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
       }
       float numHarmonic = harmonics[x];
       // amplitude
-      float amplitude = computeAmplitude(wideness, roundness, numHarmonic);
+      SoundParams sp = SoundParams(wideness, roundness);
+      float amplitude = computeAmplitude(&sp, numHarmonic);
       audibles.push_back(
           new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
     }
@@ -127,38 +127,42 @@ float DSP::nextValue(float sampleTime) {
   return audio;
 }
 
-float DSP::computeAmplitude(float wideness, float roundness,
-                            float numHarmonic) {
-  float iNormalized = (numHarmonic - 1) / (wideness * wideness);
-  float amplitude = std::max(1.f - (float)pow(iNormalized, roundness), 0.f);
+SoundParams::SoundParams(float wideness, float roundness) {
+  wide = wideness * WIDENESS_REF + 1.f;
+  round = pow(10.f, roundness - 0.5f);
+}
+
+float DSP::computeAmplitude(SoundParams *sp, float numHarmonic) {
+  float iNormalized = (numHarmonic - 1) / (sp->wide * sp->wide);
+  float amplitude = std::max(1.f - (float)pow(iNormalized, sp->round), 0.f);
   return amplitude;
 }
 
 float DSP::getLowestFreq() { return lowestFreq; }
 
 void DSP::muteUnmuteCol(int x, bool muted) {
-  if (x < 0 || x > NUMCELLSX) {
+  if (x < 0 || x > NUMCELLS_X) {
     return;
   }
   audibleCols[x] = muted;
 }
 
 void DSP::muteUnmuteRow(int y, bool muted) {
-  if (y < 0 || y > NUMCELLSY) {
+  if (y < 0 || y > NUMCELLS_Y) {
     return;
   }
   audibleRows[y] = muted;
 }
 
 bool DSP::isColAudible(int x) {
-  if (x < 0 || x > NUMCELLSX) {
+  if (x < 0 || x > NUMCELLS_X) {
     return false;
   }
   return audibleCols[x];
 }
 
 bool DSP::isRowAudible(int y) {
-  if (y < 0 || y > NUMCELLSY) {
+  if (y < 0 || y > NUMCELLS_Y) {
     return false;
   }
   return audibleRows[y];

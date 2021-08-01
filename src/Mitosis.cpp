@@ -128,16 +128,16 @@ json_t *Mitosis::dataToJson() {
   json_t *rowAudibleJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
-  for (int i = 0; i < NUMCELLSX; i++) {
-    for (int j = 0; j < NUMCELLSY; j++) {
+  for (int i = 0; i < NUMCELLS_X; i++) {
+    for (int j = 0; j < NUMCELLS_Y; j++) {
       json_array_append_new(gridJ,
                             json_boolean(golGrid->getCell(i, j)->isAlive()));
     }
   }
-  for (int i = 0; i < NUMCELLSX; i++) {
+  for (int i = 0; i < NUMCELLS_X; i++) {
     json_array_append_new(colAudibleJ, json_boolean(dsp->isColAudible(i)));
   }
-  for (int i = 0; i < NUMCELLSY; i++) {
+  for (int i = 0; i < NUMCELLS_Y; i++) {
     json_array_append_new(rowAudibleJ, json_boolean(dsp->isRowAudible(i)));
   }
   json_object_set_new(rootJ, "golGrid", gridJ);
@@ -152,17 +152,17 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   json_t *rowAudibleJ = json_object_get(rootJ, "rowAudible");
   json_t *colAudibleJ = json_object_get(rootJ, "colAudible");
   if (gridJ && rowAudibleJ && colAudibleJ) {
-    for (int i = 0; i < NUMCELLSX; i++) {
-      for (int j = 0; j < NUMCELLSY; j++) {
-        bool value = json_is_true(json_array_get(gridJ, NUMCELLSY * i + j));
+    for (int i = 0; i < NUMCELLS_X; i++) {
+      for (int j = 0; j < NUMCELLS_Y; j++) {
+        bool value = json_is_true(json_array_get(gridJ, NUMCELLS_Y * i + j));
         golGrid->setCellState(i, j, value);
       }
     }
-    for (int i = 0; i < NUMCELLSX; i++) {
+    for (int i = 0; i < NUMCELLS_X; i++) {
       bool colAudible = json_is_true(json_array_get(colAudibleJ, i));
       dsp->muteUnmuteCol(i, colAudible);
     }
-    for (int i = 0; i < NUMCELLSY; i++) {
+    for (int i = 0; i < NUMCELLS_Y; i++) {
       bool rowAudible = json_is_true(json_array_get(rowAudibleJ, i));
       dsp->muteUnmuteRow(i, rowAudible);
     }
@@ -214,35 +214,6 @@ struct MitosisWidget : ModuleWidget {
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.99, 100.267)),
                                                module, Mitosis::DATA_OUTPUT));
 
-    // mm2px(Vec(7.786, 3.786))
-    // infinity
-    // addChild(createWidget<Widget>(mm2px(Vec(134.446, 3.607))));
-    // mm2px(Vec(7.985, 3.985))
-    /*
-    addChild(createWidget<Widget>(mm2px(Vec(4.202, 56.819))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(14.592, 56.82))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(24.982, 56.82))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(35.372, 56.82))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(4.202, 62.05))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(14.592, 62.05))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(24.982, 62.05))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(35.372, 62.05))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(4.202, 67.28))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(14.592, 67.28))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(24.982, 67.28))));
-    // mm2px(Vec(7.985, 3.985))
-    addChild(createWidget<Widget>(mm2px(Vec(35.372, 67.28))));
-*/
     std::vector<float> xs;
     std::vector<float> ys;
     xs.push_back(4.202);
@@ -275,6 +246,12 @@ struct MitosisWidget : ModuleWidget {
     lpWidget->box.pos = mm2px(Vec(75.061, 3.6));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     addChild(lpWidget);
+
+    SliderParam *infWidget = new SliderParam();
+    infWidget->rb = &(module->infinityParam);
+    infWidget->box.pos = mm2px(Vec(134.446, 3.6));
+    infWidget->box.size = mm2px(Vec(7.8, 3.8));
+    addChild(infWidget);
   }
 };
 

@@ -5,8 +5,14 @@
 #include "robin_hood.h"
 
 const float ENVELOPE_DURATION = 0.1f;
-const float BASE_FREQ = 440.f;
 const int SIN_LUT_SIZE = 1000000;
+const float WIDENESS_REF = 5.0f;
+
+struct SoundParams {
+  float round;
+  float wide;
+  SoundParams(float wideness, float roundness);
+};
 
 class AudibleCell {
 
@@ -34,7 +40,7 @@ class DSP {
   float vOct = 0.f;
   float lowestFreq =
       7902.13f; // B8 - for optimization purposes, but is it the right place ?
-  float computeAmplitude(float wideness, float roundness, float numHarmonic);
+  float computeAmplitude(SoundParams *sp, float numHarmonic);
 
 public:
   static std::vector<float> sinLut;
