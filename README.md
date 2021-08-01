@@ -1,5 +1,9 @@
 Out of date. To be updated soon...
 
+Note : infinity not functional yet. 
+
+Todo scrolling bars on display. Disabled with infinity off
+
 # FrogDNA Mitosis
 
 A VCV Rack module that revolve around James Conway's "Game of Life".
