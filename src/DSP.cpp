@@ -48,13 +48,6 @@ DSP::DSP() {
 
 void DSP::paramValues(GridState state, float wideness, float roundness,
                       float vOct) {
-  std::vector<Cell *> alive;
-  for (std::vector<Cell *>::iterator it = state.currentlyAlive.begin();
-       it != state.currentlyAlive.end(); ++it) {
-    if (isCellAudible(*it)) {
-      alive.push_back(*it);
-    }
-  }
   if (this->vOct != vOct) {
     this->vOct = vOct;
     float mult = pow(2.0f, vOct);
@@ -77,37 +70,36 @@ void DSP::paramValues(GridState state, float wideness, float roundness,
     }
   }
 
-  if (this->alive != alive) {
-    this->alive = alive;
+  if (this->alive != state.currentlyAlive) {
+    this->alive = state.currentlyAlive;
     audibles.clear();
     std::vector<int> harmonics;
     harmonics.reserve(NUMCELLS_X);
     for (int x = 0; x < NUMCELLS_X; ++x) {
       harmonics[x] = 0;
     }
-    float lf;
-    if (alive.begin() != alive.end()) {
-      lf = HIGHEST_FREQUENCY;
-    } else {
-      lf = lowestFreq;
-    }
+    float lf = HIGHEST_FREQUENCY + 1.f;
     for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
          ++it) {
       Cell *c = *it;
-      int x = c->getX();
-      ++(harmonics[x]);
-      float baseFrequency = baseFreqLut[x];
-      if (baseFrequency < lf) {
-        lf = baseFrequency;
+      if (isCellAudible(*it)) {
+        int x = c->getX();
+        ++(harmonics[x]);
+        float baseFrequency = baseFreqLut[x];
+        if (baseFrequency < lf) {
+          lf = baseFrequency;
+        }
+        float numHarmonic = harmonics[x];
+        // amplitude
+        SoundParams sp = SoundParams(wideness, roundness);
+        float amplitude = computeAmplitude(&sp, numHarmonic);
+        audibles.push_back(
+            new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
       }
-      float numHarmonic = harmonics[x];
-      // amplitude
-      SoundParams sp = SoundParams(wideness, roundness);
-      float amplitude = computeAmplitude(&sp, numHarmonic);
-      audibles.push_back(
-          new AudibleCell(x, baseFrequency, numHarmonic, amplitude));
     }
-    lowestFreq = lf;
+    if (lf != HIGHEST_FREQUENCY + 1.f) {
+      lowestFreq = lf;
+    }
   }
 }
 
