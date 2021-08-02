@@ -2,7 +2,6 @@
 #define DSP_H
 
 #include "GameOfLifeGrid.hpp"
-#include "robin_hood.h"
 
 const float ENVELOPE_DURATION = 0.1f;
 const int SIN_LUT_SIZE = 1000000;
