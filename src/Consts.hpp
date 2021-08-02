@@ -9,7 +9,7 @@
 static const int NUMCELLS_X = 40;
 static const int NUMCELLS_Y = 40;
 // at position 57 is A4 = 440.0 Hz
-static const int REFERENCE_POS = 57;
+// static const int REFERENCE_POS = 57;
 static const int REFERENCE_POS = 20;
 static const float REFERENCE_FREQ = 440.0f;
 static const float HIGHEST_FREQUENCY = 7902.13f;
