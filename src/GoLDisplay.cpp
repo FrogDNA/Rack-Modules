@@ -4,8 +4,10 @@
 
 GolDisplay::GolDisplay() {
   // todo replace with static something
-  numCellsX = (float)(NUMCELLS_DISPLAY_X + 1); // take into account lineheaders
-  numCellsY = (float)(NUMCELLS_DISPLAY_Y + 1); // take into account lineheaders
+  numCellsX = (float)(NUMCELLS_DISPLAY_X +
+                      2); // take into account lineheaders and the right column
+  numCellsY = (float)(NUMCELLS_DISPLAY_Y +
+                      2); // take into account lineheaders and the bottom line
   float sizeXmm = 110.0;
   float sizeYmm = 110.0;
   sizeX = mm2px(Vec(110.0, 110.0)).x;
@@ -22,8 +24,7 @@ GolDisplay::GolDisplay() {
 void GolDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
     firstDraw = false;
-    int display_x0 = REFERENCE_POS - NUMCELLS_DISPLAY_X / 2;
-    int display_y0 = REFERENCE_POS - NUMCELLS_DISPLAY_Y / 2;
+    // define column headers
     for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
       LineHeader *lh = new LineHeader(i + display_x0, false);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
@@ -31,6 +32,7 @@ void GolDisplay::draw(const DrawArgs &args) {
       lh->rb = &(module->muteUnmuteColsBuffer);
       addChild(lh);
     }
+    // define row headers
     for (int i = 0; i < NUMCELLS_DISPLAY_Y; i++) {
       LineHeader *lh = new LineHeader(i + display_y0, true);
       lh->box.pos = Vec(0, (i + 1) * (cellSizeY + cellSpaceY));
@@ -38,6 +40,7 @@ void GolDisplay::draw(const DrawArgs &args) {
       lh->rb = &(module->muteUnmuteRowsBuffer);
       addChild(lh);
     }
+    // define visible cells. todo change to a simpler way
     for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
       for (int j = 0; j < NUMCELLS_DISPLAY_Y; j++) {
         Cell *c = module->golGrid->getCell(i + display_x0, j + display_y0);
@@ -48,6 +51,7 @@ void GolDisplay::draw(const DrawArgs &args) {
         addChild(golCell);
       }
     }
+    // define zoom bars and buttons.TODO
   }
   OpaqueWidget::draw(args);
 }

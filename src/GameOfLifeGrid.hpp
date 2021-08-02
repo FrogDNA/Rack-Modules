@@ -4,9 +4,7 @@
 #include "Consts.hpp"
 #include "Coordinate.hpp"
 #include "plugin.hpp"
-#include "robin_hood.h"
 #include <set>
-#include <unordered_map>
 
 class Cell : public Coordinate {
   bool alive;
@@ -18,8 +16,7 @@ public:
 };
 
 class GameOfLifeGrid {
-  robin_hood::unordered_map<int, robin_hood::unordered_map<int, Cell *>>
-      allCells;
+  std::vector<std::vector<Cell *>> allCells;
   std::set<Cell *> oldAlive;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;

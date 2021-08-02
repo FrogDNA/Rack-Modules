@@ -1,7 +1,5 @@
 #include "GameOfLifeGrid.hpp"
 #include "Consts.hpp"
-#include <algorithm>
-#include <cstdio>
 
 Cell::Cell(int x, int y, bool alive) : Coordinate(x, y) { this->alive = alive; }
 
@@ -10,10 +8,14 @@ bool Cell::isAlive() { return alive; }
 void Cell::setAlive(bool isAlive) { alive = isAlive; }
 
 GameOfLifeGrid::GameOfLifeGrid() {
+  allCells.reserve(NUMCELLS_X);
   for (int i = 0; i < NUMCELLS_X; i++) {
+    std::vector<Cell *> v;
+    v.reserve(NUMCELLS_Y);
     for (int j = 0; j < NUMCELLS_Y; j++) {
-      allCells[i][j] = new Cell(i, j, false);
+      v.push_back(new Cell(i, j, false));
     }
+    allCells.push_back(v);
   }
 }
 

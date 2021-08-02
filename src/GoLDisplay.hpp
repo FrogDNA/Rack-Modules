@@ -23,8 +23,6 @@ struct LineHeader : Widget {
 
 struct GolDisplay : OpaqueWidget {
   Mitosis *module = NULL;
-  float offsetX = 0.f;
-  float offsetY = 0.f;
   float sizeX = 0.f;
   float sizeY = 0.f;
   float cellSizeX = 0.f;
@@ -34,6 +32,10 @@ struct GolDisplay : OpaqueWidget {
   float numCellsX = 0.f;
   float numCellsY = 0.f;
   bool firstDraw = true;
+  // first x displayed
+  int display_x0 = CENTER_DISPLAY_X - NUMCELLS_DISPLAY_X / 2;
+  // first y displayed
+  int display_y0 = CENTER_DISPLAY_Y - NUMCELLS_DISPLAY_Y / 2;
 
   GolDisplay();
   void draw(const DrawArgs &args) override;
