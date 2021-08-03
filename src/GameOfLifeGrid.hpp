@@ -17,6 +17,7 @@ public:
 
 class GameOfLifeGrid {
   std::vector<std::vector<Cell *>> allCells;
+  std::vector<std::vector<int>> neighbours;
   std::set<Cell *> oldAlive;
   std::set<Cell *> watchList;
   std::set<Cell *> currentlyAlive;

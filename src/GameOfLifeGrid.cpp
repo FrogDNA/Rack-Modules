@@ -9,13 +9,18 @@ void Cell::setAlive(bool isAlive) { alive = isAlive; }
 
 GameOfLifeGrid::GameOfLifeGrid() {
   allCells.reserve(NUMCELLS_X);
+  neighbours.reserve(NUMCELLS_X);
   for (int i = 0; i < NUMCELLS_X; i++) {
     std::vector<Cell *> v;
     v.reserve(NUMCELLS_Y);
+    std::vector<int> n;
+    n.reserve(NUMCELLS_Y);
     for (int j = 0; j < NUMCELLS_Y; j++) {
       v.push_back(new Cell(i, j, false));
+      n.push_back(j);
     }
     allCells.push_back(v);
+    neighbours.push_back(n);
   }
 }
 
