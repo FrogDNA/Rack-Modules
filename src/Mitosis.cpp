@@ -55,7 +55,7 @@ void Mitosis::process(const ProcessArgs &args) {
         std::vector<Cell *> v = dataReceiver->getGrid()->getCurrentlyAlive();
         golGrid->init(v);
       } else {
-        golGrid->update(loop);
+        golGrid->update();
       }
     }
   }
@@ -66,7 +66,8 @@ void Mitosis::process(const ProcessArgs &args) {
     golGrid->setCellState(c->getX(), c->getY(), !alive);
   }
   if (!loopParam.empty()) {
-    loop = loopParam.shift();
+    bool loop = loopParam.shift();
+    golGrid->setLoop(loop);
   }
   while (!muteColsBuffer.empty()) {
     int col = muteColsBuffer.shift();

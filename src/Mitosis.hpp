@@ -21,7 +21,6 @@ struct Mitosis : Module {
   dsp::RingBuffer<Coordinate *, 1> clickedCells;
   // loopParam
   dsp::RingBuffer<bool, 1> loopParam;
-  bool loop = false;
   // infinity param
   dsp::RingBuffer<bool, 1> infinityParam;
   bool infinity = false;

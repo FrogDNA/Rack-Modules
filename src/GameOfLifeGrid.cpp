@@ -17,7 +17,7 @@ GameOfLifeGrid::GameOfLifeGrid() {
     n.reserve(NUMCELLS_Y);
     for (int j = 0; j < NUMCELLS_Y; j++) {
       v.push_back(new Cell(i, j, false));
-      n.push_back(j);
+      n.push_back(0);
     }
     allCells.push_back(v);
     neighbours.push_back(n);
@@ -76,34 +76,56 @@ void GameOfLifeGrid::init(std::vector<Cell *> alive) {
 }
 
 void GameOfLifeGrid::setCellState(int x, int y, bool state) {
-  // todo optimize by using a vector ?
-  if (state) {
+  Cell *c = allCells[x][y];
+  if (state && !c->isAlive()) {
     // becomes alive
     currentlyAlive.insert(allCells[x][y]);
-  } else {
+    // into watchlist and add neighbours
+    updateNeighboursAndWatchlist(x, y, 1);
+  }
+  if (!state && c->isAlive()) {
     // becomes dead
     currentlyAlive.erase(allCells[x][y]);
+    updateNeighboursAndWatchlist(x, y, -1);
   }
   // set cell state
   allCells[x][y]->setAlive(state);
   // in all cases insert neighbouring cells into watchlist
-  for (int i = x - 1; i < x + 2; i++) {
-    int ci = (i + NUMCELLS_X) % NUMCELLS_X;
-    for (int j = y - 1; j < y + 2; j++) {
-      int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
-      watchList.insert(allCells[ci][cj]);
+}
+
+void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
+  if (loop) {
+    for (int i = x - 1; i < x + 2; i++) {
+      int ci = (i + NUMCELLS_X) % NUMCELLS_X;
+      for (int j = y - 1; j < y + 2; j++) {
+        int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
+        watchList.insert(allCells[ci][cj]);
+        if (ci != x || cj != y) {
+          neighbours[ci][cj] += val;
+        }
+      }
+    }
+  } else {
+    for (int i = std::max(x - 1, 0); i < std::min(x + 2, NUMCELLS_X); i++) {
+      for (int j = std::max(y - 1, 0); j < std::min(y + 2, NUMCELLS_Y); j++) {
+        watchList.insert(allCells[i][j]);
+        if (i != x || j != y) {
+          neighbours[i][j] += val;
+        }
+      }
     }
   }
 }
 
-void GameOfLifeGrid::update(bool loop) {
+void GameOfLifeGrid::update() {
   std::set<Cell *> wl = watchList;
   std::set<Cell *> ca = currentlyAlive;
+  std::vector<std::vector<int>> neigh = neighbours;
   oldAlive = currentlyAlive;
   watchList.clear();
   for (std::set<Cell *>::iterator it = wl.begin(); it != wl.end(); ++it) {
     Cell *c = *it;
-    int count = countAlive(ca, c, loop);
+    int count = neigh[c->getX()][c->getY()];
     if (count == 3) {
       setCellState(c->getX(), c->getY(), true);
     } else if (count == 2) {
@@ -122,37 +144,7 @@ void GameOfLifeGrid::emptyGrid() {
   }
 }
 
-int GameOfLifeGrid::countAlive(std::set<Cell *> ca, Cell *c, bool loop) {
-  int count = 0;
-  int x = c->getX();
-  int y = c->getY();
-  if (loop) {
-    for (int i = x - 1; i < x + 2; i++) {
-      int ci = (i + NUMCELLS_X) % NUMCELLS_X;
-      for (int j = y - 1; j < y + 2; j++) {
-        int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
-        if (i != x || j != y) {
-          bool is_in = ca.find(allCells[ci][cj]) != ca.end();
-          if (is_in) {
-            ++count;
-          }
-        }
-      }
-    }
-  } else {
-    for (int i = std::max(x - 1, 0); i < std::min(x + 2, NUMCELLS_X); i++) {
-      for (int j = std::max(y - 1, 0); j < std::min(y + 2, NUMCELLS_Y); j++) {
-        if (i != x || j != y) {
-          bool is_in = ca.find(allCells[i][j]) != ca.end();
-          if (is_in) {
-            ++count;
-          }
-        }
-      }
-    }
-  }
-  return count;
-}
+void GameOfLifeGrid::setLoop(bool loop) { this->loop = loop; }
 
 Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
 
