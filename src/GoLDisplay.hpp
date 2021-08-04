@@ -12,6 +12,14 @@ static const int NUMCELLS_DISPLAY_Y = 40;
 static const int CENTER_DISPLAY_X = 20;
 static const int CENTER_DISPLAY_Y = 20;
 
+// proportion of the cell size between cell
+static const float CELL_PADDING = 0.2f;
+// zoom and scroll line params in mm
+// recommendation is a strict min of 7
+// with a padding of 2
+static const float ICON_SIZE = 10.0f;
+static const float ICON_PADDING = 2.0f;
+
 struct DrawableCell : Widget {
   Cell *cell;
   DrawableCell(Cell *cell);
@@ -27,8 +35,6 @@ struct LineHeader : Widget {
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };
-
-struct ZoomButton : Widget {};
 
 struct GridDisplay : OpaqueWidget {
   Mitosis *module = NULL;
@@ -47,6 +53,28 @@ struct GridDisplay : OpaqueWidget {
   int display_y0 = CENTER_DISPLAY_Y - NUMCELLS_DISPLAY_Y / 2;
 
   GridDisplay();
+  void draw(const DrawArgs &args) override;
+};
+
+struct GridScrollBar : Widget {
+  bool vertical = false;
+  void draw(const DrawArgs &args) override;
+};
+
+struct ZoomButton : Widget {
+  bool zoomPlus = false;
+  void draw(const DrawArgs &args) override;
+};
+
+struct CenterButton : Widget {
+  void draw(const DrawArgs &args) override;
+};
+
+struct GoLDisplay : OpaqueWidget {
+  GridDisplay *gridDisplay = NULL;
+  Mitosis *module = NULL;
+  bool firstDraw = true;
+  GoLDisplay();
   void draw(const DrawArgs &args) override;
 };
 

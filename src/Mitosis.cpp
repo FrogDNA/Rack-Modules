@@ -234,7 +234,7 @@ struct MitosisWidget : ModuleWidget {
         addChild(button);
       }
     }
-    GridDisplay *display = new GridDisplay();
+    GoLDisplay *display = new GoLDisplay();
     display->module = module;
     display->box.pos = mm2px(Vec(49.06, 12.5));
     display->box.size = mm2px(Vec(110.0, 110.0));

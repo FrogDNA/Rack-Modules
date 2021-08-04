@@ -4,25 +4,22 @@
 
 GridDisplay::GridDisplay() {
   // todo replace with static something
-  numCellsX = (float)(NUMCELLS_DISPLAY_X +
-                      2); // take into account lineheaders and the right column
-  numCellsY = (float)(NUMCELLS_DISPLAY_Y +
-                      2); // take into account lineheaders and the bottom line
-  float sizeXmm = 110.0;
-  float sizeYmm = 110.0;
-  sizeX = mm2px(Vec(110.0, 110.0)).x;
-  sizeY = mm2px(Vec(110.0, 110.0)).y;
-  cellSizeX =
-      mm2px(Vec(sizeXmm / (numCellsX * 1.1), sizeYmm / (numCellsY * 1.1))).x;
-  cellSizeY =
-      mm2px(Vec(sizeXmm / (numCellsX * 1.1), sizeYmm / (numCellsY * 1.1))).y;
-  cellSpaceX = cellSizeX / 10;
-  cellSpaceY = cellSizeY / 10;
   firstDraw = true;
 }
 
 void GridDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
+    numCellsX =
+        (float)(NUMCELLS_DISPLAY_X + 1); // take into account lineheaders
+    numCellsY =
+        (float)(NUMCELLS_DISPLAY_Y + 1); // take into account lineheaders
+    sizeX = box.size.x;
+    sizeY = box.size.y;
+
+    cellSizeX = sizeX / (numCellsX + CELL_PADDING * (numCellsX - 1));
+    cellSizeY = sizeY / (numCellsY + CELL_PADDING * (numCellsY - 1));
+    cellSpaceX = cellSizeX * CELL_PADDING;
+    cellSpaceY = cellSizeY * CELL_PADDING;
     firstDraw = false;
     // define column headers
     for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
@@ -113,4 +110,90 @@ void DrawableCell::onButton(const event::Button &e) {
     e.consume(this);
   }
   Widget::onButton(e);
+}
+
+/// SCROLLBAR ///
+
+void GridScrollBar::draw(const DrawArgs &args) {
+  if (vertical) {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
+  } else {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0xff, 0xff));
+  }
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  nvgFill(args.vg);
+}
+
+/// CENTER BUTTON ///
+
+void CenterButton::draw(const DrawArgs &args) {
+  nvgFillColor(args.vg, nvgRGBA(0xff, 0x00, 0x00, 0xff));
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  nvgFill(args.vg);
+}
+
+/// ZOOM BUTTON ///
+
+void ZoomButton::draw(const DrawArgs &args) {
+  if (zoomPlus) {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
+  } else {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0xff, 0xff));
+  }
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  nvgFill(args.vg);
+}
+
+GoLDisplay::GoLDisplay() { firstDraw = true; }
+
+void GoLDisplay::draw(const DrawArgs &args) {
+  if (firstDraw && module) {
+    float iconSizePx = mm2px(ICON_SIZE);
+    float iconPaddingPx = mm2px(ICON_PADDING);
+    float gridSizeX = this->box.size.x - iconSizePx - iconPaddingPx;
+    float gridSizeY = this->box.size.y - iconSizePx - iconPaddingPx;
+    // grid display
+    gridDisplay = new GridDisplay();
+    gridDisplay->module = module;
+    gridDisplay->box.pos = Vec(0.f, 0.f);
+    gridDisplay->box.size = Vec(gridSizeX, gridSizeY);
+    addChild(gridDisplay);
+    // vertical scrollBar
+    GridScrollBar *vScrollBar = new GridScrollBar();
+    vScrollBar->vertical = true;
+    vScrollBar->box.size =
+        Vec(iconSizePx, gridSizeY - (iconSizePx + iconPaddingPx));
+    vScrollBar->box.pos = Vec(gridSizeX + iconPaddingPx, 0.f);
+    addChild(vScrollBar);
+    // horizontal scrollBar
+    GridScrollBar *hScrollBar = new GridScrollBar();
+    hScrollBar->vertical = false;
+    hScrollBar->box.size =
+        Vec(gridSizeX - (iconSizePx + iconPaddingPx), iconSizePx);
+    hScrollBar->box.pos = Vec(0.f, gridSizeY + iconPaddingPx);
+    addChild(hScrollBar);
+    // zoom button +
+    ZoomButton *zoomPlus = new ZoomButton();
+    zoomPlus->zoomPlus = true;
+    zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
+    zoomPlus->box.pos = Vec(gridSizeX + iconPaddingPx, gridSizeY - iconSizePx);
+    addChild(zoomPlus);
+    // zoom button -
+    ZoomButton *zoomMinus = new ZoomButton();
+    zoomMinus->zoomPlus = false;
+    zoomMinus->box.size = Vec(iconSizePx, iconSizePx);
+    zoomMinus->box.pos = Vec(gridSizeX - iconSizePx, gridSizeY + iconPaddingPx);
+    addChild(zoomMinus);
+    // center grid button (or center zoom ? At least extra button)
+    CenterButton *centerButton = new CenterButton();
+    centerButton->box.size = Vec(iconSizePx, iconSizePx);
+    centerButton->box.pos =
+        Vec(gridSizeX + iconPaddingPx, gridSizeY + iconPaddingPx);
+    addChild(centerButton);
+    firstDraw = false;
+  }
+  OpaqueWidget::draw(args);
 }
