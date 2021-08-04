@@ -14,11 +14,4 @@ static const int REFERENCE_POS = 20;
 static const float REFERENCE_FREQ = 440.0f;
 static const float HIGHEST_FREQUENCY = 7902.13f;
 
-// could be (later) adapted via zoom param instead of const
-static const int NUMCELLS_DISPLAY_X = 40;
-static const int NUMCELLS_DISPLAY_Y = 40;
-// may be the same as REFERENCE_POS
-static const int CENTER_DISPLAY_X = 20;
-static const int CENTER_DISPLAY_Y = 20;
-
 #endif

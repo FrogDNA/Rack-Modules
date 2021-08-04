@@ -5,6 +5,13 @@
 #include "Mitosis.hpp"
 #include "plugin.hpp"
 
+// could be (later) adapted via zoom param instead of const
+static const int NUMCELLS_DISPLAY_X = 40;
+static const int NUMCELLS_DISPLAY_Y = 40;
+// may be the same as REFERENCE_POS
+static const int CENTER_DISPLAY_X = 20;
+static const int CENTER_DISPLAY_Y = 20;
+
 struct DrawableCell : Widget {
   Cell *cell;
   DrawableCell(Cell *cell);
@@ -21,7 +28,9 @@ struct LineHeader : Widget {
   void onButton(const event::Button &e) override;
 };
 
-struct GolDisplay : OpaqueWidget {
+struct ZoomButton : Widget {};
+
+struct GridDisplay : OpaqueWidget {
   Mitosis *module = NULL;
   float sizeX = 0.f;
   float sizeY = 0.f;
@@ -37,7 +46,7 @@ struct GolDisplay : OpaqueWidget {
   // first y displayed
   int display_y0 = CENTER_DISPLAY_Y - NUMCELLS_DISPLAY_Y / 2;
 
-  GolDisplay();
+  GridDisplay();
   void draw(const DrawArgs &args) override;
 };
 

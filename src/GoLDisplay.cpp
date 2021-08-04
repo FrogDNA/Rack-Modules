@@ -2,7 +2,7 @@
 #include "Consts.hpp"
 #include "Mitosis.hpp"
 
-GolDisplay::GolDisplay() {
+GridDisplay::GridDisplay() {
   // todo replace with static something
   numCellsX = (float)(NUMCELLS_DISPLAY_X +
                       2); // take into account lineheaders and the right column
@@ -21,7 +21,7 @@ GolDisplay::GolDisplay() {
   firstDraw = true;
 }
 
-void GolDisplay::draw(const DrawArgs &args) {
+void GridDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
     firstDraw = false;
     // define column headers
@@ -62,7 +62,7 @@ LineHeader::LineHeader(int coordinate, bool isLine) {
 }
 
 void LineHeader::draw(const DrawArgs &args) {
-  DSP *dsp = getAncestorOfType<GolDisplay>()->module->dsp;
+  DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
   bool muted = (isRow && !dsp->isRowAudible(coordinate)) ||
                (!isRow && !dsp->isColAudible(coordinate));
   if (muted) {
@@ -88,7 +88,7 @@ void LineHeader::onButton(const event::Button &e) {
 DrawableCell::DrawableCell(Cell *cell) { this->cell = cell; }
 
 void DrawableCell::draw(const DrawArgs &args) {
-  DSP *dsp = getAncestorOfType<GolDisplay>()->module->dsp;
+  DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
   if (cell->isAlive() && dsp->isCellAudible(cell)) {
     nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
   } else if (cell->isAlive()) {
@@ -105,7 +105,7 @@ void DrawableCell::draw(const DrawArgs &args) {
 
 void DrawableCell::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-    GolDisplay *gd = getAncestorOfType<GolDisplay>();
+    GridDisplay *gd = getAncestorOfType<GridDisplay>();
     // thread safe
     if (!gd->module->clickedCells.full()) {
       gd->module->clickedCells.push(new Coordinate(cell->getX(), cell->getY()));
