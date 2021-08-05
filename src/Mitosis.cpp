@@ -52,7 +52,8 @@ void Mitosis::process(const ProcessArgs &args) {
     }
     if (risingEdge) {
       if (dataReceiver->isNewGridReady()) {
-        std::vector<Cell *> v = dataReceiver->getGrid()->getCurrentlyAlive();
+        std::vector<std::pair<int, int> *> v =
+            dataReceiver->getGrid()->getCurrentlyAlive();
         golGrid->init(v);
       } else {
         golGrid->update();
@@ -61,9 +62,9 @@ void Mitosis::process(const ProcessArgs &args) {
   }
   // check if GUI has some messages
   if (!clickedCells.empty()) {
-    Coordinate *c = clickedCells.shift();
-    bool alive = golGrid->getCell(c->getX(), c->getY())->isAlive();
-    golGrid->setCellState(c->getX(), c->getY(), !alive);
+    std::pair<int, int> *c = clickedCells.shift();
+    bool alive = golGrid->isAlive(c);
+    golGrid->setCellState(c, !alive);
   }
   if (!loopParam.empty()) {
     bool loop = loopParam.shift();
@@ -86,7 +87,7 @@ void Mitosis::process(const ProcessArgs &args) {
     dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
   }
   // *** PROCESS AUDIO ***
-  std::vector<Cell *> state = golGrid->getCurrentlyAlive();
+  std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
   dsp->paramValues(state, food_wideness, temp_roundness, vOct);
   float audio = dsp->nextValue(args.sampleTime);
   // data send
@@ -129,8 +130,7 @@ json_t *Mitosis::dataToJson() {
   // json_array_append_new(gridParams, json_boolean(loop));
   for (int i = 0; i < NUMCELLS_X; i++) {
     for (int j = 0; j < NUMCELLS_Y; j++) {
-      json_array_append_new(gridJ,
-                            json_boolean(golGrid->getCell(i, j)->isAlive()));
+      json_array_append_new(gridJ, json_boolean(golGrid->isAlive(i, j)));
     }
   }
   for (int i = 0; i < NUMCELLS_X; i++) {

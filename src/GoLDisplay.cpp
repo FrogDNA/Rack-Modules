@@ -40,7 +40,8 @@ void GridDisplay::draw(const DrawArgs &args) {
     // define visible cells.
     for (int i = 0; i < spotsX; i++) {
       for (int j = 0; j < spotsY; j++) {
-        Cell *c = module->golGrid->getCell(i + display_x0, j + display_y0);
+        std::pair<int, int> *c =
+            module->golGrid->getCell(i + display_x0, j + display_y0);
         CellSpot *spot = new CellSpot();
         spot->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX),
                             (j + 1) * (cellSizeY + cellSpaceY));
@@ -98,10 +99,12 @@ void LineHeader::onButton(const event::Button &e) {
 
 void CellSpot::draw(const DrawArgs &args) {
   if (cell) {
-    DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
-    if (cell->isAlive() && dsp->isCellAudible(cell)) {
+    Mitosis *module = getAncestorOfType<GridDisplay>()->module;
+    DSP *dsp = module->dsp;
+    GameOfLifeGrid *grid = module->golGrid;
+    if (grid->isAlive(cell) && dsp->isCellAudible(cell)) {
       nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
-    } else if (cell->isAlive()) {
+    } else if (grid->isAlive(cell)) {
       nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
     } else if (dsp->isCellAudible(cell)) {
       nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0xdd, 0xff));
@@ -119,7 +122,7 @@ void CellSpot::onButton(const event::Button &e) {
     GridDisplay *gd = getAncestorOfType<GridDisplay>();
     // thread safe
     if (!gd->module->clickedCells.full()) {
-      gd->module->clickedCells.push(new Coordinate(cell->getX(), cell->getY()));
+      gd->module->clickedCells.push(cell);
     }
     e.consume(this);
   }

@@ -6,7 +6,7 @@ DataSender::DataSender() {
   sendX = true;
 }
 
-void DataSender::init(std::vector<Cell *> aliveCells) {
+void DataSender::init(std::vector<std::pair<int, int> *> aliveCells) {
   // do not init if a transfer is in progress
   if (!transferInProgress) {
     this->aliveCells = aliveCells;
@@ -28,7 +28,7 @@ void DataSender::next() {
     switch (state) {
     case 0: {
       clock = 0.f;
-      int x = (*itr)->getX();
+      int x = (*itr)->first;
       float xData = 10.0f * (float)(x) / (float)NUMCELLS_X;
       data = xData;
     } break;
@@ -37,7 +37,7 @@ void DataSender::next() {
       break;
     case 2: {
       clock = 0.f;
-      int y = (*itr)->getY();
+      int y = (*itr)->second;
       float yData = 10.0f * (float)(y) / (float)NUMCELLS_Y;
       data = yData;
     } break;

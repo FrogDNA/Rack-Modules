@@ -1,7 +1,6 @@
 #ifndef DATARECEIVER_H
 #define DATARECEIVER_H
 
-#include "Coordinate.hpp"
 #include "GameOfLifeGrid.hpp"
 #include <set>
 

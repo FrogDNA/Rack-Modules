@@ -26,7 +26,7 @@ static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
 static const int MIN_CELLS_ON_SCREEN = 10;
 
 struct CellSpot : Widget {
-  Cell *cell = NULL;
+  std::pair<int, int> *cell = NULL;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };

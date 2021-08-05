@@ -1,26 +1,25 @@
 #include "GameOfLifeGrid.hpp"
 #include "Consts.hpp"
 
-Cell::Cell(int x, int y, bool alive) : Coordinate(x, y) { this->alive = alive; }
-
-bool Cell::isAlive() { return alive; }
-
-void Cell::setAlive(bool isAlive) { alive = isAlive; }
-
 GameOfLifeGrid::GameOfLifeGrid() {
   allCells.reserve(NUMCELLS_X);
   neighbours.reserve(NUMCELLS_X);
+  aliveMap.reserve(NUMCELLS_X);
   for (int i = 0; i < NUMCELLS_X; i++) {
-    std::vector<Cell *> v;
+    std::vector<std::pair<int, int> *> v;
     v.reserve(NUMCELLS_Y);
     std::vector<int> n;
     n.reserve(NUMCELLS_Y);
+    std::vector<int> a;
+    a.reserve(NUMCELLS_Y);
     for (int j = 0; j < NUMCELLS_Y; j++) {
-      v.push_back(new Cell(i, j, false));
+      v.push_back(new std::pair<int, int>(i, j));
       n.push_back(0);
+      a.push_back(0);
     }
     allCells.push_back(v);
     neighbours.push_back(n);
+    aliveMap.push_back(a);
   }
 }
 
@@ -66,31 +65,34 @@ void GameOfLifeGrid::init() {
   setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
 }
 
-void GameOfLifeGrid::init(std::vector<Cell *> alive) {
+void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
   emptyGrid();
-  for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
-       ++it) {
-    Cell *c = *it;
-    setCellState(c->getX(), c->getY(), true);
+  for (std::vector<std::pair<int, int> *>::iterator it = alive.begin();
+       it != alive.end(); ++it) {
+    std::pair<int, int> *c = *it;
+    setCellState(c->first, c->second, true);
   }
 }
 
 void GameOfLifeGrid::setCellState(int x, int y, bool state) {
-  Cell *c = allCells[x][y];
-  if (state && !c->isAlive()) {
+  if (state && !isAlive(x, y)) {
     // becomes alive
     currentlyAlive.insert(allCells[x][y]);
     // into watchlist and add neighbours
     updateNeighboursAndWatchlist(x, y, 1);
   }
-  if (!state && c->isAlive()) {
+  if (!state && isAlive(x, y)) {
     // becomes dead
     currentlyAlive.erase(allCells[x][y]);
     updateNeighboursAndWatchlist(x, y, -1);
   }
   // set cell state
-  allCells[x][y]->setAlive(state);
+  aliveMap[x][y] = state ? 1 : 0;
   // in all cases insert neighbouring cells into watchlist
+}
+
+void GameOfLifeGrid::setCellState(std::pair<int, int> *cell, bool state) {
+  setCellState(cell->first, cell->second, state);
 }
 
 void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
@@ -118,47 +120,63 @@ void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
 }
 
 void GameOfLifeGrid::update() {
-  std::set<Cell *> wl = watchList;
-  std::set<Cell *> ca = currentlyAlive;
+  std::set<std::pair<int, int> *> wl = watchList;
+  std::set<std::pair<int, int> *> ca = currentlyAlive;
   std::vector<std::vector<int>> neigh = neighbours;
   oldAlive = currentlyAlive;
   watchList.clear();
-  for (std::set<Cell *>::iterator it = wl.begin(); it != wl.end(); ++it) {
-    Cell *c = *it;
-    int count = neigh[c->getX()][c->getY()];
+  for (std::set<std::pair<int, int> *>::iterator it = wl.begin();
+       it != wl.end(); ++it) {
+    std::pair<int, int> *c = *it;
+    int x = c->first;
+    int y = c->second;
+    int count = neigh[x][y];
     if (count == 3) {
-      setCellState(c->getX(), c->getY(), true);
+      setCellState(x, y, true);
     } else if (count == 2) {
-      setCellState(c->getX(), c->getY(), c->isAlive());
+      setCellState(x, y, isAlive(x, y));
     } else {
-      setCellState(c->getX(), c->getY(), false);
+      setCellState(x, y, false);
     }
   }
 }
 
 void GameOfLifeGrid::emptyGrid() {
-  std::set<Cell *> ca = currentlyAlive;
-  for (std::set<Cell *>::iterator it = ca.begin(); it != ca.end(); ++it) {
-    Cell *c = *it;
-    setCellState(c->getX(), c->getY(), false);
+  std::set<std::pair<int, int> *> ca = currentlyAlive;
+  for (std::set<std::pair<int, int> *>::iterator it = ca.begin();
+       it != ca.end(); ++it) {
+    std::pair<int, int> *c = *it;
+    setCellState(c->first, c->second, false);
   }
 }
 
 void GameOfLifeGrid::setLoop(bool loop) { this->loop = loop; }
 
-Cell *GameOfLifeGrid::getCell(int x, int y) {
-  if (x >= 0 && x < NUMCELLS_X && y >= 0 && y < NUMCELLS_Y) {
+std::pair<int, int> *GameOfLifeGrid::getCell(int x, int y) {
+  if (isInGrid(x, y)) {
     return allCells[x][y];
   } else {
     return NULL;
   }
 }
 
-std::vector<Cell *> GameOfLifeGrid::getCurrentlyAlive() {
-  std::vector<Cell *> ca(currentlyAlive.begin(), currentlyAlive.end());
+std::vector<std::pair<int, int> *> GameOfLifeGrid::getCurrentlyAlive() {
+  std::vector<std::pair<int, int> *> ca(currentlyAlive.begin(),
+                                        currentlyAlive.end());
   return ca;
 }
 
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }
 
 bool GameOfLifeGrid::isStillEvolving() { return !(currentlyAlive == oldAlive); }
+
+bool GameOfLifeGrid::isAlive(int x, int y) { return aliveMap[x][y] == 1; }
+bool GameOfLifeGrid::isAlive(std::pair<int, int> *cell) {
+  return aliveMap[cell->first][cell->second] == 1;
+}
+bool GameOfLifeGrid::isInGrid(int x, int y) {
+  if (x > 0 && y > 0 && x < NUMCELLS_X && y < NUMCELLS_Y) {
+    return true;
+  }
+  return false;
+}

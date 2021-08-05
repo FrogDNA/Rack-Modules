@@ -18,7 +18,7 @@ struct Mitosis : Module {
   float vOctOut = 0.f;
   float lastDspLowestFreq = 0.f;
 
-  dsp::RingBuffer<Coordinate *, 1> clickedCells;
+  dsp::RingBuffer<std::pair<int, int> *, 1> clickedCells;
   // loopParam
   dsp::RingBuffer<bool, 1> loopParam;
   // infinity param
@@ -53,7 +53,8 @@ struct Mitosis : Module {
 
   Mitosis();
   void process(const ProcessArgs &args) override;
-  float processAudio(std::set<Cell *> alive, float tune, float vOct);
+  float processAudio(std::set<std::pair<int, int> *> alive, float tune,
+                     float vOct);
   json_t *dataToJson() override;
   void dataFromJson(json_t *rootJ) override;
 };

@@ -17,7 +17,7 @@ class DSP {
   std::vector<bool> audibleCols;
   std::vector<bool> audibleRows;
   std::vector<float> baseFreqLut;
-  std::vector<Cell *> alive;
+  std::vector<std::pair<int, int> *> alive;
   std::vector<float> baseFrequencies;
   std::vector<float> harmonicNumbers;
   std::vector<float> amplitudes;
@@ -36,13 +36,13 @@ public:
   static std::vector<float> sinLut;
   static std::vector<float> initSinLut();
   DSP();
-  void paramValues(std::vector<Cell *> state, float wideness, float roundness,
-                   float vOct);
+  void paramValues(std::vector<std::pair<int, int> *> state, float wideness,
+                   float roundness, float vOct);
   float nextValue(float sampleTime);
   float getLowestFreq();
   void muteUnmuteCol(int x, bool muted);
   void muteUnmuteRow(int y, bool muted);
-  bool isCellAudible(Cell *c);
+  bool isCellAudible(std::pair<int, int> *c);
   bool isColAudible(int x);
   bool isRowAudible(int y);
 };

@@ -2,38 +2,33 @@
 #define GOLGRID_H
 
 #include "Consts.hpp"
-#include "Coordinate.hpp"
 #include "plugin.hpp"
 #include <set>
 
-class Cell : public Coordinate {
-  bool alive;
-
-public:
-  Cell(int x, int y, bool alive);
-  bool isAlive();
-  void setAlive(bool isAlive);
-};
-
 class GameOfLifeGrid {
   bool loop = false;
-  std::vector<std::vector<Cell *>> allCells;
+  std::vector<std::vector<std::pair<int, int> *>> allCells;
+  std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
-  std::set<Cell *> oldAlive;
-  std::set<Cell *> watchList;
-  std::set<Cell *> currentlyAlive;
+  std::set<std::pair<int, int> *> oldAlive;
+  std::set<std::pair<int, int> *> watchList;
+  std::set<std::pair<int, int> *> currentlyAlive;
   void updateNeighboursAndWatchlist(int x, int y, int val);
 
 public:
   GameOfLifeGrid();
   void init();
-  void init(std::vector<Cell *> alive);
+  void init(std::vector<std::pair<int, int> *> alive);
   void update();
   void emptyGrid();
-  std::vector<Cell *> getCurrentlyAlive();
+  std::vector<std::pair<int, int> *> getCurrentlyAlive();
   void setCellState(int x, int y, bool state);
-  Cell *getCell(int x, int y);
+  void setCellState(std::pair<int, int> *cell, bool state);
+  std::pair<int, int> *getCell(int x, int y);
   void setLoop(bool loop);
+  bool isAlive(int x, int y);
+  bool isAlive(std::pair<int, int> *);
+  bool isInGrid(int x, int y);
   bool isEmpty();
   bool isStillEvolving(); // return false if old is same as current
 };

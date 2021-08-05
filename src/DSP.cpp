@@ -26,7 +26,7 @@ DSP::DSP() {
   }
 }
 
-void DSP::paramValues(std::vector<Cell *> state, float wideness,
+void DSP::paramValues(std::vector<std::pair<int, int> *> state, float wideness,
                       float roundness, float vOct) {
   if (this->vOct != vOct) {
     this->vOct = vOct;
@@ -60,11 +60,11 @@ void DSP::paramValues(std::vector<Cell *> state, float wideness,
       harmonics[x] = 0;
     }
     float lf = HIGHEST_FREQUENCY + 1.f;
-    for (std::vector<Cell *>::iterator it = alive.begin(); it != alive.end();
-         ++it) {
-      Cell *c = *it;
+    for (std::vector<std::pair<int, int> *>::iterator it = alive.begin();
+         it != alive.end(); ++it) {
+      std::pair<int, int> *c = *it;
       if (isCellAudible(*it)) {
-        int x = c->getX();
+        int x = c->first;
         ++(harmonics[x]);
         ++vSize;
         float baseFrequency = baseFreqLut[x];
@@ -151,6 +151,6 @@ bool DSP::isRowAudible(int y) {
   return audibleRows[y];
 }
 
-bool DSP::isCellAudible(Cell *c) {
-  return (audibleRows[c->getY()] && audibleCols[c->getX()]);
+bool DSP::isCellAudible(std::pair<int, int> *c) {
+  return (audibleRows[c->second] && audibleCols[c->first]);
 }
