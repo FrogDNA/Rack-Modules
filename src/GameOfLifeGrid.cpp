@@ -146,7 +146,13 @@ void GameOfLifeGrid::emptyGrid() {
 
 void GameOfLifeGrid::setLoop(bool loop) { this->loop = loop; }
 
-Cell *GameOfLifeGrid::getCell(int x, int y) { return allCells[x][y]; }
+Cell *GameOfLifeGrid::getCell(int x, int y) {
+  if (x >= 0 && x < NUMCELLS_X && y >= 0 && y < NUMCELLS_Y) {
+    return allCells[x][y];
+  } else {
+    return NULL;
+  }
+}
 
 std::vector<Cell *> GameOfLifeGrid::getCurrentlyAlive() {
   std::vector<Cell *> ca(currentlyAlive.begin(), currentlyAlive.end());

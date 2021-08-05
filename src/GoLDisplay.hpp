@@ -24,6 +24,11 @@ static const float ICON_PADDING = 2.0f;
 static const int FRAMES_BETWEEN_ZOOM = 20;
 static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
 
+// minimum and maximum, per dimension
+// real min cells on screen is 10 * 10
+static const int MIN_CELLS_ON_SCREEN = 10;
+static const int MAX_CELLS_ON_SCREEN = 200;
+
 struct CellSpot : Widget {
   Cell *cell = NULL;
   void draw(const DrawArgs &args) override;

@@ -9,18 +9,20 @@ GridDisplay::GridDisplay() {
 
 void GridDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
-    float numCellsX = (float)(spotsX + 1); // take into account lineheaders
-    float numCellsY = (float)(spotsY + 1); // take into account lineheaders
+    float numSquareX = (float)(spotsX + 1); // take into account lineheaders
+    float numSquareY = (float)(spotsY + 1); // take into account lineheaders
+    float numCellsX = (float)std::min(spotsX, NUMCELLS_X);
+    float numCellsY = (float)std::min(spotsY, NUMCELLS_Y);
     sizeX = box.size.x;
     sizeY = box.size.y;
 
-    cellSizeX = sizeX / (numCellsX + CELL_PADDING * (numCellsX - 1));
-    cellSizeY = sizeY / (numCellsY + CELL_PADDING * (numCellsY - 1));
+    cellSizeX = sizeX / (numSquareX + CELL_PADDING * (numSquareX - 1));
+    cellSizeY = sizeY / (numSquareY + CELL_PADDING * (numSquareY - 1));
     cellSpaceX = cellSizeX * CELL_PADDING;
     cellSpaceY = cellSizeY * CELL_PADDING;
     firstDraw = false;
     // define column headers
-    for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
+    for (int i = 0; i < numCellsX; i++) {
       LineHeader *lh = new LineHeader(i + display_x0, false);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
       lh->box.size = Vec(cellSizeX, cellSizeY);
@@ -28,7 +30,7 @@ void GridDisplay::draw(const DrawArgs &args) {
       addChild(lh);
     }
     // define row headers
-    for (int i = 0; i < NUMCELLS_DISPLAY_Y; i++) {
+    for (int i = 0; i < numCellsY; i++) {
       LineHeader *lh = new LineHeader(i + display_y0, true);
       lh->box.pos = Vec(0, (i + 1) * (cellSizeY + cellSpaceY));
       lh->box.size = Vec(cellSizeX, cellSizeY);
@@ -53,11 +55,12 @@ void GridDisplay::draw(const DrawArgs &args) {
 }
 
 void GridDisplay::changeZoomLevel(int zoomChange) {
-  spotsX = std::max(10, std::min(spotsX + zoomChange, NUMCELLS_X));
-  spotsY = std::max(10, std::min(spotsY + zoomChange, NUMCELLS_Y));
-  // Null Cell when certain zoom to fix
-  // display_x0 = CENTER_DISPLAY_X - spotsX / 2;
-  // display_y0 = CENTER_DISPLAY_Y - spotsY / 2;
+  spotsX = std::max(MIN_CELLS_ON_SCREEN,
+                    std::min(spotsX + zoomChange, MAX_CELLS_ON_SCREEN));
+  spotsY = std::max(MIN_CELLS_ON_SCREEN,
+                    std::min(spotsY + zoomChange, MAX_CELLS_ON_SCREEN));
+  display_x0 = CENTER_DISPLAY_X - spotsX / 2;
+  display_y0 = CENTER_DISPLAY_Y - spotsY / 2;
   clearChildren();
   firstDraw = true;
 }
