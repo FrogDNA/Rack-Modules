@@ -250,6 +250,7 @@ struct MitosisWidget : ModuleWidget {
     infWidget->rb = &(module->infinityParam);
     infWidget->box.pos = mm2px(Vec(134.446, 3.6));
     infWidget->box.size = mm2px(Vec(7.8, 3.8));
+    infWidget->switchedOn = true;
     addChild(infWidget);
   }
 };

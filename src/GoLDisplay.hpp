@@ -6,11 +6,8 @@
 #include "plugin.hpp"
 
 // display at default zoom level
-static const int NUMCELLS_DISPLAY_X = 40;
-static const int NUMCELLS_DISPLAY_Y = 40;
-// may be the same as REFERENCE_POS
-static const int CENTER_DISPLAY_X = 20;
-static const int CENTER_DISPLAY_Y = 20;
+static const int DEFAULT_CELLS_DISPLAYED_X = 40;
+static const int DEFAULT_CELLS_DISPLAYED_Y = 40;
 
 // proportion of the cell size between cell
 static const float CELL_PADDING = 0.2f;
@@ -24,10 +21,9 @@ static const float ICON_PADDING = 2.0f;
 static const int FRAMES_BETWEEN_ZOOM = 20;
 static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
 
-// minimum and maximum, per dimension
+// minimum per dimension
 // real min cells on screen is 10 * 10
 static const int MIN_CELLS_ON_SCREEN = 10;
-static const int MAX_CELLS_ON_SCREEN = 200;
 
 struct CellSpot : Widget {
   Cell *cell = NULL;
@@ -52,13 +48,13 @@ struct GridDisplay : OpaqueWidget {
   float cellSizeY = 0.f;
   float cellSpaceX = 0.f;
   float cellSpaceY = 0.f;
-  int spotsX = NUMCELLS_DISPLAY_X;
-  int spotsY = NUMCELLS_DISPLAY_Y;
+  int spotsX = DEFAULT_CELLS_DISPLAYED_X;
+  int spotsY = DEFAULT_CELLS_DISPLAYED_Y;
   bool firstDraw = true;
   // first x displayed
-  int display_x0 = CENTER_DISPLAY_X - NUMCELLS_DISPLAY_X / 2;
+  int display_x0 = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
   // first y displayed
-  int display_y0 = CENTER_DISPLAY_Y - NUMCELLS_DISPLAY_Y / 2;
+  int display_y0 = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
 
   GridDisplay();
   void draw(const DrawArgs &args) override;

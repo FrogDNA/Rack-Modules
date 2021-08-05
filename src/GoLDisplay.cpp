@@ -37,9 +37,9 @@ void GridDisplay::draw(const DrawArgs &args) {
       lh->rb = &(module->muteUnmuteRowsBuffer);
       addChild(lh);
     }
-    // define visible cells. todo change to a simpler way
-    for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
-      for (int j = 0; j < NUMCELLS_DISPLAY_Y; j++) {
+    // define visible cells.
+    for (int i = 0; i < spotsX; i++) {
+      for (int j = 0; j < spotsY; j++) {
         Cell *c = module->golGrid->getCell(i + display_x0, j + display_y0);
         CellSpot *spot = new CellSpot();
         spot->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX),
@@ -55,12 +55,12 @@ void GridDisplay::draw(const DrawArgs &args) {
 }
 
 void GridDisplay::changeZoomLevel(int zoomChange) {
-  spotsX = std::max(MIN_CELLS_ON_SCREEN,
-                    std::min(spotsX + zoomChange, MAX_CELLS_ON_SCREEN));
-  spotsY = std::max(MIN_CELLS_ON_SCREEN,
-                    std::min(spotsY + zoomChange, MAX_CELLS_ON_SCREEN));
-  display_x0 = CENTER_DISPLAY_X - spotsX / 2;
-  display_y0 = CENTER_DISPLAY_Y - spotsY / 2;
+  spotsX =
+      std::max(MIN_CELLS_ON_SCREEN, std::min(spotsX + zoomChange, NUMCELLS_X));
+  spotsY =
+      std::max(MIN_CELLS_ON_SCREEN, std::min(spotsY + zoomChange, NUMCELLS_Y));
+  display_x0 = (NUMCELLS_X - spotsX) / 2;
+  display_y0 = (NUMCELLS_Y - spotsY) / 2;
   clearChildren();
   firstDraw = true;
 }
