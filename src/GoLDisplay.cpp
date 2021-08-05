@@ -9,10 +9,8 @@ GridDisplay::GridDisplay() {
 
 void GridDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
-    numCellsX =
-        (float)(NUMCELLS_DISPLAY_X + 1); // take into account lineheaders
-    numCellsY =
-        (float)(NUMCELLS_DISPLAY_Y + 1); // take into account lineheaders
+    float numCellsX = (float)(spotsX + 1); // take into account lineheaders
+    float numCellsY = (float)(spotsY + 1); // take into account lineheaders
     sizeX = box.size.x;
     sizeY = box.size.y;
 
@@ -52,6 +50,18 @@ void GridDisplay::draw(const DrawArgs &args) {
   }
   OpaqueWidget::draw(args);
 }
+
+void GridDisplay::changeZoomLevel(int zoomChange) {
+  spotsX = std::max(10, std::min(spotsX + zoomChange, NUMCELLS_X));
+  spotsY = std::max(10, std::min(spotsY + zoomChange, NUMCELLS_Y));
+  // Null Cell when certain zoom to fix
+  // display_x0 = CENTER_DISPLAY_X - spotsX / 2;
+  // display_y0 = CENTER_DISPLAY_Y - spotsY / 2;
+  clearChildren();
+  firstDraw = true;
+}
+
+/// LINEHEADER ///
 
 LineHeader::LineHeader(int coordinate, bool isLine) {
   this->coordinate = coordinate;
@@ -147,7 +157,21 @@ void ZoomButton::draw(const DrawArgs &args) {
   nvgFill(args.vg);
 }
 
+void ZoomButton::onButton(const event::Button &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+    GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
+    // thread safe
+    gd->zoom(zoomPlus);
+    e.consume(this);
+  }
+  Widget::onButton(e);
+}
+
 GoLDisplay::GoLDisplay() { firstDraw = true; }
+
+void GoLDisplay::zoom(bool zoomIn) {
+  gridDisplay->changeZoomLevel(zoomIn ? -10 : 10);
+}
 
 void GoLDisplay::draw(const DrawArgs &args) {
   if (firstDraw && module) {

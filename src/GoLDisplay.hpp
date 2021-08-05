@@ -5,7 +5,7 @@
 #include "Mitosis.hpp"
 #include "plugin.hpp"
 
-// could be (later) adapted via zoom param instead of const
+// display at default zoom level
 static const int NUMCELLS_DISPLAY_X = 40;
 static const int NUMCELLS_DISPLAY_Y = 40;
 // may be the same as REFERENCE_POS
@@ -44,8 +44,8 @@ struct GridDisplay : OpaqueWidget {
   float cellSizeY = 0.f;
   float cellSpaceX = 0.f;
   float cellSpaceY = 0.f;
-  float numCellsX = 0.f;
-  float numCellsY = 0.f;
+  int spotsX = NUMCELLS_DISPLAY_X;
+  int spotsY = NUMCELLS_DISPLAY_Y;
   bool firstDraw = true;
   // first x displayed
   int display_x0 = CENTER_DISPLAY_X - NUMCELLS_DISPLAY_X / 2;
@@ -54,6 +54,7 @@ struct GridDisplay : OpaqueWidget {
 
   GridDisplay();
   void draw(const DrawArgs &args) override;
+  void changeZoomLevel(int zoomChange);
 };
 
 struct GridScrollBar : Widget {
@@ -64,6 +65,7 @@ struct GridScrollBar : Widget {
 struct ZoomButton : Widget {
   bool zoomPlus = false;
   void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
 };
 
 struct CenterButton : Widget {
@@ -76,6 +78,7 @@ struct GoLDisplay : OpaqueWidget {
   bool firstDraw = true;
   GoLDisplay();
   void draw(const DrawArgs &args) override;
+  void zoom(bool zoomIn);
 };
 
 #endif
