@@ -39,11 +39,12 @@ void GridDisplay::draw(const DrawArgs &args) {
     for (int i = 0; i < NUMCELLS_DISPLAY_X; i++) {
       for (int j = 0; j < NUMCELLS_DISPLAY_Y; j++) {
         Cell *c = module->golGrid->getCell(i + display_x0, j + display_y0);
-        DrawableCell *golCell = new DrawableCell(c);
-        golCell->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX),
-                               (j + 1) * (cellSizeY + cellSpaceY));
-        golCell->box.size = Vec(cellSizeX, cellSizeY);
-        addChild(golCell);
+        CellSpot *spot = new CellSpot();
+        spot->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX),
+                            (j + 1) * (cellSizeY + cellSpaceY));
+        spot->box.size = Vec(cellSizeX, cellSizeY);
+        spot->cell = c;
+        addChild(spot);
       }
     }
     // define zoom bars and buttons.TODO
@@ -92,25 +93,25 @@ void LineHeader::onButton(const event::Button &e) {
   Widget::onButton(e);
 }
 
-DrawableCell::DrawableCell(Cell *cell) { this->cell = cell; }
-
-void DrawableCell::draw(const DrawArgs &args) {
-  DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
-  if (cell->isAlive() && dsp->isCellAudible(cell)) {
-    nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
-  } else if (cell->isAlive()) {
-    nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
-  } else if (dsp->isCellAudible(cell)) {
-    nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0xdd, 0xff));
-  } else {
-    nvgFillColor(args.vg, nvgRGBA(0xc2, 0xc2, 0xc2, 0xff));
+void CellSpot::draw(const DrawArgs &args) {
+  if (cell) {
+    DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
+    if (cell->isAlive() && dsp->isCellAudible(cell)) {
+      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
+    } else if (cell->isAlive()) {
+      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+    } else if (dsp->isCellAudible(cell)) {
+      nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0xdd, 0xff));
+    } else {
+      nvgFillColor(args.vg, nvgRGBA(0xc2, 0xc2, 0xc2, 0xff));
+    }
+    nvgBeginPath(args.vg);
+    nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+    nvgFill(args.vg);
   }
-  nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-  nvgFill(args.vg);
 }
 
-void DrawableCell::onButton(const event::Button &e) {
+void CellSpot::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
     GridDisplay *gd = getAncestorOfType<GridDisplay>();
     // thread safe
@@ -158,19 +159,46 @@ void ZoomButton::draw(const DrawArgs &args) {
 }
 
 void ZoomButton::onButton(const event::Button &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-    GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
-    // thread safe
-    gd->zoom(zoomPlus);
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (e.action == GLFW_PRESS) {
+      doZoom();
+    } else if (e.action == GLFW_RELEASE) {
+      zoomSpeed = 1;
+      zoomFramesCount = 0;
+      zoomAccelerationFramesCount = 0;
+    }
     e.consume(this);
+    Widget::onButton(e);
   }
-  Widget::onButton(e);
+}
+
+void ZoomButton::doZoom() {
+  GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
+  int mult = zoomPlus ? 1 : -1;
+  gd->zoom(zoomSpeed * mult);
+}
+
+void ZoomButton::onDragHover(const event::DragHover &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (zoomFramesCount == FRAMES_BETWEEN_ZOOM) {
+      zoomFramesCount = 0;
+      doZoom();
+      e.consume(this);
+      zoomAccelerationFramesCount++;
+      if (zoomAccelerationFramesCount == ZOOMS_BEFORE_SPEED_INCREASE) {
+        zoomSpeed = zoomSpeed * 2;
+        zoomAccelerationFramesCount = 0;
+      }
+    }
+    zoomFramesCount++;
+  }
+  Widget::onDragHover(e);
 }
 
 GoLDisplay::GoLDisplay() { firstDraw = true; }
 
-void GoLDisplay::zoom(bool zoomIn) {
-  gridDisplay->changeZoomLevel(zoomIn ? -10 : 10);
+void GoLDisplay::zoom(int zoomQuantity) {
+  gridDisplay->changeZoomLevel(zoomQuantity);
 }
 
 void GoLDisplay::draw(const DrawArgs &args) {

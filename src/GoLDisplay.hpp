@@ -20,9 +20,12 @@ static const float CELL_PADDING = 0.2f;
 static const float ICON_SIZE = 10.0f;
 static const float ICON_PADDING = 2.0f;
 
-struct DrawableCell : Widget {
-  Cell *cell;
-  DrawableCell(Cell *cell);
+// number of frames between two zooms
+static const int FRAMES_BETWEEN_ZOOM = 20;
+static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
+
+struct CellSpot : Widget {
+  Cell *cell = NULL;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
 };
@@ -63,9 +66,14 @@ struct GridScrollBar : Widget {
 };
 
 struct ZoomButton : Widget {
+  int zoomSpeed = 1;
+  int zoomFramesCount = 0;
+  int zoomAccelerationFramesCount = 0;
   bool zoomPlus = false;
+  void doZoom();
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
+  void onDragHover(const event::DragHover &e) override;
 };
 
 struct CenterButton : Widget {
@@ -78,7 +86,7 @@ struct GoLDisplay : OpaqueWidget {
   bool firstDraw = true;
   GoLDisplay();
   void draw(const DrawArgs &args) override;
-  void zoom(bool zoomIn);
+  void zoom(int zoomQuantity);
 };
 
 #endif
