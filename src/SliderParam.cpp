@@ -47,8 +47,3 @@ void LoopSliderParam::onFirstDraw() {
   firstDraw = false;
   switchedOn = &(module->golGrid->loop);
 }
-
-void InfSliderParam::onFirstDraw() {
-  firstDraw = false;
-  switchedOn = &(module->golGrid->maxSize);
-}

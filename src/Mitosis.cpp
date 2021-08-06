@@ -106,10 +106,10 @@ void Mitosis::processBuffers() {
     bool loop = loopParam.shift();
     golGrid->loop = loop;
   }
-  while (!infinityParam.empty()) {
-    bool infinity = infinityParam.shift();
-    golGrid->maxSize = infinity;
-  }
+  /*while (!progDataParam.empty()) {
+    bool progressive = progDataParam.shift();
+    dataReceiver->progressive = progressive;
+  }*/
   while (!muteColsBuffer.empty()) {
     int col = muteColsBuffer.shift();
     dsp->muteUnmuteCol(col, false);
@@ -259,13 +259,6 @@ struct MitosisWidget : ModuleWidget {
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     lpWidget->module = module;
     addChild(lpWidget);
-
-    InfSliderParam *infWidget = new InfSliderParam();
-    infWidget->rb = &(module->infinityParam);
-    infWidget->box.pos = mm2px(Vec(134.446, 3.6));
-    infWidget->box.size = mm2px(Vec(7.8, 3.8));
-    infWidget->module = module;
-    addChild(infWidget);
   }
 };
 

@@ -62,8 +62,13 @@ struct GridDisplay : OpaqueWidget {
 };
 
 struct GridScrollBar : Widget {
+  GridScrollBar();
   bool vertical = false;
   void draw(const DrawArgs &args) override;
+};
+
+struct GridScrollButton : Widget {
+  int orientation = 1; // 1 or -1
 };
 
 struct ZoomButton : Widget {

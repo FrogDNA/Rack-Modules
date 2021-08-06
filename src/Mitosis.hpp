@@ -21,8 +21,6 @@ struct Mitosis : Module {
   dsp::RingBuffer<std::pair<int, int> *, 1> clickedCells;
   // loopParam
   dsp::RingBuffer<bool, 1> loopParam;
-  // infinity param
-  dsp::RingBuffer<bool, 1> infinityParam;
   // mute columns and rows
   dsp::RingBuffer<int, 64> muteUnmuteColsBuffer;
   dsp::RingBuffer<int, 64> muteUnmuteRowsBuffer;

@@ -18,7 +18,6 @@ class GameOfLifeGrid {
 
 public:
   bool loop = false;
-  bool maxSize = true;
   GameOfLifeGrid();
   void init();
   void init(std::vector<std::pair<int, int> *> alive);

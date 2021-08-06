@@ -131,6 +131,8 @@ void CellSpot::onButton(const event::Button &e) {
 
 /// SCROLLBAR ///
 
+GridScrollBar::GridScrollBar() {}
+
 void GridScrollBar::draw(const DrawArgs &args) {
   if (vertical) {
     nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));

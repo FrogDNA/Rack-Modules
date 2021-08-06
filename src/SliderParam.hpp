@@ -1,5 +1,4 @@
-#ifndef SLIDERPARAM_H
-#define SLIDERPARAM_H
+#pragma once
 
 #include "Mitosis.hpp"
 #include "plugin.hpp"
@@ -17,9 +16,3 @@ struct SliderParam : TransparentWidget {
 struct LoopSliderParam : SliderParam {
   void onFirstDraw() override;
 };
-
-struct InfSliderParam : SliderParam {
-  void onFirstDraw() override;
-};
-
-#endif
