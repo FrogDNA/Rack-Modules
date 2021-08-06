@@ -23,7 +23,6 @@ struct Mitosis : Module {
   dsp::RingBuffer<bool, 1> loopParam;
   // infinity param
   dsp::RingBuffer<bool, 1> infinityParam;
-  bool infinity = false;
   // mute columns and rows
   dsp::RingBuffer<int, 64> muteUnmuteColsBuffer;
   dsp::RingBuffer<int, 64> muteUnmuteRowsBuffer;
@@ -52,6 +51,7 @@ struct Mitosis : Module {
   enum LightIds { NUM_LIGHTS };
 
   Mitosis();
+  void processBuffers();
   void process(const ProcessArgs &args) override;
   float processAudio(std::set<std::pair<int, int> *> alive, float tune,
                      float vOct);

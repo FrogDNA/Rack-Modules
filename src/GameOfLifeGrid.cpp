@@ -98,9 +98,9 @@ void GameOfLifeGrid::setCellState(std::pair<int, int> *cell, bool state) {
 void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
   if (loop) {
     for (int i = x - 1; i < x + 2; i++) {
-      int ci = (i + NUMCELLS_X) % NUMCELLS_X;
+      int ci = (i + numCellsX) % numCellsX;
       for (int j = y - 1; j < y + 2; j++) {
-        int cj = (j + NUMCELLS_Y) % NUMCELLS_Y;
+        int cj = (j + numCellsY) % numCellsY;
         watchList.insert(allCells[ci][cj]);
         if (ci != x || cj != y) {
           neighbours[ci][cj] += val;
@@ -131,12 +131,15 @@ void GameOfLifeGrid::update() {
     int x = c->first;
     int y = c->second;
     int count = neigh[x][y];
+    if (x >= numCellsX || y >= numCellsY) {
+      setCellState(c, false);
+    }
     if (count == 3) {
-      setCellState(x, y, true);
+      setCellState(c, true);
     } else if (count == 2) {
-      setCellState(x, y, isAlive(x, y));
+      setCellState(c, isAlive(x, y));
     } else {
-      setCellState(x, y, false);
+      setCellState(c, false);
     }
   }
 }

@@ -61,31 +61,7 @@ void Mitosis::process(const ProcessArgs &args) {
     }
   }
   // check if GUI has some messages
-  if (!clickedCells.empty()) {
-    std::pair<int, int> *c = clickedCells.shift();
-    bool alive = golGrid->isAlive(c);
-    golGrid->setCellState(c, !alive);
-  }
-  if (!loopParam.empty()) {
-    bool loop = loopParam.shift();
-    golGrid->setLoop(loop);
-  }
-  while (!muteColsBuffer.empty()) {
-    int col = muteColsBuffer.shift();
-    dsp->muteUnmuteCol(col, false);
-  }
-  while (!unmuteColsBuffer.empty()) {
-    int col = unmuteColsBuffer.shift();
-    dsp->muteUnmuteCol(col, true);
-  }
-  while (!muteUnmuteColsBuffer.empty()) {
-    int col = muteUnmuteColsBuffer.shift();
-    dsp->muteUnmuteCol(col, !dsp->isColAudible(col));
-  }
-  while (!muteUnmuteRowsBuffer.empty()) {
-    int row = muteUnmuteRowsBuffer.shift();
-    dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
-  }
+  processBuffers();
   // *** PROCESS AUDIO ***
   std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
   dsp->paramValues(state, food_wideness, temp_roundness, vOct);
@@ -118,6 +94,38 @@ void Mitosis::process(const ProcessArgs &args) {
   outputs[DATA_OUTPUT].setVoltage(dataOut);
   outputs[AUDIO_OUTPUT].setVoltage(5.f * audio);
   outputs[VOCTOUT_OUTPUT].setVoltage(vOctOut);
+}
+
+void Mitosis::processBuffers() {
+  while (!clickedCells.empty()) {
+    std::pair<int, int> *c = clickedCells.shift();
+    bool alive = golGrid->isAlive(c);
+    golGrid->setCellState(c, !alive);
+  }
+  while (!loopParam.empty()) {
+    bool loop = loopParam.shift();
+    golGrid->loop = loop;
+  }
+  while (!infinityParam.empty()) {
+    bool infinity = infinityParam.shift();
+    golGrid->maxSize = infinity;
+  }
+  while (!muteColsBuffer.empty()) {
+    int col = muteColsBuffer.shift();
+    dsp->muteUnmuteCol(col, false);
+  }
+  while (!unmuteColsBuffer.empty()) {
+    int col = unmuteColsBuffer.shift();
+    dsp->muteUnmuteCol(col, true);
+  }
+  while (!muteUnmuteColsBuffer.empty()) {
+    int col = muteUnmuteColsBuffer.shift();
+    dsp->muteUnmuteCol(col, !dsp->isColAudible(col));
+  }
+  while (!muteUnmuteRowsBuffer.empty()) {
+    int row = muteUnmuteRowsBuffer.shift();
+    dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
+  }
 }
 
 json_t *Mitosis::dataToJson() {

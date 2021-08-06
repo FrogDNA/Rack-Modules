@@ -6,6 +6,8 @@
 #include <set>
 
 class GameOfLifeGrid {
+  int numCellsX = NUMCELLS_X;
+  int numCellsY = NUMCELLS_Y;
   std::vector<std::vector<std::pair<int, int> *>> allCells;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
