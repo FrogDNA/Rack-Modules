@@ -154,9 +154,10 @@ void CenterButton::draw(const DrawArgs &args) {
 /// ZOOM BUTTON ///
 
 void ZoomButton::draw(const DrawArgs &args) {
-  if (zoomPlus) {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
+  if (pressed) {
+    nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
   } else {
+    // todo remove once graphics is OK
     nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0xff, 0xff));
   }
   nvgBeginPath(args.vg);
@@ -168,7 +169,9 @@ void ZoomButton::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
     if (e.action == GLFW_PRESS) {
       doZoom();
+      pressed = true;
     } else if (e.action == GLFW_RELEASE) {
+      pressed = false;
       zoomSpeed = 1;
       zoomFramesCount = 0;
       zoomAccelerationFramesCount = 0;

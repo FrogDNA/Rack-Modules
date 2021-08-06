@@ -67,6 +67,7 @@ struct GridScrollBar : Widget {
 };
 
 struct ZoomButton : Widget {
+  bool pressed = false;
   int zoomSpeed = 1;
   int zoomFramesCount = 0;
   int zoomAccelerationFramesCount = 0;
