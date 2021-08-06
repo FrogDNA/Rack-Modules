@@ -6,7 +6,6 @@
 #include <set>
 
 class GameOfLifeGrid {
-  bool loop = false;
   std::vector<std::vector<std::pair<int, int> *>> allCells;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
@@ -16,6 +15,8 @@ class GameOfLifeGrid {
   void updateNeighboursAndWatchlist(int x, int y, int val);
 
 public:
+  bool loop = false;
+  bool maxSize = true;
   GameOfLifeGrid();
   void init();
   void init(std::vector<std::pair<int, int> *> alive);

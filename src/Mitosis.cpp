@@ -126,6 +126,7 @@ json_t *Mitosis::dataToJson() {
   json_t *gridJ = json_array();
   json_t *colAudibleJ = json_array();
   json_t *rowAudibleJ = json_array();
+  json_t *switchesJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
   for (int i = 0; i < NUMCELLS_X; i++) {
@@ -139,9 +140,11 @@ json_t *Mitosis::dataToJson() {
   for (int i = 0; i < NUMCELLS_Y; i++) {
     json_array_append_new(rowAudibleJ, json_boolean(dsp->isRowAudible(i)));
   }
+  json_array_append_new(switchesJ, json_boolean(golGrid->loop));
   json_object_set_new(rootJ, "golGrid", gridJ);
   json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
   json_object_set_new(rootJ, "colAudible", colAudibleJ);
+  json_object_set_new(rootJ, "switches", switchesJ);
   return rootJ;
 }
 
@@ -166,6 +169,8 @@ void Mitosis::dataFromJson(json_t *rootJ) {
       dsp->muteUnmuteRow(i, rowAudible);
     }
   }
+  json_t *switchesJ = json_object_get(rootJ, "switches");
+  golGrid->loop = json_is_true(json_array_get(switchesJ, 0));
 }
 
 struct MitosisWidget : ModuleWidget {
@@ -240,17 +245,18 @@ struct MitosisWidget : ModuleWidget {
     display->box.size = mm2px(Vec(110.0, 110.0));
     addChild(display);
 
-    SliderParam *lpWidget = new SliderParam();
+    LoopSliderParam *lpWidget = new LoopSliderParam();
     lpWidget->rb = &(module->loopParam);
     lpWidget->box.pos = mm2px(Vec(75.061, 3.6));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
+    lpWidget->module = module;
     addChild(lpWidget);
 
-    SliderParam *infWidget = new SliderParam();
+    InfSliderParam *infWidget = new InfSliderParam();
     infWidget->rb = &(module->infinityParam);
     infWidget->box.pos = mm2px(Vec(134.446, 3.6));
     infWidget->box.size = mm2px(Vec(7.8, 3.8));
-    infWidget->switchedOn = true;
+    infWidget->module = module;
     addChild(infWidget);
   }
 };
