@@ -19,11 +19,11 @@ static const float ICON_PADDING = 2.0f;
 
 // number of frames between two zooms
 static const int FRAMES_BETWEEN_ZOOM = 20;
-static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
+static const int ZOOMS_BEFORE_SPEED_INCREASE = 2;
 
 // number of frames between two scrolls
 static const int FRAMES_BETWEEN_SCROLL = 20;
-static const int SCROLLS_BEFORE_SPEED_INCREASE = 1;
+static const int SCROLLS_BEFORE_SPEED_INCREASE = 2;
 
 // minimum per dimension
 // real min cells on screen is 10 * 10
@@ -67,16 +67,14 @@ struct GridDisplay : OpaqueWidget {
   void resetView();
 };
 
-struct GridScrollButton : OpaqueWidget {
+struct GridScrollButton : InterfaceButton {
   int orientation = 1; // 1 or -1
-  bool pressed = false;
   int scrollSpeed = 1;
   int scrollFramesCount = 0;
   int scrollAccelerationFramesCount = 0;
   void doScroll();
-  void draw(const DrawArgs &args) override;
-  void onButton(const event::Button &e) override;
-  void onDragHover(const event::DragHover &e) override;
+  void buttonReleased() override;
+  void whileHovering() override;
 };
 
 struct GridScrollBar : OpaqueWidget {

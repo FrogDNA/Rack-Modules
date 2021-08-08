@@ -150,54 +150,30 @@ void CellSpot::onButton(const event::Button &e) {
 }
 
 /// GRID SCROLL BUTTON ///
-void GridScrollButton::draw(const DrawArgs &args) {
-  if (orientation == 1) {
-    nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
-  } else {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
-  }
-  nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-  nvgFill(args.vg);
+
+void GridScrollButton::buttonReleased() {
+  scrollSpeed = 1;
+  scrollFramesCount = 0;
+  scrollAccelerationFramesCount = 0;
 }
 
-void GridScrollButton::onButton(const event::Button &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (e.action == GLFW_PRESS) {
-      doScroll();
-      pressed = true;
-    } else if (e.action == GLFW_RELEASE) {
-      pressed = false;
-      scrollSpeed = 1;
-      scrollFramesCount = 0;
+void GridScrollButton::whileHovering() {
+  if (scrollFramesCount % FRAMES_BETWEEN_SCROLL == 0) {
+    scrollFramesCount = 0;
+    doScroll();
+    scrollAccelerationFramesCount++;
+    if (scrollAccelerationFramesCount == SCROLLS_BEFORE_SPEED_INCREASE) {
+      scrollSpeed = scrollSpeed * 2;
       scrollAccelerationFramesCount = 0;
     }
-    e.consume(this);
-    Widget::onButton(e);
   }
+  scrollFramesCount++;
 }
 
 void GridScrollButton::doScroll() {
   GridScrollBar *sb = getAncestorOfType<GridScrollBar>();
   GoLDisplay *gd = sb->getAncestorOfType<GoLDisplay>();
   gd->gridDisplay->scroll(scrollSpeed * orientation, sb->vertical);
-}
-
-void GridScrollButton::onDragHover(const event::DragHover &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (scrollFramesCount == FRAMES_BETWEEN_SCROLL) {
-      scrollFramesCount = 0;
-      doScroll();
-      e.consume(this);
-      scrollAccelerationFramesCount++;
-      if (scrollAccelerationFramesCount == SCROLLS_BEFORE_SPEED_INCREASE) {
-        scrollSpeed = scrollSpeed * 2;
-        scrollAccelerationFramesCount = 0;
-      }
-    }
-    scrollFramesCount++;
-  }
-  Widget::onDragHover(e);
 }
 
 /// SCROLLBAR ///
