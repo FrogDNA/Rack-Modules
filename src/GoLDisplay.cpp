@@ -11,18 +11,15 @@ void GridDisplay::draw(const DrawArgs &args) {
   if (module && firstDraw) {
     float numSquareX = (float)(spotsX + 1); // take into account lineheaders
     float numSquareY = (float)(spotsY + 1); // take into account lineheaders
-    float numCellsX = (float)std::min(spotsX, NUMCELLS_X);
-    float numCellsY = (float)std::min(spotsY, NUMCELLS_Y);
     sizeX = box.size.x;
     sizeY = box.size.y;
-
     cellSizeX = sizeX / (numSquareX + CELL_PADDING * (numSquareX - 1));
     cellSizeY = sizeY / (numSquareY + CELL_PADDING * (numSquareY - 1));
     cellSpaceX = cellSizeX * CELL_PADDING;
     cellSpaceY = cellSizeY * CELL_PADDING;
     firstDraw = false;
     // define column headers
-    for (int i = 0; i < numCellsX; i++) {
+    for (int i = 0; i < spotsX; i++) {
       LineHeader *lh = new LineHeader(i + display_x0, false);
       lh->box.pos = Vec((i + 1) * (cellSizeX + cellSpaceX), 0);
       lh->box.size = Vec(cellSizeX, cellSizeY);
@@ -30,7 +27,7 @@ void GridDisplay::draw(const DrawArgs &args) {
       addChild(lh);
     }
     // define row headers
-    for (int i = 0; i < numCellsY; i++) {
+    for (int i = 0; i < spotsY; i++) {
       LineHeader *lh = new LineHeader(i + display_y0, true);
       lh->box.pos = Vec(0, (i + 1) * (cellSizeY + cellSpaceY));
       lh->box.size = Vec(cellSizeX, cellSizeY);
@@ -50,18 +47,19 @@ void GridDisplay::draw(const DrawArgs &args) {
         addChild(spot);
       }
     }
-    // define zoom bars and buttons.TODO
   }
   OpaqueWidget::draw(args);
 }
 
 void GridDisplay::changeZoomLevel(int zoomChange) {
+  int oldSx = spotsX;
+  int oldSy = spotsY;
   spotsX =
       std::max(MIN_CELLS_ON_SCREEN, std::min(spotsX + zoomChange, NUMCELLS_X));
   spotsY =
       std::max(MIN_CELLS_ON_SCREEN, std::min(spotsY + zoomChange, NUMCELLS_Y));
-  display_x0 = (NUMCELLS_X - spotsX) / 2;
-  display_y0 = (NUMCELLS_Y - spotsY) / 2;
+  scroll((oldSx - spotsX) / 2, false);
+  scroll((oldSy - spotsY) / 2, true);
   clearChildren();
   firstDraw = true;
 }
@@ -74,6 +72,15 @@ void GridDisplay::scroll(int scrollQuantity, bool vertical) {
     display_x0 =
         std::max(0, std::min(display_x0 + scrollQuantity, NUMCELLS_X - spotsX));
   }
+  clearChildren();
+  firstDraw = true;
+}
+
+void GridDisplay::resetView() {
+  spotsX = DEFAULT_CELLS_DISPLAYED_X;
+  spotsY = DEFAULT_CELLS_DISPLAYED_Y;
+  display_x0 = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
+  display_y0 = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
   clearChildren();
   firstDraw = true;
 }
@@ -232,6 +239,17 @@ void CenterButton::draw(const DrawArgs &args) {
   nvgBeginPath(args.vg);
   nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
   nvgFill(args.vg);
+}
+
+void CenterButton::onButton(const event::Button &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (e.action == GLFW_PRESS) {
+      GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
+      gd->gridDisplay->resetView();
+    }
+    e.consume(this);
+    Widget::onButton(e);
+  }
 }
 
 /// ZOOM BUTTON ///

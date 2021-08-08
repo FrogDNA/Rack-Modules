@@ -63,6 +63,7 @@ struct GridDisplay : OpaqueWidget {
   void draw(const DrawArgs &args) override;
   void changeZoomLevel(int zoomChange);
   void scroll(int scrollQuantity, bool vertical);
+  void resetView();
 };
 
 struct GridScrollButton : OpaqueWidget {
@@ -99,6 +100,7 @@ struct ZoomButton : Widget {
 
 struct CenterButton : Widget {
   void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
 };
 
 struct GoLDisplay : OpaqueWidget {

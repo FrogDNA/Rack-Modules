@@ -178,7 +178,7 @@ bool GameOfLifeGrid::isAlive(std::pair<int, int> *cell) {
   return aliveMap[cell->first][cell->second] == 1;
 }
 bool GameOfLifeGrid::isInGrid(int x, int y) {
-  if (x > 0 && y > 0 && x < NUMCELLS_X && y < NUMCELLS_Y) {
+  if (x >= 0 && y >= 0 && x < NUMCELLS_X && y < NUMCELLS_Y) {
     return true;
   }
   return false;
