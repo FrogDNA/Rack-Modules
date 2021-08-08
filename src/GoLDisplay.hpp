@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameOfLifeGrid.hpp"
+#include "InterfaceButton.hpp"
 #include "Mitosis.hpp"
 #include "plugin.hpp"
 
@@ -86,30 +87,18 @@ struct GridScrollBar : OpaqueWidget {
   void draw(const DrawArgs &args) override;
 };
 
-// todo develop this and put in a new file to factorize
-// zoom and center button
-struct InterfaceButton : Widget {
-  bool pressed = false;
-};
-
-struct ZoomButton : Widget {
-  bool pressed = false;
+struct ZoomButton : InterfaceButton {
   int zoomSpeed = 1;
   int zoomFramesCount = 0;
   int zoomAccelerationFramesCount = 0;
-  bool zoomPlus = false;
-  void doZoom();
-  void draw(const DrawArgs &args) override;
-  void onButton(const event::Button &e) override;
-  void onDragHover(const event::DragHover &e) override;
+  int baseZoom = 1;
+  void buttonReleased() override;
+  void whileHovering() override;
 };
 
-struct CenterButton : Widget {
-  bool isPressed = false;
-  void draw(const DrawArgs &args) override;
-  void onButton(const event::Button &e) override;
-  void onDragHover(const event::DragHover &e) override;
-  void onDragLeave(const event::DragLeave &e) override;
+struct CenterButton : InterfaceButton {
+  void buttonReleased() override;
+  void whileHovering() override;
 };
 
 struct GoLDisplay : OpaqueWidget {

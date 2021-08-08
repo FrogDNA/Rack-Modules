@@ -234,88 +234,36 @@ void GridScrollBar::draw(const DrawArgs &args) {
 
 /// CENTER BUTTON ///
 
-void CenterButton::draw(const DrawArgs &args) {
-  if (isPressed) {
-    nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
-    nvgBeginPath(args.vg);
-    nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-    nvgFill(args.vg);
-  }
+void CenterButton::buttonReleased() {
+  GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
+  gd->gridDisplay->resetView();
 }
 
-void CenterButton::onButton(const event::Button &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (e.action == GLFW_PRESS) {
-      isPressed = true;
-    } else if (e.action == GLFW_RELEASE) {
-      isPressed = false;
-      GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
-      gd->gridDisplay->resetView();
-    }
-    e.consume(this);
-    Widget::onButton(e);
-  }
-}
-
-void CenterButton::onDragHover(const event::DragHover &e) { e.consume(this); }
-
-void CenterButton::onDragLeave(const event::DragLeave &e) {
-  isPressed = false;
-  e.consume(this);
-}
+void CenterButton::whileHovering() {}
 
 /// ZOOM BUTTON ///
 
-void ZoomButton::draw(const DrawArgs &args) {
-  if (pressed) {
-    nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
-  } else {
-    // todo remove once graphics is OK
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0xff, 0xff));
-  }
-  nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-  nvgFill(args.vg);
+void ZoomButton::buttonReleased() {
+  zoomSpeed = 1;
+  zoomFramesCount = 0;
+  zoomAccelerationFramesCount = 0;
 }
 
-void ZoomButton::onButton(const event::Button &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (e.action == GLFW_PRESS) {
-      doZoom();
-      pressed = true;
-    } else if (e.action == GLFW_RELEASE) {
-      pressed = false;
-      zoomSpeed = 1;
-      zoomFramesCount = 0;
+void ZoomButton::whileHovering() {
+  if (zoomFramesCount % FRAMES_BETWEEN_ZOOM == 0) {
+    zoomFramesCount = 0;
+    GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
+    gd->gridDisplay->changeZoomLevel(zoomSpeed * baseZoom);
+    zoomAccelerationFramesCount++;
+    if (zoomAccelerationFramesCount == ZOOMS_BEFORE_SPEED_INCREASE) {
+      zoomSpeed = zoomSpeed * 2;
       zoomAccelerationFramesCount = 0;
     }
-    e.consume(this);
-    Widget::onButton(e);
   }
+  zoomFramesCount++;
 }
 
-void ZoomButton::doZoom() {
-  GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
-  int mult = zoomPlus ? 1 : -1;
-  gd->gridDisplay->changeZoomLevel(zoomSpeed * mult);
-}
-
-void ZoomButton::onDragHover(const event::DragHover &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (zoomFramesCount == FRAMES_BETWEEN_ZOOM) {
-      zoomFramesCount = 0;
-      doZoom();
-      e.consume(this);
-      zoomAccelerationFramesCount++;
-      if (zoomAccelerationFramesCount == ZOOMS_BEFORE_SPEED_INCREASE) {
-        zoomSpeed = zoomSpeed * 2;
-        zoomAccelerationFramesCount = 0;
-      }
-    }
-    zoomFramesCount++;
-  }
-  Widget::onDragHover(e);
-}
+/// GOLDISPLAY ///
 
 GoLDisplay::GoLDisplay() { firstDraw = true; }
 
@@ -345,18 +293,18 @@ void GoLDisplay::draw(const DrawArgs &args) {
         Vec(gridSizeX - (iconSizePx + iconPaddingPx), iconSizePx);
     hScrollBar->box.pos = Vec(0.f, gridSizeY + iconPaddingPx);
     addChild(hScrollBar);
-    // zoom button +
-    ZoomButton *zoomPlus = new ZoomButton();
-    zoomPlus->zoomPlus = true;
-    zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomPlus->box.pos = Vec(gridSizeX + iconPaddingPx, gridSizeY - iconSizePx);
-    addChild(zoomPlus);
     // zoom button -
     ZoomButton *zoomMinus = new ZoomButton();
-    zoomMinus->zoomPlus = false;
+    zoomMinus->baseZoom = -1;
     zoomMinus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomMinus->box.pos = Vec(gridSizeX - iconSizePx, gridSizeY + iconPaddingPx);
+    zoomMinus->box.pos = Vec(gridSizeX + iconPaddingPx, gridSizeY - iconSizePx);
     addChild(zoomMinus);
+    // zoom button +
+    ZoomButton *zoomPlus = new ZoomButton();
+    zoomPlus->baseZoom = 1;
+    zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
+    zoomPlus->box.pos = Vec(gridSizeX - iconSizePx, gridSizeY + iconPaddingPx);
+    addChild(zoomPlus);
     // center grid button (or center zoom ? At least extra button)
     CenterButton *centerButton = new CenterButton();
     centerButton->box.size = Vec(iconSizePx, iconSizePx);
