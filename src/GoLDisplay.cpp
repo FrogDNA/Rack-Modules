@@ -180,14 +180,39 @@ void GridScrollButton::doScroll() {
 
 void GridScrollBar::draw(const DrawArgs &args) {
   GridScrollPane *sb = getAncestorOfType<GridScrollPane>();
-  if (sb->vertical) {
-    nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
-  } else {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
-  }
+  nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
   nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  if (sb->vertical) {
+    nvgRect(args.vg, 0, 0, barSize, this->box.size.y);
+    nvgRect(args.vg, this->box.size.x - barSize, 0, barSize, this->box.size.y);
+  } else {
+    nvgRect(args.vg, 0, 0, this->box.size.x, barSize);
+    nvgRect(args.vg, 0, this->box.size.y - barSize, this->box.size.x, barSize);
+  }
   nvgFill(args.vg);
+  nvgBeginPath(args.vg);
+
+  float r = mm2px(ICON_SIZE) - 2 * barSize;
+  GridDisplay *gd = sb->getAncestorOfType<GoLDisplay>()->gridDisplay;
+
+  if (sb->vertical) {
+    // nvgCircle(args.vg, this->box.size.x / 2.0f, scrollPercent, r);
+  } else {
+    if (gd->spotsX != NUMCELLS_X) {
+      float percent =
+          (float)(gd->display_x0) / (float)(NUMCELLS_X - gd->spotsX);
+      float position = (1 - percent) * r + percent * (box.size.x - r);
+      nvgFillColor(args.vg, nvgRGBA(0xff, 0x00, 0x00, 0xff));
+      nvgCircle(args.vg, position, box.size.y / 2.0f, r);
+      printf("pos %f cx %f cy %f r %f \n", percent, position, box.size.y / 2.0f,
+             r);
+      nvgFill(args.vg);
+    } else {
+      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+      nvgFill(args.vg);
+    }
+  }
 }
 
 /// SCROLLPANE ///

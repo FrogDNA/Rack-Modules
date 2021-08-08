@@ -78,6 +78,8 @@ struct GridScrollButton : InterfaceButton {
 };
 
 struct GridScrollBar : Widget {
+  float barSize = mm2px(0.5f);
+  float pos = 0.5f;
   void draw(const DrawArgs &args) override;
 };
 
