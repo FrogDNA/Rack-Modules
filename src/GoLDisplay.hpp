@@ -1,5 +1,4 @@
-#ifndef GOLDISPLAY_H
-#define GOLDISPLAY_H
+#pragma once
 
 #include "GameOfLifeGrid.hpp"
 #include "Mitosis.hpp"
@@ -20,6 +19,10 @@ static const float ICON_PADDING = 2.0f;
 // number of frames between two zooms
 static const int FRAMES_BETWEEN_ZOOM = 20;
 static const int ZOOMS_BEFORE_SPEED_INCREASE = 1;
+
+// number of frames between two scrolls
+static const int FRAMES_BETWEEN_SCROLL = 20;
+static const int SCROLLS_BEFORE_SPEED_INCREASE = 1;
 
 // minimum per dimension
 // real min cells on screen is 10 * 10
@@ -59,16 +62,27 @@ struct GridDisplay : OpaqueWidget {
   GridDisplay();
   void draw(const DrawArgs &args) override;
   void changeZoomLevel(int zoomChange);
+  void scroll(int scrollQuantity, bool vertical);
 };
 
-struct GridScrollBar : Widget {
-  GridScrollBar();
+struct GridScrollButton : OpaqueWidget {
+  int orientation = 1; // 1 or -1
+  bool pressed = false;
+  int scrollSpeed = 1;
+  int scrollFramesCount = 0;
+  int scrollAccelerationFramesCount = 0;
+  void doScroll();
+  void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
+  void onDragHover(const event::DragHover &e) override;
+};
+
+struct GridScrollBar : OpaqueWidget {
+  bool firstDraw = true;
+  GridScrollButton *buttonPlus = NULL;
+  GridScrollButton *buttonMinus = NULL;
   bool vertical = false;
   void draw(const DrawArgs &args) override;
-};
-
-struct GridScrollButton : Widget {
-  int orientation = 1; // 1 or -1
 };
 
 struct ZoomButton : Widget {
@@ -93,7 +107,4 @@ struct GoLDisplay : OpaqueWidget {
   bool firstDraw = true;
   GoLDisplay();
   void draw(const DrawArgs &args) override;
-  void zoom(int zoomQuantity);
 };
-
-#endif

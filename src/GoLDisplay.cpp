@@ -66,6 +66,18 @@ void GridDisplay::changeZoomLevel(int zoomChange) {
   firstDraw = true;
 }
 
+void GridDisplay::scroll(int scrollQuantity, bool vertical) {
+  if (vertical) {
+    display_y0 =
+        std::max(0, std::min(display_y0 + scrollQuantity, NUMCELLS_Y - spotsY));
+  } else {
+    display_x0 =
+        std::max(0, std::min(display_x0 + scrollQuantity, NUMCELLS_X - spotsX));
+  }
+  clearChildren();
+  firstDraw = true;
+}
+
 /// LINEHEADER ///
 
 LineHeader::LineHeader(int coordinate, bool isLine) {
@@ -109,7 +121,8 @@ void CellSpot::draw(const DrawArgs &args) {
     } else if (dsp->isCellAudible(cell)) {
       nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0xdd, 0xff));
     } else {
-      nvgFillColor(args.vg, nvgRGBA(0xc2, 0xc2, 0xc2, 0xff));
+      // dont use c2 as c2 is back color
+      nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0xba, 0xff));
     }
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
@@ -129,11 +142,78 @@ void CellSpot::onButton(const event::Button &e) {
   Widget::onButton(e);
 }
 
+/// GRID SCROLL BUTTON ///
+void GridScrollButton::draw(const DrawArgs &args) {
+  if (orientation == 1) {
+    nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
+  } else {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
+  }
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  nvgFill(args.vg);
+}
+
+void GridScrollButton::onButton(const event::Button &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (e.action == GLFW_PRESS) {
+      doScroll();
+      pressed = true;
+    } else if (e.action == GLFW_RELEASE) {
+      pressed = false;
+      scrollSpeed = 1;
+      scrollFramesCount = 0;
+      scrollAccelerationFramesCount = 0;
+    }
+    e.consume(this);
+    Widget::onButton(e);
+  }
+}
+
+void GridScrollButton::doScroll() {
+  GridScrollBar *sb = getAncestorOfType<GridScrollBar>();
+  GoLDisplay *gd = sb->getAncestorOfType<GoLDisplay>();
+  gd->gridDisplay->scroll(scrollSpeed * orientation, sb->vertical);
+}
+
+void GridScrollButton::onDragHover(const event::DragHover &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (scrollFramesCount == FRAMES_BETWEEN_SCROLL) {
+      scrollFramesCount = 0;
+      doScroll();
+      e.consume(this);
+      scrollAccelerationFramesCount++;
+      if (scrollAccelerationFramesCount == SCROLLS_BEFORE_SPEED_INCREASE) {
+        scrollSpeed = scrollSpeed * 2;
+        scrollAccelerationFramesCount = 0;
+      }
+    }
+    scrollFramesCount++;
+  }
+  Widget::onDragHover(e);
+}
+
 /// SCROLLBAR ///
 
-GridScrollBar::GridScrollBar() {}
-
 void GridScrollBar::draw(const DrawArgs &args) {
+  if (firstDraw) {
+    float iconSizePx = mm2px(ICON_SIZE);
+    buttonPlus = new GridScrollButton();
+    buttonPlus->orientation = 1;
+    buttonPlus->box.size = Vec(iconSizePx, iconSizePx);
+    if (vertical) {
+      buttonPlus->box.pos = Vec(0, box.size.y - iconSizePx);
+    } else {
+      buttonPlus->box.pos = Vec(box.size.x - iconSizePx, 0);
+    }
+    buttonMinus = new GridScrollButton();
+    buttonMinus->orientation = -1;
+    buttonMinus->box.size = Vec(iconSizePx, iconSizePx);
+    buttonMinus->box.pos = Vec(0, 0);
+    addChild(buttonPlus);
+    addChild(buttonMinus);
+    firstDraw = false;
+  }
   if (vertical) {
     nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
   } else {
@@ -142,6 +222,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
   nvgBeginPath(args.vg);
   nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
   nvgFill(args.vg);
+  OpaqueWidget::draw(args);
 }
 
 /// CENTER BUTTON ///
@@ -186,7 +267,7 @@ void ZoomButton::onButton(const event::Button &e) {
 void ZoomButton::doZoom() {
   GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
   int mult = zoomPlus ? 1 : -1;
-  gd->zoom(zoomSpeed * mult);
+  gd->gridDisplay->changeZoomLevel(zoomSpeed * mult);
 }
 
 void ZoomButton::onDragHover(const event::DragHover &e) {
@@ -207,10 +288,6 @@ void ZoomButton::onDragHover(const event::DragHover &e) {
 }
 
 GoLDisplay::GoLDisplay() { firstDraw = true; }
-
-void GoLDisplay::zoom(int zoomQuantity) {
-  gridDisplay->changeZoomLevel(zoomQuantity);
-}
 
 void GoLDisplay::draw(const DrawArgs &args) {
   if (firstDraw && module) {
@@ -256,6 +333,7 @@ void GoLDisplay::draw(const DrawArgs &args) {
     centerButton->box.pos =
         Vec(gridSizeX + iconPaddingPx, gridSizeY + iconPaddingPx);
     addChild(centerButton);
+    // dont do this part again
     firstDraw = false;
   }
   OpaqueWidget::draw(args);
