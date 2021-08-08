@@ -180,32 +180,45 @@ void GridScrollButton::doScroll() {
 
 void GridScrollBar::draw(const DrawArgs &args) {
   GridScrollPane *sb = getAncestorOfType<GridScrollPane>();
+  // rectangles to materialize scroll area
   nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
   nvgBeginPath(args.vg);
   if (sb->vertical) {
-    nvgRect(args.vg, 0, 0, barSize, this->box.size.y);
-    nvgRect(args.vg, this->box.size.x - barSize, 0, barSize, this->box.size.y);
+    nvgRect(args.vg, 0, 0, barSize, box.size.y);
+    nvgRect(args.vg, box.size.x - barSize, 0, barSize, this->box.size.y);
+    nvgRect(args.vg, 0, 0, box.size.x, barSize);
+    nvgRect(args.vg, 0, box.size.y, box.size.x, barSize);
   } else {
     nvgRect(args.vg, 0, 0, this->box.size.x, barSize);
     nvgRect(args.vg, 0, this->box.size.y - barSize, this->box.size.x, barSize);
+    nvgRect(args.vg, 0, 0, barSize, box.size.y);
+    nvgRect(args.vg, box.size.x, 0, barSize, box.size.y);
   }
   nvgFill(args.vg);
   nvgBeginPath(args.vg);
-
-  float r = mm2px(ICON_SIZE) - 2 * barSize;
+  // circle to materialize position
+  float r = (mm2px(ICON_SIZE) - 2 * barSize) / 2;
   GridDisplay *gd = sb->getAncestorOfType<GoLDisplay>()->gridDisplay;
-
   if (sb->vertical) {
-    // nvgCircle(args.vg, this->box.size.x / 2.0f, scrollPercent, r);
+    if (gd->spotsY != NUMCELLS_Y) {
+      float percent =
+          (float)(gd->display_y0) / (float)(NUMCELLS_Y - gd->spotsY);
+      float position = (1 - percent) * r + percent * (box.size.y - r);
+      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+      nvgCircle(args.vg, box.size.x / 2.0f, position, r);
+      nvgFill(args.vg);
+    } else {
+      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+      nvgFill(args.vg);
+    }
   } else {
     if (gd->spotsX != NUMCELLS_X) {
       float percent =
           (float)(gd->display_x0) / (float)(NUMCELLS_X - gd->spotsX);
       float position = (1 - percent) * r + percent * (box.size.x - r);
-      nvgFillColor(args.vg, nvgRGBA(0xff, 0x00, 0x00, 0xff));
+      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
       nvgCircle(args.vg, position, box.size.y / 2.0f, r);
-      printf("pos %f cx %f cy %f r %f \n", percent, position, box.size.y / 2.0f,
-             r);
       nvgFill(args.vg);
     } else {
       nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
@@ -219,6 +232,19 @@ void GridScrollBar::draw(const DrawArgs &args) {
 void GridScrollPane::draw(const DrawArgs &args) {
   if (firstDraw) {
     float iconSizePx = mm2px(ICON_SIZE);
+    // scrollBar
+    if (vertical) {
+      GridScrollBar *vBar = new GridScrollBar();
+      vBar->box.size = Vec(iconSizePx, box.size.y - 2 * iconSizePx);
+      vBar->box.pos = Vec(0, iconSizePx);
+      addChild(vBar);
+    } else {
+      GridScrollBar *hBar = new GridScrollBar();
+      hBar->box.size = Vec(box.size.x - 2 * iconSizePx, iconSizePx);
+      hBar->box.pos = Vec(iconSizePx, 0);
+      addChild(hBar);
+    }
+    // buttonPlus
     buttonPlus = new GridScrollButton();
     buttonPlus->orientation = 1;
     buttonPlus->box.size = Vec(iconSizePx, iconSizePx);
@@ -233,15 +259,6 @@ void GridScrollPane::draw(const DrawArgs &args) {
     buttonMinus->box.pos = Vec(0, 0);
     addChild(buttonPlus);
     addChild(buttonMinus);
-    // scrollBar
-    GridScrollBar *hBar = new GridScrollBar();
-    hBar->box.size = Vec(box.size.x - 2 * iconSizePx, iconSizePx);
-    hBar->box.pos = Vec(iconSizePx, 0);
-    addChild(hBar);
-    GridScrollBar *vBar = new GridScrollBar();
-    vBar->box.size = Vec(iconSizePx, box.size.y - 2 * iconSizePx);
-    vBar->box.pos = Vec(0, iconSizePx);
-    addChild(vBar);
     firstDraw = false;
   }
   OpaqueWidget::draw(args);

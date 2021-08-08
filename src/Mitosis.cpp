@@ -22,7 +22,7 @@ Mitosis::Mitosis() {
   dataReceiver = new DataReceiver();
   dsp = new DSP();
   // for debugging
-  setbuf(stdout, NULL);
+  // setbuf(stdout, NULL);
 }
 
 void Mitosis::process(const ProcessArgs &args) {
