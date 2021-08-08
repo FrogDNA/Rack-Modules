@@ -13,7 +13,7 @@ static const float CELL_PADDING = 0.2f;
 // zoom and scroll line params in mm
 // recommendation is a strict min of 7
 // with a padding of 2
-static const float ICON_SIZE = 10.0f;
+static const float ICON_SIZE = 7.0f;
 static const float ICON_PADDING = 2.0f;
 
 // number of frames between two zooms
@@ -86,6 +86,12 @@ struct GridScrollBar : OpaqueWidget {
   void draw(const DrawArgs &args) override;
 };
 
+// todo develop this and put in a new file to factorize
+// zoom and center button
+struct InterfaceButton : Widget {
+  bool pressed = false;
+};
+
 struct ZoomButton : Widget {
   bool pressed = false;
   int zoomSpeed = 1;
@@ -99,8 +105,11 @@ struct ZoomButton : Widget {
 };
 
 struct CenterButton : Widget {
+  bool isPressed = false;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;
+  void onDragHover(const event::DragHover &e) override;
+  void onDragLeave(const event::DragLeave &e) override;
 };
 
 struct GoLDisplay : OpaqueWidget {

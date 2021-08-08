@@ -235,21 +235,33 @@ void GridScrollBar::draw(const DrawArgs &args) {
 /// CENTER BUTTON ///
 
 void CenterButton::draw(const DrawArgs &args) {
-  nvgFillColor(args.vg, nvgRGBA(0xff, 0x00, 0x00, 0xff));
-  nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-  nvgFill(args.vg);
+  if (isPressed) {
+    nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
+    nvgBeginPath(args.vg);
+    nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+    nvgFill(args.vg);
+  }
 }
 
 void CenterButton::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
     if (e.action == GLFW_PRESS) {
+      isPressed = true;
+    } else if (e.action == GLFW_RELEASE) {
+      isPressed = false;
       GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
       gd->gridDisplay->resetView();
     }
     e.consume(this);
     Widget::onButton(e);
   }
+}
+
+void CenterButton::onDragHover(const event::DragHover &e) { e.consume(this); }
+
+void CenterButton::onDragLeave(const event::DragLeave &e) {
+  isPressed = false;
+  e.consume(this);
 }
 
 /// ZOOM BUTTON ///
