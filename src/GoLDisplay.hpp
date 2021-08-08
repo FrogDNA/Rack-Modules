@@ -77,7 +77,11 @@ struct GridScrollButton : InterfaceButton {
   void whileHovering() override;
 };
 
-struct GridScrollBar : OpaqueWidget {
+struct GridScrollBar : Widget {
+  void draw(const DrawArgs &args) override;
+};
+
+struct GridScrollPane : OpaqueWidget {
   bool firstDraw = true;
   GridScrollButton *buttonPlus = NULL;
   GridScrollButton *buttonMinus = NULL;

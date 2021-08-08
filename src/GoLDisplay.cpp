@@ -171,7 +171,7 @@ void GridScrollButton::whileHovering() {
 }
 
 void GridScrollButton::doScroll() {
-  GridScrollBar *sb = getAncestorOfType<GridScrollBar>();
+  GridScrollPane *sb = getAncestorOfType<GridScrollPane>();
   GoLDisplay *gd = sb->getAncestorOfType<GoLDisplay>();
   gd->gridDisplay->scroll(scrollSpeed * orientation, sb->vertical);
 }
@@ -179,6 +179,19 @@ void GridScrollButton::doScroll() {
 /// SCROLLBAR ///
 
 void GridScrollBar::draw(const DrawArgs &args) {
+  GridScrollPane *sb = getAncestorOfType<GridScrollPane>();
+  if (sb->vertical) {
+    nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
+  } else {
+    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0x00, 0xff));
+  }
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+  nvgFill(args.vg);
+}
+
+/// SCROLLPANE ///
+void GridScrollPane::draw(const DrawArgs &args) {
   if (firstDraw) {
     float iconSizePx = mm2px(ICON_SIZE);
     buttonPlus = new GridScrollButton();
@@ -195,16 +208,17 @@ void GridScrollBar::draw(const DrawArgs &args) {
     buttonMinus->box.pos = Vec(0, 0);
     addChild(buttonPlus);
     addChild(buttonMinus);
+    // scrollBar
+    GridScrollBar *hBar = new GridScrollBar();
+    hBar->box.size = Vec(box.size.x - 2 * iconSizePx, iconSizePx);
+    hBar->box.pos = Vec(iconSizePx, 0);
+    addChild(hBar);
+    GridScrollBar *vBar = new GridScrollBar();
+    vBar->box.size = Vec(iconSizePx, box.size.y - 2 * iconSizePx);
+    vBar->box.pos = Vec(0, iconSizePx);
+    addChild(vBar);
     firstDraw = false;
   }
-  if (vertical) {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
-  } else {
-    nvgFillColor(args.vg, nvgRGBA(0x00, 0x00, 0xff, 0xff));
-  }
-  nvgBeginPath(args.vg);
-  nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-  nvgFill(args.vg);
   OpaqueWidget::draw(args);
 }
 
@@ -256,14 +270,14 @@ void GoLDisplay::draw(const DrawArgs &args) {
     gridDisplay->box.size = Vec(gridSizeX, gridSizeY);
     addChild(gridDisplay);
     // vertical scrollBar
-    GridScrollBar *vScrollBar = new GridScrollBar();
+    GridScrollPane *vScrollBar = new GridScrollPane();
     vScrollBar->vertical = true;
     vScrollBar->box.size =
         Vec(iconSizePx, gridSizeY - (iconSizePx + iconPaddingPx));
     vScrollBar->box.pos = Vec(gridSizeX + iconPaddingPx, 0.f);
     addChild(vScrollBar);
     // horizontal scrollBar
-    GridScrollBar *hScrollBar = new GridScrollBar();
+    GridScrollPane *hScrollBar = new GridScrollPane();
     hScrollBar->vertical = false;
     hScrollBar->box.size =
         Vec(gridSizeX - (iconSizePx + iconPaddingPx), iconSizePx);
