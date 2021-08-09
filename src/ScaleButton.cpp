@@ -11,7 +11,8 @@ void ScaleButton::draw(const DrawArgs &args) {
   if (module) {
     DSP *dsp = module->dsp;
     for (int i = semitone; i < NUMCELLS_X; i += 12) {
-      if (dsp->isColAudible(i)) {
+      bool audible = cols ? dsp->isColAudible(i) : dsp->isRowAudible(i);
+      if (audible) {
         oneUnmuted = true;
       } else {
         oneMuted = true;

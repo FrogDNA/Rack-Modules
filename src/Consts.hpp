@@ -8,8 +8,8 @@
 static const int NUMCELLS_X = 108;
 static const int NUMCELLS_Y = 108;
 // at position 57 is A4 = 440.0 Hz
-static const int REFERENCE_POS = 57;
-static const float REFERENCE_FREQ = 440.0f;
+static const int REFERENCE_POS = 48;
+static const float REFERENCE_VOCT = 0.0f;
 static const float HIGHEST_FREQUENCY = 7902.13f;
 /* old colors
 static const NVGcolor COLOR_DARK_GRAY = nvgRGBA(0x11, 0x11, 0x11, 0xff);

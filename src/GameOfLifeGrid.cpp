@@ -27,7 +27,7 @@ void GameOfLifeGrid::init() {
   emptyGrid();
   // optional, interesting to test all manner of things
   //(Gosper Glider Gun)
-  setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
+  /*setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
   setCellState(REFERENCE_POS - 19, REFERENCE_POS + 1, true);
   setCellState(REFERENCE_POS - 18, REFERENCE_POS, true);
   setCellState(REFERENCE_POS - 18, REFERENCE_POS + 1, true);
@@ -62,7 +62,7 @@ void GameOfLifeGrid::init() {
   setCellState(REFERENCE_POS + 15, REFERENCE_POS - 1, true);
   setCellState(REFERENCE_POS + 15, REFERENCE_POS - 2, true);
   setCellState(REFERENCE_POS + 16, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
+  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);*/
 }
 
 void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
