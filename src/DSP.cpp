@@ -49,21 +49,27 @@ void DSP::paramValues(std::vector<std::pair<int, int> *> state) {
   }
 }
 
-Outputs *DSP::getOutputs() {
-  Outputs *out = new Outputs();
+Outputs DSP::getOutputs() {
+  Outputs out;
   int xCounter = 0;
   for (std::set<int>::iterator it = usableX.begin(); it != usableX.end();
        ++it) {
-    out->xOutputs[xCounter] = xFrequencies[*it];
-    out->xPresents[xCounter] = 10.0f;
+    out.xOutputs[xCounter] = xFrequencies[*it];
+    out.xPresents[xCounter] = 10.0f;
     xCounter++;
+    if (xCounter == 10) {
+      break;
+    }
   }
   int yCounter = 0;
   for (std::set<int>::iterator it = usableY.begin(); it != usableY.end();
        ++it) {
-    out->yOutputs[yCounter] = yFrequencies[*it];
-    out->yPresents[yCounter] = 10.0f;
+    out.yOutputs[yCounter] = yFrequencies[*it];
+    out.yPresents[yCounter] = 10.0f;
     yCounter++;
+    if (yCounter == 10) {
+      break;
+    }
   }
   return out;
 }

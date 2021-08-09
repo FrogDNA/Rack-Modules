@@ -26,7 +26,7 @@ public:
   DSP();
   void resetOutputChanged();
   bool isOutputChanged();
-  Outputs *getOutputs();
+  Outputs getOutputs();
   void paramValues(std::vector<std::pair<int, int> *> state);
   void muteUnmuteCol(int x, bool muted);
   void muteUnmuteRow(int y, bool muted);

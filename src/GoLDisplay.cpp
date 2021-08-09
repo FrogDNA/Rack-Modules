@@ -96,10 +96,15 @@ void LineHeader::draw(const DrawArgs &args) {
   DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
   bool muted = (isRow && !dsp->isRowAudible(coordinate)) ||
                (!isRow && !dsp->isColAudible(coordinate));
-  if (muted) {
-    nvgFillColor(args.vg, nvgRGBA(0x2e, 0x2e, 0x2e, 0xff));
+  if (isRow && muted) {
+    nvgFillColor(args.vg, OPAQUE_C3);
+  } else if (isRow && !muted) {
+    nvgFillColor(args.vg, TPT_C3);
+  } else if (!isRow && muted) {
+    nvgFillColor(args.vg, OPAQUE_C2);
   } else {
-    nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+    //(!isRow && !muted)
+    nvgFillColor(args.vg, TPT_C2);
   }
   nvgBeginPath(args.vg);
   nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);

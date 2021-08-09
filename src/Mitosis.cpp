@@ -18,7 +18,6 @@ Mitosis::Mitosis() {
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
   dsp = new DSP();
-  out = dsp->getOutputs();
   // for debugging
   // setbuf(stdout, NULL);
 }
@@ -74,32 +73,31 @@ void Mitosis::process(const ProcessArgs &args) {
   std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
   dsp->paramValues(state);
   if (dsp->isOutputChanged()) {
-    out = dsp->getOutputs();
+    Outputs out = dsp->getOutputs();
     dsp->resetOutputChanged();
+    // outputs rows
+    outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
+    outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
+    outputs[ROW_3_OUTPUT].setVoltage(out.yOutputs[2]);
+    outputs[ROW_4_OUTPUT].setVoltage(out.yOutputs[3]);
+    outputs[ROW_5_OUTPUT].setVoltage(out.yOutputs[4]);
+    outputs[ROW_6_OUTPUT].setVoltage(out.yOutputs[5]);
+    outputs[ROW_7_OUTPUT].setVoltage(out.yOutputs[6]);
+    outputs[ROW_8_OUTPUT].setVoltage(out.yOutputs[7]);
+    outputs[ROW_9_OUTPUT].setVoltage(out.yOutputs[8]);
+    outputs[ROW_10_OUTPUT].setVoltage(out.yOutputs[9]);
+    // outputs cols
+    outputs[COL_1_OUTPUT].setVoltage(out.xOutputs[0]);
+    outputs[COL_2_OUTPUT].setVoltage(out.xOutputs[1]);
+    outputs[COL_3_OUTPUT].setVoltage(out.xOutputs[2]);
+    outputs[COL_4_OUTPUT].setVoltage(out.xOutputs[3]);
+    outputs[COL_5_OUTPUT].setVoltage(out.xOutputs[4]);
+    outputs[COL_6_OUTPUT].setVoltage(out.xOutputs[5]);
+    outputs[COL_7_OUTPUT].setVoltage(out.xOutputs[6]);
+    outputs[COL_8_OUTPUT].setVoltage(out.xOutputs[7]);
+    outputs[COL_9_OUTPUT].setVoltage(out.xOutputs[8]);
+    outputs[COL_10_OUTPUT].setVoltage(out.xOutputs[9]);
   }
-  // outputs rows
-  outputs[ROW_1_OUTPUT].setVoltage(out->yOutputs[0]);
-  outputs[ROW_2_OUTPUT].setVoltage(out->yOutputs[1]);
-  outputs[ROW_3_OUTPUT].setVoltage(out->yOutputs[2]);
-  outputs[ROW_4_OUTPUT].setVoltage(out->yOutputs[3]);
-  outputs[ROW_5_OUTPUT].setVoltage(out->yOutputs[4]);
-  outputs[ROW_6_OUTPUT].setVoltage(out->yOutputs[5]);
-  outputs[ROW_7_OUTPUT].setVoltage(out->yOutputs[6]);
-  outputs[ROW_8_OUTPUT].setVoltage(out->yOutputs[7]);
-  outputs[ROW_9_OUTPUT].setVoltage(out->yOutputs[8]);
-  outputs[ROW_10_OUTPUT].setVoltage(out->yOutputs[9]);
-  // outputs cols
-  outputs[COL_1_OUTPUT].setVoltage(out->xOutputs[0]);
-  outputs[COL_2_OUTPUT].setVoltage(out->xOutputs[1]);
-  outputs[COL_3_OUTPUT].setVoltage(out->xOutputs[2]);
-  outputs[COL_4_OUTPUT].setVoltage(out->xOutputs[3]);
-  outputs[COL_5_OUTPUT].setVoltage(out->xOutputs[4]);
-  outputs[COL_6_OUTPUT].setVoltage(out->xOutputs[5]);
-  outputs[COL_7_OUTPUT].setVoltage(out->xOutputs[6]);
-  outputs[COL_8_OUTPUT].setVoltage(out->xOutputs[7]);
-  outputs[COL_9_OUTPUT].setVoltage(out->xOutputs[8]);
-  outputs[COL_10_OUTPUT].setVoltage(out->xOutputs[9]);
-
   outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
                                                                      : 0.f);
   outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
