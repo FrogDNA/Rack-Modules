@@ -121,18 +121,26 @@ void CellSpot::draw(const DrawArgs &args) {
     Mitosis *module = getAncestorOfType<GridDisplay>()->module;
     DSP *dsp = module->dsp;
     GameOfLifeGrid *grid = module->golGrid;
-    if (grid->isAlive(cell) && dsp->isCellAudible(cell)) {
-      nvgFillColor(args.vg, COLOR_DARK_GRAY);
-    } else if (grid->isAlive(cell)) {
-      nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
-    } else if (dsp->isCellAudible(cell)) {
-      nvgFillColor(args.vg, COLOR_LIGHT_GRAY);
+    if (grid->isAlive(cell)) {
+      nvgFillColor(args.vg, OPAQUE_C1_DARK);
     } else {
-      nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
+      nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
     }
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
     nvgFill(args.vg);
+    if (!dsp->isColAudible(cell->first)) {
+      nvgFillColor(args.vg, TPT_C2);
+      nvgBeginPath(args.vg);
+      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+      nvgFill(args.vg);
+    }
+    if (!dsp->isRowAudible(cell->second)) {
+      nvgFillColor(args.vg, TPT_C3);
+      nvgBeginPath(args.vg);
+      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+      nvgFill(args.vg);
+    }
   }
 }
 
@@ -186,7 +194,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
              ->gridDisplay;
   }
   // rectangles to materialize scroll area
-  nvgFillColor(args.vg, COLOR_DARK_GRAY);
+  nvgFillColor(args.vg, OPAQUE_C1_DARK);
   nvgBeginPath(args.vg);
   if (vertical) {
     nvgRect(args.vg, 0, 0, barSize, box.size.y);
@@ -210,11 +218,11 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsY != NUMCELLS_Y) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.y - r - barSize);
-        nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
+        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgCircle(args.vg, box.size.x / 2.0f, position, r);
         nvgFill(args.vg);
       } else {
-        nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
+        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
         nvgFill(args.vg);
       }
@@ -222,11 +230,11 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsX != NUMCELLS_X) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.x - r - barSize);
-        nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
+        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgCircle(args.vg, position, box.size.y / 2.0f, r);
         nvgFill(args.vg);
       } else {
-        nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
+        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
         nvgFill(args.vg);
       }

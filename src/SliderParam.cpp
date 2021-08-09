@@ -7,7 +7,7 @@ void SliderParam::draw(const DrawArgs &args) {
     onFirstDraw();
   }
   if (!firstDraw) {
-    nvgFillColor(args.vg, COLOR_DARK_GRAY);
+    nvgFillColor(args.vg, OPAQUE_C1_DARK);
     nvgBeginPath(args.vg);
     if (*switchedOn) {
       nvgRect(args.vg, this->box.size.x / 2, 0, this->box.size.x / 2,
