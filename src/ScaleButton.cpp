@@ -30,12 +30,12 @@ void ScaleButton::draw(const DrawArgs &args) {
   }
   // if all cols are unmuted, move to status 0
   if (status == 1) {
-    nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0x00, 0x6e));
+    nvgFillColor(args.vg, COLOR_YELLOW_BUTTON_T);
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
     nvgFill(args.vg);
   } else if (status == 2) {
-    nvgFillColor(args.vg, nvgRGBA(0xba, 0x00, 0x00, 0x6e));
+    nvgFillColor(args.vg, COLOR_GREEN_BUTTON_T);
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
     nvgFill(args.vg);

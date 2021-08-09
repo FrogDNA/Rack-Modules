@@ -122,14 +122,13 @@ void CellSpot::draw(const DrawArgs &args) {
     DSP *dsp = module->dsp;
     GameOfLifeGrid *grid = module->golGrid;
     if (grid->isAlive(cell) && dsp->isCellAudible(cell)) {
-      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
+      nvgFillColor(args.vg, COLOR_DARK_GRAY);
     } else if (grid->isAlive(cell)) {
-      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+      nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
     } else if (dsp->isCellAudible(cell)) {
-      nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0xdd, 0xff));
+      nvgFillColor(args.vg, COLOR_LIGHT_GRAY);
     } else {
-      // dont use c2 as c2 is back color
-      nvgFillColor(args.vg, nvgRGBA(0xba, 0xba, 0xba, 0xff));
+      nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
     }
     nvgBeginPath(args.vg);
     nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
@@ -187,7 +186,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
              ->gridDisplay;
   }
   // rectangles to materialize scroll area
-  nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
+  nvgFillColor(args.vg, COLOR_DARK_GRAY);
   nvgBeginPath(args.vg);
   if (vertical) {
     nvgRect(args.vg, 0, 0, barSize, box.size.y);
@@ -211,11 +210,11 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsY != NUMCELLS_Y) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.y - r - barSize);
-        nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+        nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
         nvgCircle(args.vg, box.size.x / 2.0f, position, r);
         nvgFill(args.vg);
       } else {
-        nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+        nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
         nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
         nvgFill(args.vg);
       }
@@ -223,11 +222,11 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsX != NUMCELLS_X) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.x - r - barSize);
-        nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+        nvgFillColor(args.vg, COLOR_MEDIUM_DARK_GRAY);
         nvgCircle(args.vg, position, box.size.y / 2.0f, r);
         nvgFill(args.vg);
       } else {
-        nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+        nvgFillColor(args.vg, COLOR_MEDIUM_LIGHT_GRAY);
         nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
         nvgFill(args.vg);
       }

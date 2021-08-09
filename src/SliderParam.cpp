@@ -7,7 +7,7 @@ void SliderParam::draw(const DrawArgs &args) {
     onFirstDraw();
   }
   if (!firstDraw) {
-    nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
+    nvgFillColor(args.vg, COLOR_DARK_GRAY);
     nvgBeginPath(args.vg);
     if (*switchedOn) {
       nvgRect(args.vg, this->box.size.x / 2, 0, this->box.size.x / 2,
@@ -19,10 +19,10 @@ void SliderParam::draw(const DrawArgs &args) {
     // draw the empty area
     nvgBeginPath(args.vg);
     if (*switchedOn) {
-      nvgFillColor(args.vg, nvgRGBA(0x00, 0xba, 0x00, 0xff));
+      nvgFillColor(args.vg, COLOR_GREEN_BUTTON_O);
       nvgRect(args.vg, 0, 0, this->box.size.x / 2, this->box.size.y);
     } else {
-      nvgFillColor(args.vg, nvgRGBA(0xba, 0x00, 0x00, 0xff));
+      nvgFillColor(args.vg, COLOR_RED_BUTTON_O);
       nvgRect(args.vg, this->box.size.x / 2, 0, this->box.size.x / 2,
               this->box.size.y);
     }
