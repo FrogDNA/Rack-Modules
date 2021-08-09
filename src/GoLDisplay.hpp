@@ -79,8 +79,13 @@ struct GridScrollButton : InterfaceButton {
 
 struct GridScrollBar : Widget {
   float barSize = mm2px(0.5f);
+  float r = (mm2px(ICON_SIZE) - 2 * barSize) / 2;
   float pos = 0.5f;
+  bool vertical = false;
+  GridDisplay *gd = NULL;
+  GridScrollBar();
   void draw(const DrawArgs &args) override;
+  void onDragHover(const event::DragHover &e) override;
 };
 
 struct GridScrollPane : OpaqueWidget {

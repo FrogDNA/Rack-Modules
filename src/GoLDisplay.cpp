@@ -178,53 +178,95 @@ void GridScrollButton::doScroll() {
 
 /// SCROLLBAR ///
 
+GridScrollBar::GridScrollBar() {}
+
 void GridScrollBar::draw(const DrawArgs &args) {
-  GridScrollPane *sb = getAncestorOfType<GridScrollPane>();
+  if (getAncestorOfType<GridScrollPane>()) {
+    gd = getAncestorOfType<GridScrollPane>()
+             ->getAncestorOfType<GoLDisplay>()
+             ->gridDisplay;
+  }
   // rectangles to materialize scroll area
   nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0xff));
   nvgBeginPath(args.vg);
-  if (sb->vertical) {
+  if (vertical) {
     nvgRect(args.vg, 0, 0, barSize, box.size.y);
     nvgRect(args.vg, box.size.x - barSize, 0, barSize, this->box.size.y);
     nvgRect(args.vg, 0, 0, box.size.x, barSize);
-    nvgRect(args.vg, 0, box.size.y, box.size.x, barSize);
+    nvgRect(args.vg, 0, box.size.y - barSize, box.size.x, barSize);
   } else {
-    nvgRect(args.vg, 0, 0, this->box.size.x, barSize);
-    nvgRect(args.vg, 0, this->box.size.y - barSize, this->box.size.x, barSize);
+    nvgRect(args.vg, 0, 0, box.size.x, barSize);
+    nvgRect(args.vg, 0, box.size.y - barSize, this->box.size.x, barSize);
     nvgRect(args.vg, 0, 0, barSize, box.size.y);
-    nvgRect(args.vg, box.size.x, 0, barSize, box.size.y);
+    nvgRect(args.vg, box.size.x - barSize, 0, barSize, box.size.y);
   }
   nvgFill(args.vg);
   nvgBeginPath(args.vg);
   // circle to materialize position
-  float r = (mm2px(ICON_SIZE) - 2 * barSize) / 2;
-  GridDisplay *gd = sb->getAncestorOfType<GoLDisplay>()->gridDisplay;
-  if (sb->vertical) {
-    if (gd->spotsY != NUMCELLS_Y) {
-      float percent =
-          (float)(gd->display_y0) / (float)(NUMCELLS_Y - gd->spotsY);
-      float position = (1 - percent) * r + percent * (box.size.y - r);
-      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
-      nvgCircle(args.vg, box.size.x / 2.0f, position, r);
-      nvgFill(args.vg);
+  if (gd) {
+    float percent =
+        vertical ? (float)(gd->display_y0) / (float)(NUMCELLS_Y - gd->spotsY)
+                 : (float)(gd->display_x0) / (float)(NUMCELLS_X - gd->spotsX);
+    if (vertical) {
+      if (gd->spotsY != NUMCELLS_Y) {
+        float position = (1 - percent) * (r + barSize) +
+                         percent * (box.size.y - r - barSize);
+        nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+        nvgCircle(args.vg, box.size.x / 2.0f, position, r);
+        nvgFill(args.vg);
+      } else {
+        nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+        nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+        nvgFill(args.vg);
+      }
     } else {
-      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
-      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-      nvgFill(args.vg);
+      if (gd->spotsX != NUMCELLS_X) {
+        float position = (1 - percent) * (r + barSize) +
+                         percent * (box.size.x - r - barSize);
+        nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+        nvgCircle(args.vg, position, box.size.y / 2.0f, r);
+        nvgFill(args.vg);
+      } else {
+        nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
+        nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+        nvgFill(args.vg);
+      }
     }
-  } else {
-    if (gd->spotsX != NUMCELLS_X) {
-      float percent =
-          (float)(gd->display_x0) / (float)(NUMCELLS_X - gd->spotsX);
-      float position = (1 - percent) * r + percent * (box.size.x - r);
-      nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
-      nvgCircle(args.vg, position, box.size.y / 2.0f, r);
-      nvgFill(args.vg);
+  }
+}
+
+void GridScrollBar::onDragHover(const event::DragHover &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    float infLimit = r + barSize;
+    float supLimit = vertical ? box.size.y : box.size.x;
+    supLimit -= (r + barSize);
+    float position = vertical ? e.pos.y : e.pos.x;
+    if (position <= infLimit) {
+      if (vertical) {
+        gd->display_y0 = 0;
+      } else {
+        gd->display_x0 = 0;
+      }
+    } else if (position >= supLimit) {
+      if (vertical) {
+        gd->display_y0 = NUMCELLS_Y - gd->spotsY;
+      } else {
+        gd->display_x0 = NUMCELLS_X - gd->spotsX;
+      }
     } else {
-      nvgFillColor(args.vg, nvgRGBA(0x11, 0x11, 0x11, 0x6e));
-      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-      nvgFill(args.vg);
+      float percent = (position - infLimit) / (supLimit - infLimit);
+      float max = vertical ? NUMCELLS_Y - gd->spotsY : NUMCELLS_X - gd->spotsX;
+      int val = floor(percent * max);
+      if (vertical) {
+        gd->display_y0 = val;
+      } else {
+        gd->display_x0 = val;
+      }
     }
+    e.consume(this);
+    Widget::onDragHover(e);
+    gd->clearChildren();
+    gd->firstDraw = true;
   }
 }
 
@@ -237,11 +279,13 @@ void GridScrollPane::draw(const DrawArgs &args) {
       GridScrollBar *vBar = new GridScrollBar();
       vBar->box.size = Vec(iconSizePx, box.size.y - 2 * iconSizePx);
       vBar->box.pos = Vec(0, iconSizePx);
+      vBar->vertical = true;
       addChild(vBar);
     } else {
       GridScrollBar *hBar = new GridScrollBar();
       hBar->box.size = Vec(box.size.x - 2 * iconSizePx, iconSizePx);
       hBar->box.pos = Vec(iconSizePx, 0);
+      hBar->vertical = false;
       addChild(hBar);
     }
     // buttonPlus
