@@ -17,7 +17,7 @@ class DSP {
   std::vector<bool> audibleRows;
   std::vector<float> xFrequencies;
   std::vector<float> yFrequencies;
-  std::vector<std::pair<int, int> *> alive;
+  std::vector<std::pair<int, int> *> knownState;
   bool audibilityChanged = false;
   bool outputChanged = false;
   int vSize = 0;

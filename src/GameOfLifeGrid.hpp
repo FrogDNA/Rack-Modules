@@ -3,7 +3,7 @@
 
 #include "Consts.hpp"
 #include "plugin.hpp"
-#include <set>
+#include <unordered_set>
 
 class GameOfLifeGrid {
   int numCellsX = NUMCELLS_X;
@@ -11,9 +11,9 @@ class GameOfLifeGrid {
   std::vector<std::vector<std::pair<int, int> *>> allCells;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
-  std::set<std::pair<int, int> *> oldAlive;
-  std::set<std::pair<int, int> *> watchList;
-  std::set<std::pair<int, int> *> currentlyAlive;
+  std::unordered_set<std::pair<int, int> *> oldAlive;
+  std::unordered_set<std::pair<int, int> *> watchList;
+  std::unordered_set<std::pair<int, int> *> currentlyAlive;
   void updateNeighboursAndWatchlist(int x, int y, int val);
 
 public:

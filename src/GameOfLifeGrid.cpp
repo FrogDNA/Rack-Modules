@@ -27,7 +27,7 @@ void GameOfLifeGrid::init() {
   emptyGrid();
   // optional, interesting to test all manner of things
   //(Gosper Glider Gun)
-  /*setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
+  setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
   setCellState(REFERENCE_POS - 19, REFERENCE_POS + 1, true);
   setCellState(REFERENCE_POS - 18, REFERENCE_POS, true);
   setCellState(REFERENCE_POS - 18, REFERENCE_POS + 1, true);
@@ -62,7 +62,7 @@ void GameOfLifeGrid::init() {
   setCellState(REFERENCE_POS + 15, REFERENCE_POS - 1, true);
   setCellState(REFERENCE_POS + 15, REFERENCE_POS - 2, true);
   setCellState(REFERENCE_POS + 16, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);*/
+  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
 }
 
 void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
@@ -120,12 +120,12 @@ void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
 }
 
 void GameOfLifeGrid::update() {
-  std::set<std::pair<int, int> *> wl = watchList;
-  std::set<std::pair<int, int> *> ca = currentlyAlive;
+  std::unordered_set<std::pair<int, int> *> wl = watchList;
+  std::unordered_set<std::pair<int, int> *> ca = currentlyAlive;
   std::vector<std::vector<int>> neigh = neighbours;
   oldAlive = currentlyAlive;
   watchList.clear();
-  for (std::set<std::pair<int, int> *>::iterator it = wl.begin();
+  for (std::unordered_set<std::pair<int, int> *>::iterator it = wl.begin();
        it != wl.end(); ++it) {
     std::pair<int, int> *c = *it;
     int x = c->first;
@@ -145,8 +145,8 @@ void GameOfLifeGrid::update() {
 }
 
 void GameOfLifeGrid::emptyGrid() {
-  std::set<std::pair<int, int> *> ca = currentlyAlive;
-  for (std::set<std::pair<int, int> *>::iterator it = ca.begin();
+  std::unordered_set<std::pair<int, int> *> ca = currentlyAlive;
+  for (std::unordered_set<std::pair<int, int> *>::iterator it = ca.begin();
        it != ca.end(); ++it) {
     std::pair<int, int> *c = *it;
     setCellState(c->first, c->second, false);

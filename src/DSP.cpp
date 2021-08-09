@@ -30,12 +30,12 @@ DSP::DSP() {
 }
 
 void DSP::paramValues(std::vector<std::pair<int, int> *> state) {
-  if (this->alive != state || audibilityChanged) {
-    alive = state;
+  if (knownState != state || audibilityChanged) {
+    knownState = state;
     usableX.clear();
     usableY.clear();
-    for (std::vector<std::pair<int, int> *>::iterator it = alive.begin();
-         it != alive.end(); ++it) {
+    for (std::vector<std::pair<int, int> *>::iterator it = knownState.begin();
+         it != knownState.end(); ++it) {
       std::pair<int, int> *c = *it;
       int x = c->first;
       int y = c->second;
