@@ -252,198 +252,157 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(57.591, 5.5)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.591, 9.0)), module,
                                              Mitosis::CLOCK_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(88.531, 5.5)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(89.198, 9.0)), module,
                                              Mitosis::SEND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.1, 114.0)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 113.5)), module,
                                              Mitosis::BUSYIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.1, 114.0)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 113.5)), module,
                                              Mitosis::DATACLKIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.1, 114.0)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.1, 113.5)), module,
                                              Mitosis::DATAIN_INPUT));
 
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(120.531, 5.5)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(119.865, 9.0)), module,
                                                Mitosis::DEAD_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 16.65)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 29.45)), module,
                                                Mitosis::ROW_1_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 16.65)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 29.45)), module,
                                                Mitosis::ROW_1_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 16.65)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 29.45)), module,
                                                Mitosis::COL_1_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 16.65)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 29.45)), module,
                                                Mitosis::COL_1_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 27.95)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 39.35)), module,
                                                Mitosis::ROW_2_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 27.95)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 39.35)), module,
                                                Mitosis::ROW_2_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 27.95)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 39.35)), module,
                                                Mitosis::COL_2_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 27.95)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 39.35)), module,
                                                Mitosis::COL_2_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 39.25)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 49.25)), module,
                                                Mitosis::ROW_3_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 39.25)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 49.25)), module,
                                                Mitosis::ROW_3_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 39.25)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 49.25)), module,
                                                Mitosis::COL_3_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 39.25)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 49.25)), module,
                                                Mitosis::COL_3_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 50.55)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 59.15)), module,
                                                Mitosis::ROW_4_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 50.55)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 59.15)), module,
                                                Mitosis::ROW_4_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 50.55)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 59.15)), module,
                                                Mitosis::COL_4_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 50.55)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 59.15)), module,
                                                Mitosis::COL_4_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 61.85)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 69.05)), module,
                                                Mitosis::ROW_5_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 61.85)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 69.05)), module,
                                                Mitosis::ROW_5_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 61.85)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 69.05)), module,
                                                Mitosis::COL_5_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 61.85)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 69.05)), module,
                                                Mitosis::COL_5_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 73.15)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 78.95)), module,
                                                Mitosis::ROW_6_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 73.15)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 78.95)), module,
                                                Mitosis::ROW_6_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 73.15)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 78.95)), module,
                                                Mitosis::COL_6_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 73.15)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 78.95)), module,
                                                Mitosis::COL_6_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 84.45)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 88.85)), module,
                                                Mitosis::ROW_7_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 84.45)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 88.85)), module,
                                                Mitosis::ROW_7_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 84.45)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 88.85)), module,
                                                Mitosis::COL_7_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 84.45)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 88.85)), module,
                                                Mitosis::COL_7_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 95.75)), module,
-                                               Mitosis::ROW_8_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(176.1, 95.75)), module,
-                                               Mitosis::ROW_8_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 95.75)), module,
-                                               Mitosis::COL_8_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(197.1, 95.75)), module,
-                                               Mitosis::COL_8_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.1, 98.0)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.1, 97.5)), module,
                                                Mitosis::BUSY_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.1, 98.0)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(21.1, 97.5)), module,
                                                Mitosis::DATACLK_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.1, 98.0)), module,
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.1, 97.5)), module,
                                                Mitosis::DATA_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 107.05)),
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 98.75)), module,
+                                               Mitosis::ROW_8_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 98.75)), module,
+                                               Mitosis::ROW_8_P_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 98.75)), module,
+                                               Mitosis::COL_8_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 98.75)), module,
+                                               Mitosis::COL_8_P_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 108.65)),
                                                module, Mitosis::ROW_9_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(176.1, 107.05)), module, Mitosis::ROW_9_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 107.05)),
+        mm2px(Vec(174.1, 108.65)), module, Mitosis::ROW_9_P_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 108.65)),
                                                module, Mitosis::COL_9_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(197.1, 107.05)), module, Mitosis::COL_9_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(166.1, 118.35)),
+        mm2px(Vec(195.1, 108.65)), module, Mitosis::COL_9_P_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 118.55)),
                                                module, Mitosis::ROW_10_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(176.1, 118.35)), module, Mitosis::ROW_10_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(187.1, 118.35)),
+        mm2px(Vec(174.1, 118.55)), module, Mitosis::ROW_10_P_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(185.1, 118.55)),
                                                module, Mitosis::COL_10_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(
-        mm2px(Vec(197.1, 118.35)), module, Mitosis::COL_10_P_OUTPUT));
+        mm2px(Vec(195.1, 118.55)), module, Mitosis::COL_10_P_OUTPUT));
 
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(163.1, 4.25)), module, Mitosis::ROW_1_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(167.1, 4.25)), module, Mitosis::ROW_2_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(171.1, 4.25)), module, Mitosis::ROW_3_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(175.1, 4.25)), module, Mitosis::ROW_4_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(179.1, 4.25)), module, Mitosis::ROW_5_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(184.1, 4.25)), module, Mitosis::COL_1_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(188.1, 4.25)), module, Mitosis::COL_2_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(192.1, 4.25)), module, Mitosis::COL_3_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(196.1, 4.25)), module, Mitosis::COL_4_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(200.1, 4.25)), module, Mitosis::COL_5_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(163.1, 6.75)), module, Mitosis::ROW_6_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(167.1, 6.75)), module, Mitosis::ROW_7_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(171.1, 6.75)), module, Mitosis::ROW_8_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(175.1, 6.75)), module, Mitosis::ROW_9_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(179.1, 6.75)), module, Mitosis::ROW_10_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(184.1, 6.75)), module, Mitosis::COL_6_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(188.1, 6.75)), module, Mitosis::COL_7_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(192.1, 6.75)), module, Mitosis::COL_8_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(196.1, 6.75)), module, Mitosis::COL_9_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(200.1, 6.75)), module, Mitosis::COL_10_LIGHT));
-
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(163.1, 4.25)), module, Mitosis::ROW_1_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(167.1, 4.25)), module, Mitosis::ROW_2_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(171.1, 4.25)), module, Mitosis::ROW_3_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(175.1, 4.25)), module, Mitosis::ROW_4_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(179.1, 4.25)), module, Mitosis::ROW_5_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(184.1, 4.25)), module, Mitosis::COL_1_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(188.1, 4.25)), module, Mitosis::COL_2_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(192.1, 4.25)), module, Mitosis::COL_3_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(196.1, 4.25)), module, Mitosis::COL_4_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(200.1, 4.25)), module, Mitosis::COL_5_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(163.1, 6.75)), module, Mitosis::ROW_6_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(167.1, 6.75)), module, Mitosis::ROW_7_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(171.1, 6.75)), module, Mitosis::ROW_8_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(175.1, 6.75)), module, Mitosis::ROW_9_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(179.1, 6.75)), module, Mitosis::ROW_10_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(184.1, 6.75)), module, Mitosis::COL_6_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(188.1, 6.75)), module, Mitosis::COL_7_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(192.1, 6.75)), module, Mitosis::COL_8_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(196.1, 6.75)), module, Mitosis::COL_9_LIGHT));
-    addChild(createLightCentered<MediumLight<RedLight>>(
-        mm2px(Vec(200.1, 6.75)), module, Mitosis::COL_10_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(161.1, 11.5)), module, Mitosis::ROW_1_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(165.1, 11.5)), module, Mitosis::ROW_2_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(169.1, 11.5)), module, Mitosis::ROW_3_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(173.1, 11.5)), module, Mitosis::ROW_4_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(177.1, 11.5)), module, Mitosis::ROW_5_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(182.1, 11.5)), module, Mitosis::COL_1_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(186.1, 11.5)), module, Mitosis::COL_2_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(190.1, 11.5)), module, Mitosis::COL_3_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(194.1, 11.5)), module, Mitosis::COL_4_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(198.1, 11.5)), module, Mitosis::COL_5_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(161.1, 16.5)), module, Mitosis::ROW_6_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(165.1, 16.5)), module, Mitosis::ROW_7_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(169.1, 16.5)), module, Mitosis::ROW_8_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(173.1, 16.5)), module, Mitosis::ROW_9_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(177.1, 16.5)), module, Mitosis::ROW_10_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(182.1, 16.5)), module, Mitosis::COL_6_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(186.1, 16.5)), module, Mitosis::COL_7_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(190.1, 16.5)), module, Mitosis::COL_8_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(194.1, 16.5)), module, Mitosis::COL_9_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(198.1, 16.5)), module, Mitosis::COL_10_LIGHT));
 
     // mute rows
     std::vector<float> xs;
     std::vector<float> ys;
-    xs.push_back(2.1);
-    xs.push_back(11.1);
-    xs.push_back(20.1);
-    xs.push_back(29.1);
-    ys.push_back(37);
-    ys.push_back(46);
-    ys.push_back(55);
+    xs.push_back(4.1);
+    xs.push_back(13.1);
+    xs.push_back(22.1);
+    xs.push_back(31.1);
+    ys.push_back(37.5);
+    ys.push_back(46.5);
+    ys.push_back(55.5);
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 3; j++) {
         ScaleButton *button = new ScaleButton();
@@ -460,13 +419,13 @@ struct MitosisWidget : ModuleWidget {
     // mute cols
     xs.clear();
     ys.clear();
-    xs.push_back(2.1);
-    xs.push_back(11.1);
-    xs.push_back(20.1);
-    xs.push_back(29.1);
-    ys.push_back(66);
-    ys.push_back(75);
-    ys.push_back(84);
+    xs.push_back(4.1);
+    xs.push_back(13.1);
+    xs.push_back(22.1);
+    xs.push_back(31.1);
+    ys.push_back(65.5);
+    ys.push_back(74.5);
+    ys.push_back(83.5);
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 3; j++) {
         ScaleButton *button = new ScaleButton();
@@ -482,13 +441,13 @@ struct MitosisWidget : ModuleWidget {
     }
     GoLDisplay *display = new GoLDisplay();
     display->module = module;
-    display->box.pos = mm2px(Vec(39.6, 12.5));
-    display->box.size = mm2px(Vec(110.0, 110.0));
+    display->box.pos = mm2px(Vec(41.1, 15.5));
+    display->box.size = mm2px(Vec(116.0, 107.0));
     addChild(display);
 
     LoopSliderParam *lpWidget = new LoopSliderParam();
     lpWidget->rb = &(module->loopParam);
-    lpWidget->box.pos = mm2px(Vec(148.428, 3.6));
+    lpWidget->box.pos = mm2px(Vec(148.428, 7.1));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     lpWidget->module = module;
     addChild(lpWidget);
