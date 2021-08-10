@@ -96,10 +96,15 @@ void LineHeader::draw(const DrawArgs &args) {
   DSP *dsp = getAncestorOfType<GridDisplay>()->module->dsp;
   bool muted = (isRow && !dsp->isRowAudible(coordinate)) ||
                (!isRow && !dsp->isColAudible(coordinate));
-  if (muted) {
-    nvgFillColor(args.vg, nvgRGBA(0x2e, 0x2e, 0x2e, 0xff));
+  if (isRow && muted) {
+    nvgFillColor(args.vg, OPAQUE_C3);
+  } else if (isRow && !muted) {
+    nvgFillColor(args.vg, TPT_C3);
+  } else if (!isRow && muted) {
+    nvgFillColor(args.vg, OPAQUE_C2);
   } else {
-    nvgFillColor(args.vg, nvgRGBA(0x6e, 0x6e, 0x6e, 0xff));
+    //(!isRow && !muted)
+    nvgFillColor(args.vg, TPT_C2);
   }
   nvgBeginPath(args.vg);
   nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
@@ -221,10 +226,6 @@ void GridScrollBar::draw(const DrawArgs &args) {
         nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgCircle(args.vg, box.size.x / 2.0f, position, r);
         nvgFill(args.vg);
-      } else {
-        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
-        nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
-        nvgFill(args.vg);
       }
     } else {
       if (gd->spotsX != NUMCELLS_X) {
@@ -232,10 +233,6 @@ void GridScrollBar::draw(const DrawArgs &args) {
                          percent * (box.size.x - r - barSize);
         nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
         nvgCircle(args.vg, position, box.size.y / 2.0f, r);
-        nvgFill(args.vg);
-      } else {
-        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
-        nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
         nvgFill(args.vg);
       }
     }
@@ -312,7 +309,14 @@ void GridScrollPane::draw(const DrawArgs &args) {
     addChild(buttonMinus);
     firstDraw = false;
   }
-  OpaqueWidget::draw(args);
+  if (!scrollPossible) {
+    nvgFillColor(args.vg, TPT_C1_LIGHT);
+    nvgBeginPath(args.vg);
+    nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+    nvgFill(args.vg);
+  } else {
+    OpaqueWidget::draw(args);
+  }
 }
 
 /// CENTER BUTTON ///
@@ -336,7 +340,7 @@ void ZoomButton::whileHovering() {
   if (zoomFramesCount % FRAMES_BETWEEN_ZOOM == 0) {
     zoomFramesCount = 0;
     GoLDisplay *gd = getAncestorOfType<GoLDisplay>();
-    gd->gridDisplay->changeZoomLevel(zoomSpeed * baseZoom);
+    gd->changeZoomLevel(zoomSpeed * baseZoom);
     zoomAccelerationFramesCount++;
     if (zoomAccelerationFramesCount == ZOOMS_BEFORE_SPEED_INCREASE) {
       zoomSpeed = zoomSpeed * 2;
@@ -350,51 +354,63 @@ void ZoomButton::whileHovering() {
 
 GoLDisplay::GoLDisplay() { firstDraw = true; }
 
+void GoLDisplay::changeZoomLevel(int zoomChange) {
+  gridDisplay->changeZoomLevel(zoomChange);
+  if (gridDisplay->spotsX == NUMCELLS_X) {
+    hScrollPane->scrollPossible = false;
+  } else {
+    hScrollPane->scrollPossible = true;
+  }
+  if (gridDisplay->spotsY == NUMCELLS_Y) {
+    vScrollPane->scrollPossible = false;
+  } else {
+    vScrollPane->scrollPossible = true;
+  }
+}
+
 void GoLDisplay::draw(const DrawArgs &args) {
   if (firstDraw && module) {
     float iconSizePx = mm2px(ICON_SIZE);
     float iconPaddingPx = mm2px(ICON_PADDING);
-    float gridSizeX = this->box.size.x - iconSizePx - iconPaddingPx;
+    float gridSizeX = this->box.size.x - 2 * (iconSizePx + iconPaddingPx);
     float gridSizeY = this->box.size.y - iconSizePx - iconPaddingPx;
     // grid display
     gridDisplay = new GridDisplay();
     gridDisplay->module = module;
-    gridDisplay->box.pos = Vec(0.f, 0.f);
+    gridDisplay->box.pos = Vec(iconSizePx + iconPaddingPx, 0.f);
     gridDisplay->box.size = Vec(gridSizeX, gridSizeY);
     addChild(gridDisplay);
-    // vertical scrollBar
-    GridScrollPane *vScrollBar = new GridScrollPane();
-    vScrollBar->vertical = true;
-    vScrollBar->box.size =
-        Vec(iconSizePx, gridSizeY - (iconSizePx + iconPaddingPx));
-    vScrollBar->box.pos = Vec(gridSizeX + iconPaddingPx, 0.f);
-    addChild(vScrollBar);
-    // horizontal scrollBar
-    GridScrollPane *hScrollBar = new GridScrollPane();
-    hScrollBar->vertical = false;
-    hScrollBar->box.size =
-        Vec(gridSizeX - (iconSizePx + iconPaddingPx), iconSizePx);
-    hScrollBar->box.pos = Vec(0.f, gridSizeY + iconPaddingPx);
-    addChild(hScrollBar);
-    // zoom button -
-    ZoomButton *zoomMinus = new ZoomButton();
-    zoomMinus->baseZoom = -1;
-    zoomMinus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomMinus->box.pos = Vec(gridSizeX + iconPaddingPx, gridSizeY - iconSizePx);
-    addChild(zoomMinus);
-    // zoom button +
-    ZoomButton *zoomPlus = new ZoomButton();
-    zoomPlus->baseZoom = 1;
-    zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomPlus->box.pos = Vec(gridSizeX - iconSizePx, gridSizeY + iconPaddingPx);
-    addChild(zoomPlus);
+    // vertical scrollPane
+    vScrollPane = new GridScrollPane();
+    vScrollPane->vertical = true;
+    vScrollPane->box.size = Vec(iconSizePx, gridSizeY);
+    vScrollPane->box.pos = Vec(gridSizeX + 2 * iconPaddingPx + iconSizePx, 0.f);
+    addChild(vScrollPane);
+    // horizontal scrollPane
+    hScrollPane = new GridScrollPane();
+    hScrollPane->vertical = false;
+    hScrollPane->box.size = Vec(gridSizeX, iconSizePx);
+    hScrollPane->box.pos =
+        Vec(iconSizePx + iconPaddingPx, gridSizeY + iconPaddingPx);
+    addChild(hScrollPane);
     // center grid button (or center zoom ? At least extra button)
     CenterButton *centerButton = new CenterButton();
     centerButton->box.size = Vec(iconSizePx, iconSizePx);
-    centerButton->box.pos =
-        Vec(gridSizeX + iconPaddingPx, gridSizeY + iconPaddingPx);
+    centerButton->box.pos = Vec(0.f, 0.f);
     addChild(centerButton);
-    // dont do this part again
+    // zoom button +
+    ZoomButton *zoomPlus = new ZoomButton();
+    zoomPlus->baseZoom = -1;
+    zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
+    zoomPlus->box.pos = Vec(0.f, iconSizePx + iconPaddingPx);
+    addChild(zoomPlus);
+    // zoom button -
+    ZoomButton *zoomMinus = new ZoomButton();
+    zoomMinus->baseZoom = 1;
+    zoomMinus->box.size = Vec(iconSizePx, iconSizePx);
+    zoomMinus->box.pos = Vec(0.f, 2 * (iconSizePx + iconPaddingPx));
+    addChild(zoomMinus);
+    // dont do this cursed part ever again
     firstDraw = false;
   }
   OpaqueWidget::draw(args);

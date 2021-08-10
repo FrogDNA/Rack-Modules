@@ -8,7 +8,7 @@
 // display at default zoom level
 static const int DEFAULT_CELLS_DISPLAYED_X = 40;
 static const int DEFAULT_CELLS_DISPLAYED_Y = 40;
-
+static const int DEFAULT_CENTER = 54;
 // proportion of the cell size between cell
 static const float CELL_PADDING = 0.2f;
 // zoom and scroll line params in mm
@@ -90,9 +90,10 @@ struct GridScrollBar : Widget {
 
 struct GridScrollPane : OpaqueWidget {
   bool firstDraw = true;
+  bool vertical = false;
+  bool scrollPossible = true;
   GridScrollButton *buttonPlus = NULL;
   GridScrollButton *buttonMinus = NULL;
-  bool vertical = false;
   void draw(const DrawArgs &args) override;
 };
 
@@ -112,8 +113,11 @@ struct CenterButton : InterfaceButton {
 
 struct GoLDisplay : OpaqueWidget {
   GridDisplay *gridDisplay = NULL;
+  GridScrollPane *hScrollPane = NULL;
+  GridScrollPane *vScrollPane = NULL;
   Mitosis *module = NULL;
   bool firstDraw = true;
   GoLDisplay();
+  void changeZoomLevel(int zoomChange);
   void draw(const DrawArgs &args) override;
 };

@@ -8,6 +8,7 @@ struct ScaleButton : OpaqueWidget {
   Mitosis *module;
   int semitone = 0;
   int status = 0;
+  bool cols = false;
   dsp::RingBuffer<int, 64> *muteRb;
   dsp::RingBuffer<int, 64> *unmuteRb;
   void draw(const DrawArgs &args) override;
