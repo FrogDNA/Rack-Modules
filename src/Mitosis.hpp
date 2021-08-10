@@ -9,6 +9,7 @@
 
 struct Mitosis : Module {
   DSP *dsp = NULL;
+  Outputs out;
   GameOfLifeGrid *golGrid = NULL;
   DataSender *dataSender = NULL;
   DataReceiver *dataReceiver = NULL;

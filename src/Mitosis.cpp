@@ -18,6 +18,7 @@ Mitosis::Mitosis() {
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
   dsp = new DSP();
+  out = dsp->getOutputs();
   // for debugging
   // setbuf(stdout, NULL);
 }
@@ -73,75 +74,77 @@ void Mitosis::process(const ProcessArgs &args) {
   std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
   dsp->paramValues(state);
   if (dsp->isOutputChanged()) {
-    Outputs out = dsp->getOutputs();
+    out = dsp->getOutputs();
     dsp->resetOutputChanged();
-    // outputs rows
-    outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
-    outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
-    outputs[ROW_3_OUTPUT].setVoltage(out.yOutputs[2]);
-    outputs[ROW_4_OUTPUT].setVoltage(out.yOutputs[3]);
-    outputs[ROW_5_OUTPUT].setVoltage(out.yOutputs[4]);
-    outputs[ROW_6_OUTPUT].setVoltage(out.yOutputs[5]);
-    outputs[ROW_7_OUTPUT].setVoltage(out.yOutputs[6]);
-    outputs[ROW_8_OUTPUT].setVoltage(out.yOutputs[7]);
-    outputs[ROW_9_OUTPUT].setVoltage(out.yOutputs[8]);
-    outputs[ROW_10_OUTPUT].setVoltage(out.yOutputs[9]);
-    // outputs presents row
-    outputs[ROW_1_P_OUTPUT].setVoltage(out.yPresents[0]);
-    outputs[ROW_2_P_OUTPUT].setVoltage(out.yPresents[1]);
-    outputs[ROW_3_P_OUTPUT].setVoltage(out.yPresents[2]);
-    outputs[ROW_4_P_OUTPUT].setVoltage(out.yPresents[3]);
-    outputs[ROW_5_P_OUTPUT].setVoltage(out.yPresents[4]);
-    outputs[ROW_6_P_OUTPUT].setVoltage(out.yPresents[5]);
-    outputs[ROW_7_P_OUTPUT].setVoltage(out.yPresents[6]);
-    outputs[ROW_8_P_OUTPUT].setVoltage(out.yPresents[7]);
-    outputs[ROW_9_P_OUTPUT].setVoltage(out.yPresents[8]);
-    outputs[ROW_10_P_OUTPUT].setVoltage(out.yPresents[9]);
-    // outputs presents lights row
-    lights[ROW_1_LIGHT].setBrightness(out.yPresents[0] == 0.f ? 0.f : 1.f);
-    lights[ROW_2_LIGHT].setBrightness(out.yPresents[1] == 0.f ? 0.f : 1.f);
-    lights[ROW_3_LIGHT].setBrightness(out.yPresents[2] == 0.f ? 0.f : 1.f);
-    lights[ROW_4_LIGHT].setBrightness(out.yPresents[3] == 0.f ? 0.f : 1.f);
-    lights[ROW_5_LIGHT].setBrightness(out.yPresents[4] == 0.f ? 0.f : 1.f);
-    lights[ROW_6_LIGHT].setBrightness(out.yPresents[5] == 0.f ? 0.f : 1.f);
-    lights[ROW_7_LIGHT].setBrightness(out.yPresents[6] == 0.f ? 0.f : 1.f);
-    lights[ROW_8_LIGHT].setBrightness(out.yPresents[7] == 0.f ? 0.f : 1.f);
-    lights[ROW_9_LIGHT].setBrightness(out.yPresents[8] == 0.f ? 0.f : 1.f);
-    lights[ROW_10_LIGHT].setBrightness(out.yPresents[9] == 0.f ? 0.f : 1.f);
-    // outputs cols
-    outputs[COL_1_OUTPUT].setVoltage(out.xOutputs[0]);
-    outputs[COL_2_OUTPUT].setVoltage(out.xOutputs[1]);
-    outputs[COL_3_OUTPUT].setVoltage(out.xOutputs[2]);
-    outputs[COL_4_OUTPUT].setVoltage(out.xOutputs[3]);
-    outputs[COL_5_OUTPUT].setVoltage(out.xOutputs[4]);
-    outputs[COL_6_OUTPUT].setVoltage(out.xOutputs[5]);
-    outputs[COL_7_OUTPUT].setVoltage(out.xOutputs[6]);
-    outputs[COL_8_OUTPUT].setVoltage(out.xOutputs[7]);
-    outputs[COL_9_OUTPUT].setVoltage(out.xOutputs[8]);
-    outputs[COL_10_OUTPUT].setVoltage(out.xOutputs[9]);
-    // outputs presents col
-    outputs[COL_1_P_OUTPUT].setVoltage(out.xPresents[0]);
-    outputs[COL_2_P_OUTPUT].setVoltage(out.xPresents[1]);
-    outputs[COL_3_P_OUTPUT].setVoltage(out.xPresents[2]);
-    outputs[COL_4_P_OUTPUT].setVoltage(out.xPresents[3]);
-    outputs[COL_5_P_OUTPUT].setVoltage(out.xPresents[4]);
-    outputs[COL_6_P_OUTPUT].setVoltage(out.xPresents[5]);
-    outputs[COL_7_P_OUTPUT].setVoltage(out.xPresents[6]);
-    outputs[COL_8_P_OUTPUT].setVoltage(out.xPresents[7]);
-    outputs[COL_9_P_OUTPUT].setVoltage(out.xPresents[8]);
-    outputs[COL_10_P_OUTPUT].setVoltage(out.xPresents[9]);
-    // outputs presents lights row
-    lights[COL_1_LIGHT].setBrightness(out.xPresents[0] == 0.f ? 0.f : 1.f);
-    lights[COL_2_LIGHT].setBrightness(out.xPresents[1] == 0.f ? 0.f : 1.f);
-    lights[COL_3_LIGHT].setBrightness(out.xPresents[2] == 0.f ? 0.f : 1.f);
-    lights[COL_4_LIGHT].setBrightness(out.xPresents[3] == 0.f ? 0.f : 1.f);
-    lights[COL_5_LIGHT].setBrightness(out.xPresents[4] == 0.f ? 0.f : 1.f);
-    lights[COL_6_LIGHT].setBrightness(out.xPresents[5] == 0.f ? 0.f : 1.f);
-    lights[COL_7_LIGHT].setBrightness(out.xPresents[6] == 0.f ? 0.f : 1.f);
-    lights[COL_8_LIGHT].setBrightness(out.xPresents[7] == 0.f ? 0.f : 1.f);
-    lights[COL_9_LIGHT].setBrightness(out.xPresents[8] == 0.f ? 0.f : 1.f);
-    lights[COL_10_LIGHT].setBrightness(out.xPresents[9] == 0.f ? 0.f : 1.f);
   }
+  printf("r1 : %f p %f\n", out.yOutputs[0], out.yPresents[0]);
+  // outputs rows
+  outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
+  outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
+  outputs[ROW_3_OUTPUT].setVoltage(out.yOutputs[2]);
+  outputs[ROW_4_OUTPUT].setVoltage(out.yOutputs[3]);
+  outputs[ROW_5_OUTPUT].setVoltage(out.yOutputs[4]);
+  outputs[ROW_6_OUTPUT].setVoltage(out.yOutputs[5]);
+  outputs[ROW_7_OUTPUT].setVoltage(out.yOutputs[6]);
+  outputs[ROW_8_OUTPUT].setVoltage(out.yOutputs[7]);
+  outputs[ROW_9_OUTPUT].setVoltage(out.yOutputs[8]);
+  outputs[ROW_10_OUTPUT].setVoltage(out.yOutputs[9]);
+  // outputs presents row
+  outputs[ROW_1_P_OUTPUT].setVoltage(out.yPresents[0]);
+  outputs[ROW_2_P_OUTPUT].setVoltage(out.yPresents[1]);
+  outputs[ROW_3_P_OUTPUT].setVoltage(out.yPresents[2]);
+  outputs[ROW_4_P_OUTPUT].setVoltage(out.yPresents[3]);
+  outputs[ROW_5_P_OUTPUT].setVoltage(out.yPresents[4]);
+  outputs[ROW_6_P_OUTPUT].setVoltage(out.yPresents[5]);
+  outputs[ROW_7_P_OUTPUT].setVoltage(out.yPresents[6]);
+  outputs[ROW_8_P_OUTPUT].setVoltage(out.yPresents[7]);
+  outputs[ROW_9_P_OUTPUT].setVoltage(out.yPresents[8]);
+  outputs[ROW_10_P_OUTPUT].setVoltage(out.yPresents[9]);
+  // outputs presents lights row
+  lights[ROW_1_LIGHT].setBrightness(out.yPresents[0] == 0.f ? 0.f : 1.f);
+  lights[ROW_2_LIGHT].setBrightness(out.yPresents[1] == 0.f ? 0.f : 1.f);
+  lights[ROW_3_LIGHT].setBrightness(out.yPresents[2] == 0.f ? 0.f : 1.f);
+  lights[ROW_4_LIGHT].setBrightness(out.yPresents[3] == 0.f ? 0.f : 1.f);
+  lights[ROW_5_LIGHT].setBrightness(out.yPresents[4] == 0.f ? 0.f : 1.f);
+  lights[ROW_6_LIGHT].setBrightness(out.yPresents[5] == 0.f ? 0.f : 1.f);
+  lights[ROW_7_LIGHT].setBrightness(out.yPresents[6] == 0.f ? 0.f : 1.f);
+  lights[ROW_8_LIGHT].setBrightness(out.yPresents[7] == 0.f ? 0.f : 1.f);
+  lights[ROW_9_LIGHT].setBrightness(out.yPresents[8] == 0.f ? 0.f : 1.f);
+  lights[ROW_10_LIGHT].setBrightness(out.yPresents[9] == 0.f ? 0.f : 1.f);
+  // outputs cols
+  outputs[COL_1_OUTPUT].setVoltage(out.xOutputs[0]);
+  outputs[COL_2_OUTPUT].setVoltage(out.xOutputs[1]);
+  outputs[COL_3_OUTPUT].setVoltage(out.xOutputs[2]);
+  outputs[COL_4_OUTPUT].setVoltage(out.xOutputs[3]);
+  outputs[COL_5_OUTPUT].setVoltage(out.xOutputs[4]);
+  outputs[COL_6_OUTPUT].setVoltage(out.xOutputs[5]);
+  outputs[COL_7_OUTPUT].setVoltage(out.xOutputs[6]);
+  outputs[COL_8_OUTPUT].setVoltage(out.xOutputs[7]);
+  outputs[COL_9_OUTPUT].setVoltage(out.xOutputs[8]);
+  outputs[COL_10_OUTPUT].setVoltage(out.xOutputs[9]);
+  // outputs presents col
+  outputs[COL_1_P_OUTPUT].setVoltage(out.xPresents[0]);
+  outputs[COL_2_P_OUTPUT].setVoltage(out.xPresents[1]);
+  outputs[COL_3_P_OUTPUT].setVoltage(out.xPresents[2]);
+  outputs[COL_4_P_OUTPUT].setVoltage(out.xPresents[3]);
+  outputs[COL_5_P_OUTPUT].setVoltage(out.xPresents[4]);
+  outputs[COL_6_P_OUTPUT].setVoltage(out.xPresents[5]);
+  outputs[COL_7_P_OUTPUT].setVoltage(out.xPresents[6]);
+  outputs[COL_8_P_OUTPUT].setVoltage(out.xPresents[7]);
+  outputs[COL_9_P_OUTPUT].setVoltage(out.xPresents[8]);
+  outputs[COL_10_P_OUTPUT].setVoltage(out.xPresents[9]);
+  // outputs presents lights row
+  lights[COL_1_LIGHT].setBrightness(out.xPresents[0] == 0.f ? 0.f : 1.f);
+  lights[COL_2_LIGHT].setBrightness(out.xPresents[1] == 0.f ? 0.f : 1.f);
+  lights[COL_3_LIGHT].setBrightness(out.xPresents[2] == 0.f ? 0.f : 1.f);
+  lights[COL_4_LIGHT].setBrightness(out.xPresents[3] == 0.f ? 0.f : 1.f);
+  lights[COL_5_LIGHT].setBrightness(out.xPresents[4] == 0.f ? 0.f : 1.f);
+  lights[COL_6_LIGHT].setBrightness(out.xPresents[5] == 0.f ? 0.f : 1.f);
+  lights[COL_7_LIGHT].setBrightness(out.xPresents[6] == 0.f ? 0.f : 1.f);
+  lights[COL_8_LIGHT].setBrightness(out.xPresents[7] == 0.f ? 0.f : 1.f);
+  lights[COL_9_LIGHT].setBrightness(out.xPresents[8] == 0.f ? 0.f : 1.f);
+  lights[COL_10_LIGHT].setBrightness(out.xPresents[9] == 0.f ? 0.f : 1.f);
+
   outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
                                                                      : 0.f);
   outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
