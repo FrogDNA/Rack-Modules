@@ -447,7 +447,7 @@ struct MitosisWidget : ModuleWidget {
 
     LoopSliderParam *lpWidget = new LoopSliderParam();
     lpWidget->rb = &(module->loopParam);
-    lpWidget->box.pos = mm2px(Vec(148.428, 7.1));
+    lpWidget->box.pos = mm2px(Vec(146.428, 7.1));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     lpWidget->module = module;
     addChild(lpWidget);
