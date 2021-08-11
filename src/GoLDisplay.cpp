@@ -190,7 +190,7 @@ void GridScrollButton::doScroll() {
 
 /// SCROLLBAR ///
 
-GridScrollBar::GridScrollBar() {}
+GridScrollBar::GridScrollBar() { r = (mm2px(ICON_SIZE) - 4 * barSize) / 2; }
 
 void GridScrollBar::draw(const DrawArgs &args) {
   if (getAncestorOfType<GridScrollPane>()) {
@@ -199,6 +199,10 @@ void GridScrollBar::draw(const DrawArgs &args) {
              ->gridDisplay;
   }
   // rectangles to materialize scroll area
+  nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+  nvgFill(args.vg);
   nvgFillColor(args.vg, OPAQUE_C1_DARK);
   nvgBeginPath(args.vg);
   if (vertical) {
@@ -223,7 +227,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsY != NUMCELLS_Y) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.y - r - barSize);
-        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
+        nvgFillColor(args.vg, OPAQUE_C1_DARK);
         nvgCircle(args.vg, box.size.x / 2.0f, position, r);
         nvgFill(args.vg);
       }
@@ -231,7 +235,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
       if (gd->spotsX != NUMCELLS_X) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.x - r - barSize);
-        nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
+        nvgFillColor(args.vg, OPAQUE_C1_DARK);
         nvgCircle(args.vg, position, box.size.y / 2.0f, r);
         nvgFill(args.vg);
       }
