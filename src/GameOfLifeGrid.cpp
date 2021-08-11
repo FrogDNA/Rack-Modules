@@ -23,7 +23,9 @@ GameOfLifeGrid::GameOfLifeGrid() {
   }
 }
 
-void GameOfLifeGrid::init() {
+void GameOfLifeGrid::initEmpty() { emptyGrid(); }
+
+void GameOfLifeGrid::initGlider() {
   emptyGrid();
   // optional, interesting to test all manner of things
   //(Gosper Glider Gun)
@@ -64,6 +66,8 @@ void GameOfLifeGrid::init() {
   setCellState(REFERENCE_POS + 16, REFERENCE_POS - 1, true);
   setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
 }
+
+void GameOfLifeGrid::initRandom() { emptyGrid(); }
 
 void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
   emptyGrid();

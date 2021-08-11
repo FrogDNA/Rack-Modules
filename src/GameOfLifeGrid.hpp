@@ -19,7 +19,9 @@ class GameOfLifeGrid {
 
 public:
   GameOfLifeGrid();
-  void init();
+  void initEmpty();
+  void initRandom();
+  void initGlider();
   void init(std::vector<std::pair<int, int> *> alive);
   void update();
   void emptyGrid();

@@ -31,6 +31,7 @@ static const NVGcolor TPT_C3 = nvgRGBA(246, 198, 184, ALPHA_TPT);
 static const NVGcolor TPT_C2_DARKER = nvgRGBA(51, 50, 13, ALPHA_TPT);
 static const NVGcolor TPT_C3_DARKER = nvgRGBA(123, 99, 92, ALPHA_TPT);
 //
+static const NVGcolor COLOR_RED_BUTTON_T = nvgRGBA(186, 0, 0, ALPHA_TPT);
 static const NVGcolor COLOR_YELLOW_BUTTON_T = nvgRGBA(186, 186, 0, ALPHA_TPT);
 static const NVGcolor COLOR_GREEN_BUTTON_T = nvgRGBA(0, 186, 0, ALPHA_TPT);
 static const NVGcolor COLOR_NOK_BUTTON_O = nvgRGBA(186, 0, 0, ALPHA_OPAQUE);

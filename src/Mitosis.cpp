@@ -14,7 +14,7 @@ Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
   clockUp = false;
   golGrid = new GameOfLifeGrid();
-  golGrid->init();
+  golGrid->initGlider();
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
   dsp = new DSP();
@@ -264,6 +264,12 @@ struct MitosisWidget : ModuleWidget {
                                              Mitosis::DATACLKIN_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.1, 113.5)), module,
                                              Mitosis::DATAIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.35, 19.75)), module,
+                                             Mitosis::INIT_RND_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.85, 19.75)), module,
+                                             Mitosis::INIT_GG_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.35, 30.25)), module,
+                                             Mitosis::INIT_NIL_INPUT));
 
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(119.865, 9.0)), module,
                                                Mitosis::DEAD_OUTPUT));

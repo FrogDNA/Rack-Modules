@@ -1,5 +1,4 @@
-#ifndef MITOSIS_H
-#define MITOSIS_H
+#pragma once
 
 #include "DSP.hpp"
 #include "DataReceiver.hpp"
@@ -33,6 +32,9 @@ struct Mitosis : Module {
   enum InputIds {
     CLOCK_INPUT,
     SEND_INPUT,
+    INIT_RND_INPUT,
+    INIT_GG_INPUT,
+    INIT_NIL_INPUT,
     BUSYIN_INPUT,
     DATACLKIN_INPUT,
     DATAIN_INPUT,
@@ -117,5 +119,3 @@ struct Mitosis : Module {
   json_t *dataToJson() override;
   void dataFromJson(json_t *rootJ) override;
 };
-
-#endif

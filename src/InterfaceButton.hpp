@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Consts.hpp"
 #include "plugin.hpp"
 
 struct InterfaceButton : Widget {
