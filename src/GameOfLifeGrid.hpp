@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 class GameOfLifeGrid {
+  bool loop = false;
   int numCellsX = NUMCELLS_X;
   int numCellsY = NUMCELLS_Y;
   std::vector<std::vector<std::pair<int, int> *>> allCells;
@@ -17,7 +18,6 @@ class GameOfLifeGrid {
   void updateNeighboursAndWatchlist(int x, int y, int val);
 
 public:
-  bool loop = false;
   GameOfLifeGrid();
   void init();
   void init(std::vector<std::pair<int, int> *> alive);
@@ -28,6 +28,7 @@ public:
   void setCellState(std::pair<int, int> *cell, bool state);
   std::pair<int, int> *getCell(int x, int y);
   void setLoop(bool loop);
+  bool getLoop();
   bool isAlive(int x, int y);
   bool isAlive(std::pair<int, int> *);
   bool isInGrid(int x, int y);

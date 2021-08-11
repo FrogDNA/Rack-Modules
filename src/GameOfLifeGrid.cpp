@@ -96,23 +96,14 @@ void GameOfLifeGrid::setCellState(std::pair<int, int> *cell, bool state) {
 }
 
 void GameOfLifeGrid::updateNeighboursAndWatchlist(int x, int y, int val) {
-  if (loop) {
-    for (int i = x - 1; i < x + 2; i++) {
-      int ci = (i + numCellsX) % numCellsX;
-      for (int j = y - 1; j < y + 2; j++) {
-        int cj = (j + numCellsY) % numCellsY;
+  for (int i = x - 1; i < x + 2; i++) {
+    int ci = (i + numCellsX) % numCellsX;
+    for (int j = y - 1; j < y + 2; j++) {
+      int cj = (j + numCellsY) % numCellsY;
+      if (loop || (ci == i && cj == j)) {
         watchList.insert(allCells[ci][cj]);
         if (ci != x || cj != y) {
           neighbours[ci][cj] += val;
-        }
-      }
-    }
-  } else {
-    for (int i = std::max(x - 1, 0); i < std::min(x + 2, NUMCELLS_X); i++) {
-      for (int j = std::max(y - 1, 0); j < std::min(y + 2, NUMCELLS_Y); j++) {
-        watchList.insert(allCells[i][j]);
-        if (i != x || j != y) {
-          neighbours[i][j] += val;
         }
       }
     }
@@ -153,7 +144,39 @@ void GameOfLifeGrid::emptyGrid() {
   }
 }
 
-void GameOfLifeGrid::setLoop(bool loop) { this->loop = loop; }
+void GameOfLifeGrid::setLoop(bool loop) {
+  if (this->loop != loop) {
+    this->loop = loop;
+    for (std::unordered_set<std::pair<int, int> *>::iterator it =
+             currentlyAlive.begin();
+         it != currentlyAlive.end(); ++it) {
+      std::pair<int, int> *c = *it;
+      int x = c->first;
+      int y = c->second;
+      for (int i = x - 1; i < x + 2; i++) {
+        int ci = (i + numCellsX) % numCellsX;
+        for (int j = y - 1; j < y + 2; j++) {
+          int cj = (j + numCellsY) % numCellsY;
+          if (ci != i || cj != j) {
+            if (loop) {
+              // add neighbours to the other side of borders
+              // and add to wachlist
+              neighbours[ci][cj]++;
+              watchList.insert(allCells[ci][cj]);
+            } else {
+              // remove those neighbours
+              // dont lose time removing cells from watchlist
+              neighbours[ci][cj]--;
+            }
+          }
+          // if ci == i && cj == j, then nothing to do
+        }
+      }
+    }
+  }
+}
+
+bool GameOfLifeGrid::getLoop() { return loop; }
 
 std::pair<int, int> *GameOfLifeGrid::getCell(int x, int y) {
   if (isInGrid(x, y)) {

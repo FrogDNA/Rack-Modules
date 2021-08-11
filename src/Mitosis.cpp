@@ -159,7 +159,7 @@ void Mitosis::processBuffers() {
   }
   while (!loopParam.empty()) {
     bool loop = loopParam.shift();
-    golGrid->loop = loop;
+    golGrid->setLoop(loop);
   }
   while (!muteRowsBuffer.empty()) {
     int row = muteRowsBuffer.shift();
@@ -207,7 +207,7 @@ json_t *Mitosis::dataToJson() {
   for (int i = 0; i < NUMCELLS_Y; i++) {
     json_array_append_new(rowAudibleJ, json_boolean(dsp->isRowAudible(i)));
   }
-  json_array_append_new(switchesJ, json_boolean(golGrid->loop));
+  json_array_append_new(switchesJ, json_boolean(golGrid->getLoop()));
   json_object_set_new(rootJ, "golGrid", gridJ);
   json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
   json_object_set_new(rootJ, "colAudible", colAudibleJ);
@@ -237,7 +237,7 @@ void Mitosis::dataFromJson(json_t *rootJ) {
     }
   }
   json_t *switchesJ = json_object_get(rootJ, "switches");
-  golGrid->loop = json_is_true(json_array_get(switchesJ, 0));
+  golGrid->setLoop(json_is_true(json_array_get(switchesJ, 0)));
 }
 
 struct MitosisWidget : ModuleWidget {
@@ -447,11 +447,10 @@ struct MitosisWidget : ModuleWidget {
     display->box.size = mm2px(Vec(116.0, 107.0));
     addChild(display);
 
-    LoopSliderParam *lpWidget = new LoopSliderParam();
+    SliderParam *lpWidget = new SliderParam();
     lpWidget->rb = &(module->loopParam);
     lpWidget->box.pos = mm2px(Vec(146.428, 7.1));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
-    lpWidget->module = module;
     addChild(lpWidget);
   }
 };
