@@ -16,7 +16,7 @@
     {
       "slug": "Mitosis",
       "name": "Mitosis",
-      "description": "Chaotic VCO inspired by Conway's Game of L Life",
+      "description": "Chaotic sequencer inspired by Conway's Game of L Life",
       "tags": [
         "Sequencer", "Random"
       ]
