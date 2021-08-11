@@ -15,10 +15,10 @@ void SliderParam::draw(const DrawArgs &args) {
   // draw the empty area
   nvgBeginPath(args.vg);
   if (switchedOn) {
-    nvgFillColor(args.vg, COLOR_GREEN_BUTTON_O);
+    nvgFillColor(args.vg, COLOR_OK_BUTTON_O);
     nvgRect(args.vg, 0, 0, this->box.size.x / 2, this->box.size.y);
   } else {
-    nvgFillColor(args.vg, COLOR_RED_BUTTON_O);
+    nvgFillColor(args.vg, COLOR_NOK_BUTTON_O);
     nvgRect(args.vg, this->box.size.x / 2, 0, this->box.size.x / 2,
             this->box.size.y);
   }

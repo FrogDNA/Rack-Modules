@@ -97,14 +97,14 @@ void LineHeader::draw(const DrawArgs &args) {
   bool muted = (isRow && !dsp->isRowAudible(coordinate)) ||
                (!isRow && !dsp->isColAudible(coordinate));
   if (isRow && muted) {
-    nvgFillColor(args.vg, OPAQUE_C3);
+    nvgFillColor(args.vg, OPAQUE_C3_DARKER);
   } else if (isRow && !muted) {
-    nvgFillColor(args.vg, TPT_C3);
+    nvgFillColor(args.vg, OPAQUE_C3);
   } else if (!isRow && muted) {
-    nvgFillColor(args.vg, OPAQUE_C2);
+    nvgFillColor(args.vg, OPAQUE_C2_DARKER);
   } else {
     //(!isRow && !muted)
-    nvgFillColor(args.vg, TPT_C2);
+    nvgFillColor(args.vg, OPAQUE_C2);
   }
   nvgBeginPath(args.vg);
   nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
