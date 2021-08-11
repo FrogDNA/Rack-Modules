@@ -77,7 +77,6 @@ void Mitosis::process(const ProcessArgs &args) {
     out = dsp->getOutputs();
     dsp->resetOutputChanged();
   }
-  printf("r1 : %f p %f\n", out.yOutputs[0], out.yPresents[0]);
   // outputs rows
   outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
   outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
