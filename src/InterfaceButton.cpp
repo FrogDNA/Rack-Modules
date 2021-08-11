@@ -23,7 +23,7 @@ void InterfaceButton::onButton(const event::Button &e) {
 }
 
 void InterfaceButton::onDragHover(const event::DragHover &e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT && pressed) {
     whileHovering();
     e.consume(this);
     Widget::onDragHover(e);

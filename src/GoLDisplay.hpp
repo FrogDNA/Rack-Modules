@@ -82,10 +82,13 @@ struct GridScrollBar : Widget {
   float r = (mm2px(ICON_SIZE) - 2 * barSize) / 2;
   float pos = 0.5f;
   bool vertical = false;
+  bool dragging = false;
   GridDisplay *gd = NULL;
   GridScrollBar();
   void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
   void onDragHover(const event::DragHover &e) override;
+  void onDragLeave(const event::DragLeave &e) override;
 };
 
 struct GridScrollPane : OpaqueWidget {

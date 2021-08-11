@@ -239,8 +239,25 @@ void GridScrollBar::draw(const DrawArgs &args) {
   }
 }
 
-void GridScrollBar::onDragHover(const event::DragHover &e) {
+void GridScrollBar::onButton(const event::Button &e) {
   if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (e.action == GLFW_PRESS) {
+      dragging = true;
+    } else if (e.action == GLFW_RELEASE) {
+      dragging = false;
+    }
+    e.consume(this);
+    Widget::onButton(e);
+  }
+}
+
+void GridScrollBar::onDragLeave(const event::DragLeave &e) {
+  dragging = false;
+  e.consume(this);
+}
+
+void GridScrollBar::onDragHover(const event::DragHover &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT && dragging) {
     float infLimit = r + barSize;
     float supLimit = vertical ? box.size.y : box.size.x;
     supLimit -= (r + barSize);
