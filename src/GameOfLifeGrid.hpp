@@ -23,6 +23,8 @@ class GameOfLifeGrid {
 public:
   static std::vector<std::pair<int, int> *> createRandomGrid();
   static std::vector<std::pair<int, int> *> getDefaultInit();
+  static std::pair<int, int> *getCell(int x, int y);
+  static bool isInGrid(int x, int y);
   GameOfLifeGrid();
   void init(std::vector<std::pair<int, int> *> alive);
   void update();
@@ -33,12 +35,10 @@ public:
   bool isHasCAChanged();
   void setCellState(int x, int y, bool state);
   void setCellState(std::pair<int, int> *cell, bool state);
-  std::pair<int, int> *getCell(int x, int y);
   void setLoop(bool loop);
   bool getLoop();
   bool isAlive(int x, int y);
   bool isAlive(std::pair<int, int> *);
-  bool isInGrid(int x, int y);
   bool isEmpty();
   bool isStillEvolving(); // return false if old is same as current
 };

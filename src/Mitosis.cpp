@@ -91,7 +91,7 @@ void Mitosis::process(const ProcessArgs &args) {
   }
   // check if GUI has some messages
   processBuffers();
-  // DSP outputs
+  // DSP update and outputs
   bool hasCAChanged = golGrid->isHasCAChanged();
   if (hasCAChanged || audibilityChanged) {
     std::vector<std::pair<int, int> *> state =
@@ -222,18 +222,50 @@ void Mitosis::processBuffers() {
   }
 }
 
+std::vector<std::vector<bool>> ca2grid(std::vector<std::pair<int, int> *> ca) {
+  std::vector<std::vector<bool>> grid;
+  grid.reserve(NUMCELLS_X);
+  for (int i = 0; i < NUMCELLS_X; i++) {
+    std::vector<bool> v;
+    v.reserve(NUMCELLS_Y);
+    for (int j = 0; j < NUMCELLS_Y; j++) {
+      v.push_back(false);
+    }
+    grid.push_back(v);
+  }
+  for (std::vector<std::pair<int, int> *>::iterator it = ca.begin();
+       it != ca.end(); ++it) {
+    std::pair<int, int> *c = *it;
+    int x = c->first;
+    int y = c->second;
+    grid[x][y] = true;
+  }
+  return grid;
+}
+
 json_t *Mitosis::dataToJson() {
 
   json_t *rootJ = json_object();
   json_t *gridJ = json_array();
+  json_t *grid1J = json_array();
+  json_t *grid2J = json_array();
+  json_t *grid3J = json_array();
   json_t *colAudibleJ = json_array();
   json_t *rowAudibleJ = json_array();
   json_t *switchesJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
+  std::vector<std::vector<bool>> grid = ca2grid(golGrid->getCurrentlyAlive());
+  std::vector<std::vector<bool>> grid1 = ca2grid(saves[0]);
+  std::vector<std::vector<bool>> grid2 = ca2grid(saves[1]);
+  std::vector<std::vector<bool>> grid3 = ca2grid(saves[2]);
+
   for (int i = 0; i < NUMCELLS_X; i++) {
     for (int j = 0; j < NUMCELLS_Y; j++) {
-      json_array_append_new(gridJ, json_boolean(golGrid->isAlive(i, j)));
+      json_array_append_new(gridJ, json_boolean(grid[i][j]));
+      json_array_append_new(grid1J, json_boolean(grid1[i][j]));
+      json_array_append_new(grid2J, json_boolean(grid2[i][j]));
+      json_array_append_new(grid3J, json_boolean(grid3[i][j]));
     }
   }
   for (int i = 0; i < NUMCELLS_X; i++) {
@@ -244,6 +276,9 @@ json_t *Mitosis::dataToJson() {
   }
   json_array_append_new(switchesJ, json_boolean(golGrid->getLoop()));
   json_object_set_new(rootJ, "golGrid", gridJ);
+  json_object_set_new(rootJ, "save1", grid1J);
+  json_object_set_new(rootJ, "save2", grid2J);
+  json_object_set_new(rootJ, "save3", grid3J);
   json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
   json_object_set_new(rootJ, "colAudible", colAudibleJ);
   json_object_set_new(rootJ, "switches", switchesJ);
@@ -253,15 +288,34 @@ json_t *Mitosis::dataToJson() {
 void Mitosis::dataFromJson(json_t *rootJ) {
   // running
   json_t *gridJ = json_object_get(rootJ, "golGrid");
+  json_t *grid1J = json_object_get(rootJ, "save1");
+  json_t *grid2J = json_object_get(rootJ, "save2");
+  json_t *grid3J = json_object_get(rootJ, "save3");
   json_t *rowAudibleJ = json_object_get(rootJ, "rowAudible");
   json_t *colAudibleJ = json_object_get(rootJ, "colAudible");
-  if (gridJ && rowAudibleJ && colAudibleJ) {
+  json_t *switchesJ = json_object_get(rootJ, "switches");
+  golGrid->setLoop(json_is_true(json_array_get(switchesJ, 0)));
+  std::vector<std::vector<std::pair<int, int> *>> saves;
+  for (int i = 0; i < 3; i++) {
+    saves.push_back(std::vector<std::pair<int, int> *>());
+  }
+  if (gridJ && rowAudibleJ && colAudibleJ && grid1J && grid2J && grid3J) {
     for (int i = 0; i < NUMCELLS_X; i++) {
       for (int j = 0; j < NUMCELLS_Y; j++) {
         bool value = json_is_true(json_array_get(gridJ, NUMCELLS_Y * i + j));
         golGrid->setCellState(i, j, value);
+        if (json_is_true(json_array_get(grid1J, NUMCELLS_Y * i + j))) {
+          saves[0].push_back(GameOfLifeGrid::getCell(i, j));
+        }
+        if (json_is_true(json_array_get(grid2J, NUMCELLS_Y * i + j))) {
+          saves[1].push_back(GameOfLifeGrid::getCell(i, j));
+        }
+        if (json_is_true(json_array_get(grid3J, NUMCELLS_Y * i + j))) {
+          saves[2].push_back(GameOfLifeGrid::getCell(i, j));
+        }
       }
     }
+    this->saves = saves;
     for (int i = 0; i < NUMCELLS_X; i++) {
       bool colAudible = json_is_true(json_array_get(colAudibleJ, i));
       dsp->muteUnmuteCol(i, colAudible);
@@ -271,8 +325,6 @@ void Mitosis::dataFromJson(json_t *rootJ) {
       dsp->muteUnmuteRow(i, rowAudible);
     }
   }
-  json_t *switchesJ = json_object_get(rootJ, "switches");
-  golGrid->setLoop(json_is_true(json_array_get(switchesJ, 0)));
 }
 
 struct MitosisWidget : ModuleWidget {
