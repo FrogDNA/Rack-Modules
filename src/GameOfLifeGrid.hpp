@@ -8,6 +8,7 @@
 class GameOfLifeGrid {
   static std::vector<std::vector<std::pair<int, int> *>> allCells;
   static std::vector<std::vector<std::pair<int, int> *>> initAllCells();
+  bool hasCAChanged = true;
   bool loop = false;
   int numCellsX = NUMCELLS_X;
   int numCellsY = NUMCELLS_Y;
@@ -26,6 +27,10 @@ public:
   void init(std::vector<std::pair<int, int> *> alive);
   void update();
   std::vector<std::pair<int, int> *> getCurrentlyAlive();
+  // quick and dirty trick, to inform if currentlyAlive has changed since last
+  // asked
+  std::vector<std::pair<int, int> *> getCurrentlyAliveRegister();
+  bool isHasCAChanged();
   void setCellState(int x, int y, bool state);
   void setCellState(std::pair<int, int> *cell, bool state);
   std::pair<int, int> *getCell(int x, int y);

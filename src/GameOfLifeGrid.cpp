@@ -117,6 +117,7 @@ void GameOfLifeGrid::setCellState(int x, int y, bool state) {
 }
 
 void GameOfLifeGrid::setCellState(std::pair<int, int> *cell, bool state) {
+  hasCAChanged = true;
   setCellState(cell->first, cell->second, state);
 }
 
@@ -216,6 +217,15 @@ std::vector<std::pair<int, int> *> GameOfLifeGrid::getCurrentlyAlive() {
                                         currentlyAlive.end());
   return ca;
 }
+
+std::vector<std::pair<int, int> *> GameOfLifeGrid::getCurrentlyAliveRegister() {
+  std::vector<std::pair<int, int> *> ca(currentlyAlive.begin(),
+                                        currentlyAlive.end());
+  hasCAChanged = false;
+  return ca;
+}
+
+bool GameOfLifeGrid::isHasCAChanged() { return hasCAChanged; }
 
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }
 

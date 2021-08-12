@@ -92,8 +92,15 @@ void Mitosis::process(const ProcessArgs &args) {
   // check if GUI has some messages
   processBuffers();
   // DSP outputs
-  std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
-  dsp->paramValues(state, rowVoct, colVoct);
+  bool hasCAChanged = golGrid->isHasCAChanged();
+  if (hasCAChanged || audibilityChanged) {
+    std::vector<std::pair<int, int> *> state =
+        golGrid->getCurrentlyAliveRegister();
+    dsp->update(state, rowVoct, colVoct);
+    audibilityChanged = false;
+  } else {
+    dsp->update(rowVoct, colVoct);
+  }
   if (dsp->isOutputChanged()) {
     out = dsp->getOutputs();
     dsp->resetOutputChanged();
@@ -186,26 +193,32 @@ void Mitosis::processBuffers() {
   while (!muteRowsBuffer.empty()) {
     int row = muteRowsBuffer.shift();
     dsp->muteUnmuteRow(row, false);
+    audibilityChanged = true;
   }
   while (!unmuteRowsBuffer.empty()) {
     int row = unmuteRowsBuffer.shift();
     dsp->muteUnmuteRow(row, true);
+    audibilityChanged = true;
   }
   while (!muteColsBuffer.empty()) {
     int col = muteColsBuffer.shift();
     dsp->muteUnmuteCol(col, false);
+    audibilityChanged = true;
   }
   while (!unmuteColsBuffer.empty()) {
     int col = unmuteColsBuffer.shift();
     dsp->muteUnmuteCol(col, true);
+    audibilityChanged = true;
   }
   while (!muteUnmuteColsBuffer.empty()) {
     int col = muteUnmuteColsBuffer.shift();
     dsp->muteUnmuteCol(col, !dsp->isColAudible(col));
+    audibilityChanged = true;
   }
   while (!muteUnmuteRowsBuffer.empty()) {
     int row = muteUnmuteRowsBuffer.shift();
     dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
+    audibilityChanged = true;
   }
 }
 

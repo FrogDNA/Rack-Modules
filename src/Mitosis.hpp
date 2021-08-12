@@ -7,6 +7,7 @@
 struct Mitosis : Module {
   DSP *dsp = NULL;
   Outputs out;
+  bool audibilityChanged = true;
   GameOfLifeGrid *golGrid = NULL;
   bool clockUp = false;
   float vOctOut = 0.f;

@@ -28,9 +28,7 @@ DSP::DSP() {
     yFrequencies[i] = (i - REFERENCE_POS) / 12.0f;
   }
 }
-
-void DSP::paramValues(std::vector<std::pair<int, int> *> state, float rowVoct,
-                      float colVoct) {
+void DSP::update(float rowVoct, float colVoct) {
   int rowOffset = floor(rowVoct * 12.f);
   int colOffset = floor(colVoct * 12.f);
   if (colOffset != offsetX) {
@@ -41,23 +39,24 @@ void DSP::paramValues(std::vector<std::pair<int, int> *> state, float rowVoct,
     offsetY = rowOffset;
     outputChanged = true;
   }
-  if (knownState != state || audibilityChanged) {
-    knownState = state;
-    usableX.clear();
-    usableY.clear();
-    for (std::vector<std::pair<int, int> *>::iterator it = knownState.begin();
-         it != knownState.end(); ++it) {
-      std::pair<int, int> *c = *it;
-      int x = c->first;
-      int y = c->second;
-      if (isCellAudible(c)) {
-        usableX.insert(x);
-        usableY.insert(y);
-      }
+}
+
+void DSP::update(std::vector<std::pair<int, int> *> state, float rowVoct,
+                 float colVoct) {
+  update(rowVoct, colVoct);
+  usableX.clear();
+  usableY.clear();
+  for (std::vector<std::pair<int, int> *>::iterator it = state.begin();
+       it != state.end(); ++it) {
+    std::pair<int, int> *c = *it;
+    int x = c->first;
+    int y = c->second;
+    if (isCellAudible(c)) {
+      usableX.insert(x);
+      usableY.insert(y);
     }
-    outputChanged = true;
-    audibilityChanged = false;
   }
+  outputChanged = true;
 }
 
 Outputs DSP::getOutputs() {
@@ -115,7 +114,6 @@ void DSP::muteUnmuteCol(int x, bool muted) {
     return;
   }
   audibleCols[x] = muted;
-  audibilityChanged = true;
 }
 
 void DSP::muteUnmuteRow(int y, bool muted) {
@@ -123,7 +121,6 @@ void DSP::muteUnmuteRow(int y, bool muted) {
     return;
   }
   audibleRows[y] = muted;
-  audibilityChanged = true;
 }
 
 bool DSP::isColAudible(int x) {
