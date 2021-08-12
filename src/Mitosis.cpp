@@ -1,7 +1,5 @@
 #include "Mitosis.hpp"
 #include "DSP.hpp"
-#include "DataReceiver.hpp"
-#include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "GoLDisplay.hpp"
 #include "ScaleButton.hpp"

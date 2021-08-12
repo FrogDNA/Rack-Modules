@@ -1,8 +1,6 @@
 #pragma once
 
 #include "DSP.hpp"
-#include "DataReceiver.hpp"
-#include "DataSender.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "plugin.hpp"
 
