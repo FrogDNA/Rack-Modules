@@ -25,49 +25,59 @@ GameOfLifeGrid::GameOfLifeGrid() {
 
 void GameOfLifeGrid::initEmpty() { emptyGrid(); }
 
-void GameOfLifeGrid::initGlider() {
-  emptyGrid();
-  // optional, interesting to test all manner of things
+std::vector<std::pair<int, int> *> GameOfLifeGrid::getDefaultInit() {
+  std::vector<std::pair<int, int> *> toReturn;
   //(Gosper Glider Gun)
-  setCellState(REFERENCE_POS - 19, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS - 19, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS - 18, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS - 18, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS - 9, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS - 9, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS - 9, REFERENCE_POS + 2, true);
-  setCellState(REFERENCE_POS - 8, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS - 8, REFERENCE_POS + 3, true);
-  setCellState(REFERENCE_POS - 7, REFERENCE_POS - 2, true);
-  setCellState(REFERENCE_POS - 7, REFERENCE_POS + 4, true);
-  setCellState(REFERENCE_POS - 6, REFERENCE_POS - 2, true);
-  setCellState(REFERENCE_POS - 6, REFERENCE_POS + 4, true);
-  setCellState(REFERENCE_POS - 5, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS - 4, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS - 4, REFERENCE_POS + 3, true);
-  setCellState(REFERENCE_POS - 3, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS - 3, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS - 3, REFERENCE_POS + 2, true);
-  setCellState(REFERENCE_POS - 2, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS + 1, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS + 1, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 1, REFERENCE_POS - 2, true);
-  setCellState(REFERENCE_POS + 2, REFERENCE_POS, true);
-  setCellState(REFERENCE_POS + 2, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 2, REFERENCE_POS - 2, true);
-  setCellState(REFERENCE_POS + 3, REFERENCE_POS - 3, true);
-  setCellState(REFERENCE_POS + 3, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS + 5, REFERENCE_POS - 3, true);
-  setCellState(REFERENCE_POS + 5, REFERENCE_POS + 1, true);
-  setCellState(REFERENCE_POS + 5, REFERENCE_POS - 4, true);
-  setCellState(REFERENCE_POS + 5, REFERENCE_POS + 2, true);
-  setCellState(REFERENCE_POS + 15, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 15, REFERENCE_POS - 2, true);
-  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 1, true);
-  setCellState(REFERENCE_POS + 16, REFERENCE_POS - 2, true);
+  toReturn.push_back(allCells[REFERENCE_POS - 19][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS - 19][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 18][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS - 18][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 9][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS - 9][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 9][REFERENCE_POS + 2]);
+  toReturn.push_back(allCells[REFERENCE_POS - 8][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 8][REFERENCE_POS + 3]);
+  toReturn.push_back(allCells[REFERENCE_POS - 7][REFERENCE_POS - 2]);
+  toReturn.push_back(allCells[REFERENCE_POS - 7][REFERENCE_POS + 4]);
+  toReturn.push_back(allCells[REFERENCE_POS - 6][REFERENCE_POS - 2]);
+  toReturn.push_back(allCells[REFERENCE_POS - 6][REFERENCE_POS + 4]);
+  toReturn.push_back(allCells[REFERENCE_POS - 5][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 4][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 4][REFERENCE_POS + 3]);
+  toReturn.push_back(allCells[REFERENCE_POS - 3][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS - 3][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS - 3][REFERENCE_POS + 2]);
+  toReturn.push_back(allCells[REFERENCE_POS - 2][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 1][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS + 1][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 1][REFERENCE_POS - 2]);
+  toReturn.push_back(allCells[REFERENCE_POS + 2][REFERENCE_POS]);
+  toReturn.push_back(allCells[REFERENCE_POS + 2][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 2][REFERENCE_POS - 2]);
+  toReturn.push_back(allCells[REFERENCE_POS + 3][REFERENCE_POS - 3]);
+  toReturn.push_back(allCells[REFERENCE_POS + 3][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 5][REFERENCE_POS - 3]);
+  toReturn.push_back(allCells[REFERENCE_POS + 5][REFERENCE_POS + 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 5][REFERENCE_POS - 4]);
+  toReturn.push_back(allCells[REFERENCE_POS + 5][REFERENCE_POS + 2]);
+  toReturn.push_back(allCells[REFERENCE_POS + 15][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 15][REFERENCE_POS - 2]);
+  toReturn.push_back(allCells[REFERENCE_POS + 16][REFERENCE_POS - 1]);
+  toReturn.push_back(allCells[REFERENCE_POS + 16][REFERENCE_POS - 2]);
+  return toReturn;
 }
 
-void GameOfLifeGrid::initRandom() { emptyGrid(); }
+void GameOfLifeGrid::initRandom() {
+  emptyGrid();
+  for (int i = 0; i < NUMCELLS_X; i++) {
+    for (int j = 0; j < NUMCELLS_Y; j++) {
+      float value = random::uniform();
+      if (value > 0.75) {
+        setCellState(i, j, true);
+      }
+    }
+  }
+}
 
 void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
   emptyGrid();

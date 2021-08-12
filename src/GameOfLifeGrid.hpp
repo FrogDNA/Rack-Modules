@@ -21,7 +21,7 @@ public:
   GameOfLifeGrid();
   void initEmpty();
   void initRandom();
-  void initGlider();
+  std::vector<std::pair<int, int> *> getDefaultInit();
   void init(std::vector<std::pair<int, int> *> alive);
   void update();
   void emptyGrid();

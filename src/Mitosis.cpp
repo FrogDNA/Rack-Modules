@@ -14,7 +14,8 @@ Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
   clockUp = false;
   golGrid = new GameOfLifeGrid();
-  golGrid->initGlider();
+  savedInitCells = golGrid->getDefaultInit();
+  golGrid->init(savedInitCells);
   dataSender = new DataSender();
   dataReceiver = new DataReceiver();
   dsp = new DSP();
@@ -31,6 +32,9 @@ void Mitosis::process(const ProcessArgs &args) {
   float dataIn = inputs[DATAIN_INPUT].getVoltage();
   float rowVoct = inputs[ROW_VOCT_INPUT].getVoltage();
   float colVoct = inputs[COL_VOCT_INPUT].getVoltage();
+  float initLoad = inputs[INIT_LOAD_INPUT].getVoltage();
+  float initSave = inputs[INIT_SAVE_INPUT].getVoltage();
+  float initRnd = inputs[INIT_RND_INPUT].getVoltage();
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
@@ -40,6 +44,28 @@ void Mitosis::process(const ProcessArgs &args) {
     std::vector<std::pair<int, int> *> v =
         dataReceiver->getGrid()->getCurrentlyAlive();
     golGrid->init(v);
+  }
+  // init
+  if (initSave < 1.5f) {
+    initSaveHigh = false;
+  }
+  if (initLoad < 1.5f) {
+    initLoadHigh = false;
+  }
+  if (initRnd < 1.5f) {
+    initRndHigh = false;
+  }
+  if (initSave > 3.5f && !initSaveHigh) {
+    initSaveHigh = true;
+    savedInitCells = golGrid->getCurrentlyAlive();
+  }
+  if (initLoad > 3.5f && !initLoadHigh) {
+    initLoadHigh = true;
+    golGrid->init(savedInitCells);
+  }
+  if (initRnd > 3.5f && !initRndHigh) {
+    initRndHigh = true;
+    golGrid->initRandom();
   }
   /* clock and AM. */
   /* todo check if AM really brings something */

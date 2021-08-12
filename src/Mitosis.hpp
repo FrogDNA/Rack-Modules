@@ -17,6 +17,10 @@ struct Mitosis : Module {
   bool hasResetSend = true;
   float vOctOut = 0.f;
   float lastDspLowestFreq = 0.f;
+  bool initLoadHigh = false;
+  bool initSaveHigh = false;
+  bool initRndHigh = false;
+  std::vector<std::pair<int, int> *> savedInitCells;
 
   dsp::RingBuffer<std::pair<int, int> *, 1> clickedCells;
   // loopParam
