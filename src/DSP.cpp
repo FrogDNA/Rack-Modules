@@ -29,7 +29,16 @@ DSP::DSP() {
   }
 }
 
-void DSP::paramValues(std::vector<std::pair<int, int> *> state) {
+void DSP::paramValues(std::vector<std::pair<int, int> *> state, float rowVoct,
+                      float colVoct) {
+  int rowOffset = floor(rowVoct * 12.f);
+  int colOffset = floor(colVoct * 12.f);
+  if (colOffset != offsetX) {
+    offsetX = colOffset;
+  }
+  if (rowOffset != offsetY) {
+    offsetY = rowOffset;
+  }
   if (knownState != state || audibilityChanged) {
     knownState = state;
     usableX.clear();
@@ -51,26 +60,43 @@ void DSP::paramValues(std::vector<std::pair<int, int> *> state) {
 
 Outputs DSP::getOutputs() {
   Outputs out;
+  std::set<int>::iterator it;
+  std::set<int>::iterator startX = usableX.lower_bound(offsetX);
+  if (startX == usableX.end()) {
+    startX == usableX.begin();
+  }
+  it = startX;
   int xCounter = 0;
-  for (std::set<int>::iterator it = usableX.begin(); it != usableX.end();
-       ++it) {
+  do {
     out.xOutputs[xCounter] = xFrequencies[*it];
     out.xPresents[xCounter] = 10.0f;
     xCounter++;
     if (xCounter == 10) {
       break;
     }
+    it++;
+    if (it == usableX.end()) {
+      it = usableX.begin();
+    }
+  } while (it != startX);
+  std::set<int>::iterator startY = usableY.lower_bound(offsetX);
+  if (startY == usableY.end()) {
+    startY == usableY.begin();
   }
+  it = startY;
   int yCounter = 0;
-  for (std::set<int>::iterator it = usableY.begin(); it != usableY.end();
-       ++it) {
+  do {
     out.yOutputs[yCounter] = yFrequencies[*it];
     out.yPresents[yCounter] = 10.0f;
     yCounter++;
     if (yCounter == 10) {
       break;
     }
-  }
+    it++;
+    if (it == usableY.end()) {
+      it = usableY.begin();
+    }
+  } while (it != startY);
   return out;
 }
 

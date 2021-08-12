@@ -29,6 +29,8 @@ void Mitosis::process(const ProcessArgs &args) {
   float busyIn = inputs[BUSYIN_INPUT].getVoltage();
   float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
   float dataIn = inputs[DATAIN_INPUT].getVoltage();
+  float rowVoct = inputs[ROW_VOCT_INPUT].getVoltage();
+  float colVoct = inputs[COL_VOCT_INPUT].getVoltage();
   float dataOut = 0.f;
   float ClockOut = 0.f;
   bool risingEdge = false;
@@ -71,7 +73,7 @@ void Mitosis::process(const ProcessArgs &args) {
   ClockOut = dataSender->getClock();
   // DSP outputs
   std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
-  dsp->paramValues(state);
+  dsp->paramValues(state, rowVoct, colVoct);
   if (dsp->isOutputChanged()) {
     out = dsp->getOutputs();
     dsp->resetOutputChanged();
