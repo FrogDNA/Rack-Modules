@@ -34,6 +34,11 @@ void Mitosis::process(const ProcessArgs &args) {
   bool risingEdge = false;
   // data receive
   dataReceiver->check(busyIn, clockIn, dataIn);
+  if (dataReceiver->isNewGridReady()) {
+    std::vector<std::pair<int, int> *> v =
+        dataReceiver->getGrid()->getCurrentlyAlive();
+    golGrid->init(v);
+  }
   /* clock and AM. */
   /* todo check if AM really brings something */
   if (busyIn < 1.5f) {
@@ -46,13 +51,7 @@ void Mitosis::process(const ProcessArgs &args) {
       risingEdge = false;
     }
     if (risingEdge) {
-      if (dataReceiver->isNewGridReady()) {
-        std::vector<std::pair<int, int> *> v =
-            dataReceiver->getGrid()->getCurrentlyAlive();
-        golGrid->init(v);
-      } else {
-        golGrid->update();
-      }
+      golGrid->update();
     }
   }
   // check if GUI has some messages
