@@ -104,6 +104,7 @@ void Mitosis::process(const ProcessArgs &args) {
     out = dsp->getOutputs();
     dsp->resetOutputChanged();
   }
+  lights[SAVE_OK_LIGHT].setBrightness(initSaveHigh ? 1.f : 0.f);
   // outputs rows
   outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
   outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
@@ -431,6 +432,8 @@ struct MitosisWidget : ModuleWidget {
         mm2px(Vec(194.1, 21.0)), module, Mitosis::COL_8_LIGHT));
     addChild(createLightCentered<MediumLight<GreenLight>>(
         mm2px(Vec(198.1, 21.0)), module, Mitosis::COL_10_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(
+        mm2px(Vec(35.85, 32.25)), module, Mitosis::SAVE_OK_LIGHT));
 
     // mute rows
     std::vector<float> xs;

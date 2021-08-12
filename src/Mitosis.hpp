@@ -114,6 +114,7 @@ struct Mitosis : Module {
     COL_6_LIGHT,
     COL_8_LIGHT,
     COL_10_LIGHT,
+    SAVE_OK_LIGHT,
     NUM_LIGHTS
   };
 
