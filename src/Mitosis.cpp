@@ -12,12 +12,10 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-  clockUp = false;
   golGrid = new GameOfLifeGrid();
-  savedInitCells = golGrid->getDefaultInit();
-  golGrid->init(savedInitCells);
-  dataSender = new DataSender();
-  dataReceiver = new DataReceiver();
+  for (int i = 0; i < 3; i++) {
+    saves.push_back(std::vector<std::pair<int, int> *>());
+  }
   dsp = new DSP();
   out = dsp->getOutputs();
   // for debugging
@@ -26,77 +24,75 @@ Mitosis::Mitosis() {
 
 void Mitosis::process(const ProcessArgs &args) {
   float clock = inputs[CLOCK_INPUT].getVoltage();
-  float send = inputs[SEND_INPUT].getVoltage();
-  float busyIn = inputs[BUSYIN_INPUT].getVoltage();
-  float clockIn = inputs[DATACLKIN_INPUT].getVoltage();
-  float dataIn = inputs[DATAIN_INPUT].getVoltage();
   float rowVoct = inputs[ROW_VOCT_INPUT].getVoltage();
   float colVoct = inputs[COL_VOCT_INPUT].getVoltage();
-  float initLoad = inputs[INIT_LOAD_INPUT].getVoltage();
-  float initSave = inputs[INIT_SAVE_INPUT].getVoltage();
-  float initRnd = inputs[INIT_RND_INPUT].getVoltage();
-  float dataOut = 0.f;
-  float ClockOut = 0.f;
-  bool risingEdge = false;
-  // data receive
-  dataReceiver->check(busyIn, clockIn, dataIn);
-  if (dataReceiver->isNewGridReady()) {
-    std::vector<std::pair<int, int> *> v =
-        dataReceiver->getGrid()->getCurrentlyAlive();
-    golGrid->init(v);
-  }
+  float load1 = inputs[LOAD_1_INPUT].getVoltage();
+  float load2 = inputs[LOAD_2_INPUT].getVoltage();
+  float load3 = inputs[LOAD_3_INPUT].getVoltage();
+  float save1 = inputs[SAVE_1_INPUT].getVoltage();
+  float save2 = inputs[SAVE_2_INPUT].getVoltage();
+  float save3 = inputs[SAVE_3_INPUT].getVoltage();
+  float reset = inputs[RESET_INPUT].getVoltage();
+  float loadRnd = inputs[INIT_RND_INPUT].getVoltage();
   // init
-  if (initSave < 1.5f) {
-    initSaveHigh = false;
+  // save and load can only be triggered if all of them are low beforehand.
+  if (save1 < 1.5f && save2 < 1.5f && save3 < 1.5f) {
+    saveHigh = false;
   }
-  if (initLoad < 1.5f) {
-    initLoadHigh = false;
+  if (load1 < 1.5f && load2 < 1.5f && load3 < 1.5f && loadRnd < 1.5f &&
+      reset < 1.5f) {
+    loadHigh = false;
   }
-  if (initRnd < 1.5f) {
-    initRndHigh = false;
-  }
-  if (initSave > 3.5f && !initSaveHigh) {
-    initSaveHigh = true;
-    savedInitCells = golGrid->getCurrentlyAlive();
-  }
-  if (initLoad > 3.5f && !initLoadHigh) {
-    initLoadHigh = true;
-    golGrid->init(savedInitCells);
-  }
-  if (initRnd > 3.5f && !initRndHigh) {
-    initRndHigh = true;
-    golGrid->initRandom();
-  }
-  /* clock and AM. */
-  /* todo check if AM really brings something */
-  if (busyIn < 1.5f) {
-    // ignore clock if busyIn is high
-    if (clock > 3.5f) {
-      risingEdge = (clockUp == false ? true : false);
-      clockUp = true;
-    } else if (clock < 1.5f) {
-      clockUp = false;
-      risingEdge = false;
+  // save
+  if (!saveHigh && (save1 > 3.5f || save2 > 3.5f || save3 > 3.5f)) {
+    saveHigh = true;
+    if (save1 > 3.5f) {
+      lastLoaded = 1;
+    } else if (save2 > 3.5f) {
+      lastLoaded = 2;
+    } else if (save3 > 3.5f) {
+      lastLoaded = 3;
     }
-    if (risingEdge) {
-      golGrid->update();
+    lastLoadedData = golGrid->getCurrentlyAlive();
+    saves[lastLoaded - 1] = lastLoadedData;
+  }
+  if (!loadHigh && (load1 > 3.5f || load2 > 3.5f || load3 > 3.5f ||
+                    loadRnd > 3.5f || reset > 3.5f)) {
+    loadHigh = true;
+    std::vector<std::pair<int, int> *> cells;
+    if (load1 > 3.5f) {
+      lastLoaded = 1;
+      cells = saves[0];
+    } else if (load2 > 3.5f) {
+      lastLoaded = 2;
+      cells = saves[1];
+    } else if (load3 > 3.5f) {
+      lastLoaded = 3;
+      cells = saves[2];
+    } else if (loadRnd > 3.5f) {
+      lastLoaded = 4;
+      cells = GameOfLifeGrid::createRandomGrid();
+    } else if (reset > 3.5f) {
+      // reset
+      cells = lastLoadedData;
     }
+    lastLoadedData = cells;
+    golGrid->init(cells);
+  }
+  // clock
+  bool risingEdge = false;
+  if (clock > 3.5f) {
+    risingEdge = (clockUp == false ? true : false);
+    clockUp = true;
+  } else if (clock < 1.5f) {
+    clockUp = false;
+    risingEdge = false;
+  }
+  if (risingEdge) {
+    golGrid->update();
   }
   // check if GUI has some messages
   processBuffers();
-  // data send
-  if (send > 3.5f && hasResetSend) {
-    if (!dataSender->isTransferInProgress()) {
-      dataSender->init(golGrid->getCurrentlyAlive());
-      hasResetSend = false;
-    }
-  }
-  if (send < 1.5f) {
-    hasResetSend = true;
-  }
-  dataSender->next();
-  dataOut = dataSender->getData();
-  ClockOut = dataSender->getClock();
   // DSP outputs
   std::vector<std::pair<int, int> *> state = golGrid->getCurrentlyAlive();
   dsp->paramValues(state, rowVoct, colVoct);
@@ -104,7 +100,13 @@ void Mitosis::process(const ProcessArgs &args) {
     out = dsp->getOutputs();
     dsp->resetOutputChanged();
   }
-  lights[SAVE_OK_LIGHT].setBrightness(initSaveHigh ? 1.f : 0.f);
+  // misc outputs
+  outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
+  // load/save lights
+  lights[LS_1_LIGHT].setBrightness(lastLoaded == 1 ? 1.f : 0.f);
+  lights[LS_2_LIGHT].setBrightness(lastLoaded == 2 ? 1.f : 0.f);
+  lights[LS_3_LIGHT].setBrightness(lastLoaded == 3 ? 1.f : 0.f);
+  lights[INIT_RND_LIGHT].setBrightness(lastLoaded == 4 ? 1.f : 0.f);
   // outputs rows
   outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
   outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
@@ -171,12 +173,6 @@ void Mitosis::process(const ProcessArgs &args) {
   lights[COL_8_LIGHT].setBrightness(out.xPresents[7] == 0.f ? 0.f : 1.f);
   lights[COL_9_LIGHT].setBrightness(out.xPresents[8] == 0.f ? 0.f : 1.f);
   lights[COL_10_LIGHT].setBrightness(out.xPresents[9] == 0.f ? 0.f : 1.f);
-
-  outputs[BUSY_OUTPUT].setVoltage(dataSender->isTransferInProgress() ? 10.f
-                                                                     : 0.f);
-  outputs[DEAD_OUTPUT].setVoltage(golGrid->isStillEvolving() ? 0.f : 10.f);
-  outputs[DATACLK_OUTPUT].setVoltage(ClockOut);
-  outputs[DATA_OUTPUT].setVoltage(dataOut);
 }
 
 void Mitosis::processBuffers() {
@@ -284,24 +280,26 @@ struct MitosisWidget : ModuleWidget {
 
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.591, 9.0)), module,
                                              Mitosis::CLOCK_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(89.198, 9.0)), module,
-                                             Mitosis::SEND_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.602, 9.0)), module,
+                                             Mitosis::RESET_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(174.326, 9.0)), module,
                                              Mitosis::ROW_VOCT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(195.326, 9.0)), module,
                                              Mitosis::COL_VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.35, 19.75)), module,
-                                             Mitosis::INIT_SAVE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.85, 19.75)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.585, 21.5)), module,
                                              Mitosis::INIT_RND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(23.35, 30.25)), module,
-                                             Mitosis::INIT_LOAD_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 113.5)), module,
-                                             Mitosis::BUSYIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 113.5)), module,
-                                             Mitosis::DATACLKIN_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.1, 113.5)), module,
-                                             Mitosis::DATAIN_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.6, 97.5)), module,
+                                             Mitosis::SAVE_3_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 98.0)), module,
+                                             Mitosis::SAVE_1_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 98.0)), module,
+                                             Mitosis::LOAD_1_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 114.0)), module,
+                                             Mitosis::SAVE_2_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 114.0)), module,
+                                             Mitosis::LOAD_2_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.6, 118.5)), module,
+                                             Mitosis::LOAD_3_INPUT));
 
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(119.865, 9.0)), module,
                                                Mitosis::DEAD_OUTPUT));
@@ -361,12 +359,6 @@ struct MitosisWidget : ModuleWidget {
                                                Mitosis::COL_7_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(195.1, 88.85)), module,
                                                Mitosis::COL_7_P_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9.1, 97.5)), module,
-                                               Mitosis::BUSY_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(21.1, 97.5)), module,
-                                               Mitosis::DATACLK_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.1, 97.5)), module,
-                                               Mitosis::DATA_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(164.1, 98.75)), module,
                                                Mitosis::ROW_8_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.1, 98.75)), module,
@@ -432,8 +424,14 @@ struct MitosisWidget : ModuleWidget {
         mm2px(Vec(194.1, 21.0)), module, Mitosis::COL_8_LIGHT));
     addChild(createLightCentered<MediumLight<GreenLight>>(
         mm2px(Vec(198.1, 21.0)), module, Mitosis::COL_10_LIGHT));
-    addChild(createLightCentered<MediumLight<GreenLight>>(
-        mm2px(Vec(35.85, 32.25)), module, Mitosis::SAVE_OK_LIGHT));
+    addChild(createLightCentered<SmallLight<GreenLight>>(
+        mm2px(Vec(33.585, 31.5)), module, Mitosis::INIT_RND_LIGHT));
+    addChild(createLightCentered<SmallLight<GreenLight>>(
+        mm2px(Vec(15.1, 100.0)), module, Mitosis::LS_1_LIGHT));
+    addChild(createLightCentered<SmallLight<GreenLight>>(
+        mm2px(Vec(33.6, 108.0)), module, Mitosis::LS_3_LIGHT));
+    addChild(createLightCentered<SmallLight<GreenLight>>(
+        mm2px(Vec(15.1, 116.0)), module, Mitosis::LS_2_LIGHT));
 
     // mute rows
     std::vector<float> xs;

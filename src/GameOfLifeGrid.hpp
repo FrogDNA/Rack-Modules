@@ -6,25 +6,25 @@
 #include <unordered_set>
 
 class GameOfLifeGrid {
+  static std::vector<std::vector<std::pair<int, int> *>> allCells;
+  static std::vector<std::vector<std::pair<int, int> *>> initAllCells();
   bool loop = false;
   int numCellsX = NUMCELLS_X;
   int numCellsY = NUMCELLS_Y;
-  std::vector<std::vector<std::pair<int, int> *>> allCells;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
   std::unordered_set<std::pair<int, int> *> oldAlive;
   std::unordered_set<std::pair<int, int> *> watchList;
   std::unordered_set<std::pair<int, int> *> currentlyAlive;
   void updateNeighboursAndWatchlist(int x, int y, int val);
+  void emptyGrid();
 
 public:
+  static std::vector<std::pair<int, int> *> createRandomGrid();
+  static std::vector<std::pair<int, int> *> getDefaultInit();
   GameOfLifeGrid();
-  void initEmpty();
-  void initRandom();
-  std::vector<std::pair<int, int> *> getDefaultInit();
   void init(std::vector<std::pair<int, int> *> alive);
   void update();
-  void emptyGrid();
   std::vector<std::pair<int, int> *> getCurrentlyAlive();
   void setCellState(int x, int y, bool state);
   void setCellState(std::pair<int, int> *cell, bool state);

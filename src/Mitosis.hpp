@@ -10,17 +10,15 @@ struct Mitosis : Module {
   DSP *dsp = NULL;
   Outputs out;
   GameOfLifeGrid *golGrid = NULL;
-  DataSender *dataSender = NULL;
-  DataReceiver *dataReceiver = NULL;
-  bool golUpdateArmed = true;
-  bool clockUp;
-  bool hasResetSend = true;
+  bool clockUp = false;
   float vOctOut = 0.f;
-  float lastDspLowestFreq = 0.f;
-  bool initLoadHigh = false;
-  bool initSaveHigh = false;
-  bool initRndHigh = false;
-  std::vector<std::pair<int, int> *> savedInitCells;
+  // 0 is default, 1-3 are loads/saves 1-3, 4 is random seed
+  // lastLoaded variables are modified when load OR save.
+  int lastLoaded = 0;
+  std::vector<std::pair<int, int> *> lastLoadedData;
+  bool loadHigh = false;
+  bool saveHigh = false;
+  std::vector<std::vector<std::pair<int, int> *>> saves;
 
   dsp::RingBuffer<std::pair<int, int> *, 1> clickedCells;
   // loopParam
@@ -35,15 +33,16 @@ struct Mitosis : Module {
   enum ParamIds { NUM_PARAMS };
   enum InputIds {
     CLOCK_INPUT,
-    SEND_INPUT,
+    RESET_INPUT,
     ROW_VOCT_INPUT,
     COL_VOCT_INPUT,
-    INIT_SAVE_INPUT,
     INIT_RND_INPUT,
-    INIT_LOAD_INPUT,
-    BUSYIN_INPUT,
-    DATACLKIN_INPUT,
-    DATAIN_INPUT,
+    SAVE_3_INPUT,
+    SAVE_1_INPUT,
+    LOAD_1_INPUT,
+    SAVE_2_INPUT,
+    LOAD_2_INPUT,
+    LOAD_3_INPUT,
     NUM_INPUTS
   };
   enum OutputIds {
@@ -76,9 +75,6 @@ struct Mitosis : Module {
     ROW_7_P_OUTPUT,
     COL_7_OUTPUT,
     COL_7_P_OUTPUT,
-    BUSY_OUTPUT,
-    DATACLK_OUTPUT,
-    DATA_OUTPUT,
     ROW_8_OUTPUT,
     ROW_8_P_OUTPUT,
     COL_8_OUTPUT,
@@ -114,7 +110,10 @@ struct Mitosis : Module {
     COL_6_LIGHT,
     COL_8_LIGHT,
     COL_10_LIGHT,
-    SAVE_OK_LIGHT,
+    INIT_RND_LIGHT,
+    LS_1_LIGHT,
+    LS_3_LIGHT,
+    LS_2_LIGHT,
     NUM_LIGHTS
   };
 

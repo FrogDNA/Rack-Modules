@@ -1,29 +1,39 @@
 #include "GameOfLifeGrid.hpp"
 #include "Consts.hpp"
 
-GameOfLifeGrid::GameOfLifeGrid() {
+std::vector<std::vector<std::pair<int, int> *>> GameOfLifeGrid::allCells =
+    GameOfLifeGrid::initAllCells();
+
+std::vector<std::vector<std::pair<int, int> *>> GameOfLifeGrid::initAllCells() {
+  std::vector<std::vector<std::pair<int, int> *>> allCells;
   allCells.reserve(NUMCELLS_X);
-  neighbours.reserve(NUMCELLS_X);
-  aliveMap.reserve(NUMCELLS_X);
   for (int i = 0; i < NUMCELLS_X; i++) {
     std::vector<std::pair<int, int> *> v;
     v.reserve(NUMCELLS_Y);
+    for (int j = 0; j < NUMCELLS_Y; j++) {
+      v.push_back(new std::pair<int, int>(i, j));
+    }
+    allCells.push_back(v);
+  }
+  return allCells;
+}
+
+GameOfLifeGrid::GameOfLifeGrid() {
+  neighbours.reserve(NUMCELLS_X);
+  aliveMap.reserve(NUMCELLS_X);
+  for (int i = 0; i < NUMCELLS_X; i++) {
     std::vector<int> n;
     n.reserve(NUMCELLS_Y);
     std::vector<int> a;
     a.reserve(NUMCELLS_Y);
     for (int j = 0; j < NUMCELLS_Y; j++) {
-      v.push_back(new std::pair<int, int>(i, j));
       n.push_back(0);
       a.push_back(0);
     }
-    allCells.push_back(v);
     neighbours.push_back(n);
     aliveMap.push_back(a);
   }
 }
-
-void GameOfLifeGrid::initEmpty() { emptyGrid(); }
 
 std::vector<std::pair<int, int> *> GameOfLifeGrid::getDefaultInit() {
   std::vector<std::pair<int, int> *> toReturn;
@@ -67,16 +77,17 @@ std::vector<std::pair<int, int> *> GameOfLifeGrid::getDefaultInit() {
   return toReturn;
 }
 
-void GameOfLifeGrid::initRandom() {
-  emptyGrid();
+std::vector<std::pair<int, int> *> GameOfLifeGrid::createRandomGrid() {
+  std::vector<std::pair<int, int> *> toReturn;
   for (int i = 0; i < NUMCELLS_X; i++) {
     for (int j = 0; j < NUMCELLS_Y; j++) {
       float value = random::uniform();
       if (value > 0.75) {
-        setCellState(i, j, true);
+        toReturn.push_back(allCells[i][j]);
       }
     }
   }
+  return toReturn;
 }
 
 void GameOfLifeGrid::init(std::vector<std::pair<int, int> *> alive) {
