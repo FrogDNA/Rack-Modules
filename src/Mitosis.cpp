@@ -250,22 +250,24 @@ json_t *Mitosis::dataToJson() {
   json_t *grid1J = json_array();
   json_t *grid2J = json_array();
   json_t *grid3J = json_array();
+  json_t *gridLLJ = json_array();
   json_t *colAudibleJ = json_array();
   json_t *rowAudibleJ = json_array();
-  json_t *switchesJ = json_array();
+  json_t *miscValuesJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
   std::vector<std::vector<bool>> grid = ca2grid(golGrid->getCurrentlyAlive());
   std::vector<std::vector<bool>> grid1 = ca2grid(saves[0]);
   std::vector<std::vector<bool>> grid2 = ca2grid(saves[1]);
   std::vector<std::vector<bool>> grid3 = ca2grid(saves[2]);
-
+  std::vector<std::vector<bool>> gridLL = ca2grid(lastLoadedData);
   for (int i = 0; i < NUMCELLS_X; i++) {
     for (int j = 0; j < NUMCELLS_Y; j++) {
       json_array_append_new(gridJ, json_boolean(grid[i][j]));
       json_array_append_new(grid1J, json_boolean(grid1[i][j]));
       json_array_append_new(grid2J, json_boolean(grid2[i][j]));
       json_array_append_new(grid3J, json_boolean(grid3[i][j]));
+      json_array_append_new(gridLLJ, json_boolean(gridLL[i][j]));
     }
   }
   for (int i = 0; i < NUMCELLS_X; i++) {
@@ -274,14 +276,16 @@ json_t *Mitosis::dataToJson() {
   for (int i = 0; i < NUMCELLS_Y; i++) {
     json_array_append_new(rowAudibleJ, json_boolean(dsp->isRowAudible(i)));
   }
-  json_array_append_new(switchesJ, json_boolean(golGrid->getLoop()));
+  json_array_append_new(miscValuesJ, json_boolean(golGrid->getLoop()));
+  json_array_append_new(miscValuesJ, json_integer(lastLoaded));
   json_object_set_new(rootJ, "golGrid", gridJ);
   json_object_set_new(rootJ, "save1", grid1J);
   json_object_set_new(rootJ, "save2", grid2J);
   json_object_set_new(rootJ, "save3", grid3J);
+  json_object_set_new(rootJ, "last loaded", gridLLJ);
   json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
   json_object_set_new(rootJ, "colAudible", colAudibleJ);
-  json_object_set_new(rootJ, "switches", switchesJ);
+  json_object_set_new(rootJ, "misc values", miscValuesJ);
   return rootJ;
 }
 
@@ -291,14 +295,17 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   json_t *grid1J = json_object_get(rootJ, "save1");
   json_t *grid2J = json_object_get(rootJ, "save2");
   json_t *grid3J = json_object_get(rootJ, "save3");
+  json_t *gridLLJ = json_object_get(rootJ, "last loaded");
   json_t *rowAudibleJ = json_object_get(rootJ, "rowAudible");
   json_t *colAudibleJ = json_object_get(rootJ, "colAudible");
-  json_t *switchesJ = json_object_get(rootJ, "switches");
+  json_t *switchesJ = json_object_get(rootJ, "misc values");
   golGrid->setLoop(json_is_true(json_array_get(switchesJ, 0)));
+  lastLoaded = json_integer_value(json_array_get(switchesJ, 1));
   std::vector<std::vector<std::pair<int, int> *>> saves;
   for (int i = 0; i < 3; i++) {
     saves.push_back(std::vector<std::pair<int, int> *>());
   }
+  lastLoadedData.clear();
   if (gridJ && rowAudibleJ && colAudibleJ && grid1J && grid2J && grid3J) {
     for (int i = 0; i < NUMCELLS_X; i++) {
       for (int j = 0; j < NUMCELLS_Y; j++) {
@@ -312,6 +319,9 @@ void Mitosis::dataFromJson(json_t *rootJ) {
         }
         if (json_is_true(json_array_get(grid3J, NUMCELLS_Y * i + j))) {
           saves[2].push_back(GameOfLifeGrid::getCell(i, j));
+        }
+        if (json_is_true(json_array_get(gridLLJ, NUMCELLS_Y * i + j))) {
+          lastLoadedData.push_back(GameOfLifeGrid::getCell(i, j));
         }
       }
     }
