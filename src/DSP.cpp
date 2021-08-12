@@ -35,9 +35,11 @@ void DSP::paramValues(std::vector<std::pair<int, int> *> state, float rowVoct,
   int colOffset = floor(colVoct * 12.f);
   if (colOffset != offsetX) {
     offsetX = colOffset;
+    outputChanged = true;
   }
   if (rowOffset != offsetY) {
     offsetY = rowOffset;
+    outputChanged = true;
   }
   if (knownState != state || audibilityChanged) {
     knownState = state;
@@ -62,41 +64,45 @@ Outputs DSP::getOutputs() {
   Outputs out;
   std::set<int>::iterator it;
   std::set<int>::iterator startX = usableX.lower_bound(offsetX);
-  if (startX == usableX.end()) {
-    startX == usableX.begin();
+  if (usableX.begin() != usableX.end()) {
+    if (startX == usableX.end()) {
+      startX == usableX.begin();
+    }
+    it = startX;
+    int xCounter = 0;
+    do {
+      out.xOutputs[xCounter] = xFrequencies[*it];
+      out.xPresents[xCounter] = 10.0f;
+      xCounter++;
+      if (xCounter == 10) {
+        break;
+      }
+      it++;
+      if (it == usableX.end()) {
+        it = usableX.begin();
+      }
+    } while (it != startX);
   }
-  it = startX;
-  int xCounter = 0;
-  do {
-    out.xOutputs[xCounter] = xFrequencies[*it];
-    out.xPresents[xCounter] = 10.0f;
-    xCounter++;
-    if (xCounter == 10) {
-      break;
+  if (usableY.begin() != usableY.end()) {
+    std::set<int>::iterator startY = usableY.lower_bound(offsetY);
+    if (startY == usableY.end()) {
+      startY == usableY.begin();
     }
-    it++;
-    if (it == usableX.end()) {
-      it = usableX.begin();
-    }
-  } while (it != startX);
-  std::set<int>::iterator startY = usableY.lower_bound(offsetX);
-  if (startY == usableY.end()) {
-    startY == usableY.begin();
+    it = startY;
+    int yCounter = 0;
+    do {
+      out.yOutputs[yCounter] = yFrequencies[*it];
+      out.yPresents[yCounter] = 10.0f;
+      yCounter++;
+      if (yCounter == 10) {
+        break;
+      }
+      it++;
+      if (it == usableY.end()) {
+        it = usableY.begin();
+      }
+    } while (it != startY);
   }
-  it = startY;
-  int yCounter = 0;
-  do {
-    out.yOutputs[yCounter] = yFrequencies[*it];
-    out.yPresents[yCounter] = 10.0f;
-    yCounter++;
-    if (yCounter == 10) {
-      break;
-    }
-    it++;
-    if (it == usableY.end()) {
-      it = usableY.begin();
-    }
-  } while (it != startY);
   return out;
 }
 
