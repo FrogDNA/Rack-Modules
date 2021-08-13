@@ -2,9 +2,14 @@
 
 void InterfaceButton::draw(const DrawArgs &args) {
   if (pressed) {
-    nvgFillColor(args.vg, COLOR_YELLOW_BUTTON_T);
+    nvgFillColor(args.vg, color);
     nvgBeginPath(args.vg);
-    nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+    if (circular) {
+      nvgCircle(args.vg, this->box.size.x / 2, this->box.size.y / 2,
+                this->box.size.x / 2);
+    } else {
+      nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+    }
     nvgFill(args.vg);
   }
 }

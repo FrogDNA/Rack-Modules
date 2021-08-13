@@ -4,6 +4,8 @@
 #include "plugin.hpp"
 
 struct InterfaceButton : Widget {
+  bool circular = false;
+  NVGcolor color = COLOR_YELLOW_BUTTON_T;
   bool pressed = false;
   void draw(const DrawArgs &args) override;
   void onButton(const event::Button &e) override;

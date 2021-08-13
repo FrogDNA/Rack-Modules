@@ -2,7 +2,14 @@
 
 #include "DSP.hpp"
 #include "GameOfLifeGrid.hpp"
+#include "InterfaceButton.hpp"
 #include "plugin.hpp"
+
+struct SeedButton : InterfaceButton {
+  dsp::RingBuffer<int, 1> *rb;
+  void buttonReleased() override;
+  void whileHovering() override {}
+};
 
 struct Mitosis : Module {
   DSP *dsp = NULL;
@@ -11,14 +18,16 @@ struct Mitosis : Module {
   GameOfLifeGrid *golGrid = NULL;
   bool clockUp = false;
   float vOctOut = 0.f;
-  // 0 is default, 1-3 are loads/saves 1-3, 4 is random seed
+  // 0 is default, 1-3 are loads/saves 1-2, 3 is random seed
   // lastLoaded variables are modified when load OR save.
   int lastLoaded = 0;
   std::vector<std::pair<int, int> *> lastLoadedData;
   bool loadHigh = false;
   bool saveHigh = false;
   std::vector<std::vector<std::pair<int, int> *>> saves;
-
+  // button to reinit by seeding
+  dsp::RingBuffer<int, 1> seedInitBuffer;
+  // clicked cells to set alive or dead
   dsp::RingBuffer<std::pair<int, int> *, 1> clickedCells;
   // loopParam
   dsp::RingBuffer<bool, 1> loopParam;
@@ -29,19 +38,17 @@ struct Mitosis : Module {
   dsp::RingBuffer<int, 64> unmuteRowsBuffer;
   dsp::RingBuffer<int, 64> muteColsBuffer;
   dsp::RingBuffer<int, 64> unmuteColsBuffer;
-  enum ParamIds { NUM_PARAMS };
+  enum ParamIds { DEAD_PARAM, NUM_PARAMS };
   enum InputIds {
     CLOCK_INPUT,
     RESET_INPUT,
     ROW_VOCT_INPUT,
     COL_VOCT_INPUT,
-    INIT_RND_INPUT,
-    SAVE_3_INPUT,
     SAVE_1_INPUT,
     LOAD_1_INPUT,
+    SEED_INPUT,
     SAVE_2_INPUT,
     LOAD_2_INPUT,
-    LOAD_3_INPUT,
     NUM_INPUTS
   };
   enum OutputIds {
@@ -99,6 +106,10 @@ struct Mitosis : Module {
     COL_5_LIGHT,
     COL_7_LIGHT,
     COL_9_LIGHT,
+    DEAD_5_LIGHT,
+    DEAD_6_LIGHT,
+    DEAD_4_LIGHT,
+    DEAD_7_LIGHT,
     ROW_2_LIGHT,
     ROW_4_LIGHT,
     ROW_6_LIGHT,
@@ -109,9 +120,14 @@ struct Mitosis : Module {
     COL_6_LIGHT,
     COL_8_LIGHT,
     COL_10_LIGHT,
-    INIT_RND_LIGHT,
+    DEAD_3_LIGHT,
+    DEAD_8_LIGHT,
+    DEAD_2_LIGHT,
+    DEAD_9_LIGHT,
+    DEAD_1_LIGHT,
+    DEAD_10_LIGHT,
     LS_1_LIGHT,
-    LS_3_LIGHT,
+    SEED_LIGHT,
     LS_2_LIGHT,
     NUM_LIGHTS
   };

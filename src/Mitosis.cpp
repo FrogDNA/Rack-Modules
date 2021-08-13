@@ -10,6 +10,8 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+  configParam(DEAD_PARAM, 1.f, 10.f, 1.f,
+              "Number of cycles taken into account for DEAD output");
   golGrid = new GameOfLifeGrid();
   for (int i = 0; i < 3; i++) {
     saves.push_back(std::vector<std::pair<int, int> *>());
@@ -21,41 +23,37 @@ Mitosis::Mitosis() {
 }
 
 void Mitosis::process(const ProcessArgs &args) {
+  float deadValue = params[DEAD_PARAM].getValue();
   float clock = inputs[CLOCK_INPUT].getVoltage();
   float rowVoct = inputs[ROW_VOCT_INPUT].getVoltage();
   float colVoct = inputs[COL_VOCT_INPUT].getVoltage();
   float load1 = inputs[LOAD_1_INPUT].getVoltage();
   float load2 = inputs[LOAD_2_INPUT].getVoltage();
-  float load3 = inputs[LOAD_3_INPUT].getVoltage();
   float save1 = inputs[SAVE_1_INPUT].getVoltage();
   float save2 = inputs[SAVE_2_INPUT].getVoltage();
-  float save3 = inputs[SAVE_3_INPUT].getVoltage();
   float reset = inputs[RESET_INPUT].getVoltage();
-  float loadRnd = inputs[INIT_RND_INPUT].getVoltage();
+  float loadSeed = inputs[SEED_INPUT].getVoltage();
   // init
   // save and load can only be triggered if all of them are low beforehand.
-  if (save1 < 1.5f && save2 < 1.5f && save3 < 1.5f) {
+  if (save1 < 1.5f && save2 < 1.5f) {
     saveHigh = false;
   }
-  if (load1 < 1.5f && load2 < 1.5f && load3 < 1.5f && loadRnd < 1.5f &&
-      reset < 1.5f) {
+  if (load1 < 1.5f && load2 < 1.5f && loadSeed < 1.5f && reset < 1.5f) {
     loadHigh = false;
   }
   // save
-  if (!saveHigh && (save1 > 3.5f || save2 > 3.5f || save3 > 3.5f)) {
+  if (!saveHigh && (save1 > 3.5f || save2 > 3.5f)) {
     saveHigh = true;
     if (save1 > 3.5f) {
       lastLoaded = 1;
     } else if (save2 > 3.5f) {
       lastLoaded = 2;
-    } else if (save3 > 3.5f) {
-      lastLoaded = 3;
     }
     lastLoadedData = golGrid->getCurrentlyAlive();
     saves[lastLoaded - 1] = lastLoadedData;
   }
-  if (!loadHigh && (load1 > 3.5f || load2 > 3.5f || load3 > 3.5f ||
-                    loadRnd > 3.5f || reset > 3.5f)) {
+  if (!loadHigh &&
+      (load1 > 3.5f || load2 > 3.5f || loadSeed > 3.5f || reset > 3.5f)) {
     loadHigh = true;
     std::vector<std::pair<int, int> *> cells;
     if (load1 > 3.5f) {
@@ -64,11 +62,8 @@ void Mitosis::process(const ProcessArgs &args) {
     } else if (load2 > 3.5f) {
       lastLoaded = 2;
       cells = saves[1];
-    } else if (load3 > 3.5f) {
+    } else if (loadSeed > 3.5f) {
       lastLoaded = 3;
-      cells = saves[2];
-    } else if (loadRnd > 3.5f) {
-      lastLoaded = 4;
       cells = GameOfLifeGrid::createRandomGrid();
     } else if (reset > 3.5f) {
       // reset
@@ -110,8 +105,18 @@ void Mitosis::process(const ProcessArgs &args) {
   // load/save lights
   lights[LS_1_LIGHT].setBrightness(lastLoaded == 1 ? 1.f : 0.f);
   lights[LS_2_LIGHT].setBrightness(lastLoaded == 2 ? 1.f : 0.f);
-  lights[LS_3_LIGHT].setBrightness(lastLoaded == 3 ? 1.f : 0.f);
-  lights[INIT_RND_LIGHT].setBrightness(lastLoaded == 4 ? 1.f : 0.f);
+  lights[SEED_LIGHT].setBrightness(lastLoaded == 3 ? 1.f : 0.f);
+  lights[DEAD_1_LIGHT].setBrightness(isNear(deadValue, 1.0f) ? 1.f : 0.f);
+  lights[DEAD_2_LIGHT].setBrightness(isNear(deadValue, 2.0f) ? 1.f : 0.f);
+  lights[DEAD_3_LIGHT].setBrightness(isNear(deadValue, 3.0f) ? 1.f : 0.f);
+  lights[DEAD_4_LIGHT].setBrightness(isNear(deadValue, 4.0f) ? 1.f : 0.f);
+  lights[DEAD_5_LIGHT].setBrightness(isNear(deadValue, 5.0f) ? 1.f : 0.f);
+  lights[DEAD_6_LIGHT].setBrightness(isNear(deadValue, 6.0f) ? 1.f : 0.f);
+  lights[DEAD_7_LIGHT].setBrightness(isNear(deadValue, 7.0f) ? 1.f : 0.f);
+  lights[DEAD_8_LIGHT].setBrightness(isNear(deadValue, 8.0f) ? 1.f : 0.f);
+  lights[DEAD_9_LIGHT].setBrightness(isNear(deadValue, 9.0f) ? 1.f : 0.f);
+  lights[DEAD_10_LIGHT].setBrightness(isNear(deadValue, 10.0f) ? 1.f : 0.f);
+
   // outputs rows
   outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);
   outputs[ROW_2_OUTPUT].setVoltage(out.yOutputs[1]);
@@ -220,27 +225,12 @@ void Mitosis::processBuffers() {
     dsp->muteUnmuteRow(row, !dsp->isRowAudible(row));
     audibilityChanged = true;
   }
-}
-
-std::vector<std::vector<bool>> ca2grid(std::vector<std::pair<int, int> *> ca) {
-  std::vector<std::vector<bool>> grid;
-  grid.reserve(NUMCELLS_X);
-  for (int i = 0; i < NUMCELLS_X; i++) {
-    std::vector<bool> v;
-    v.reserve(NUMCELLS_Y);
-    for (int j = 0; j < NUMCELLS_Y; j++) {
-      v.push_back(false);
-    }
-    grid.push_back(v);
+  while (!seedInitBuffer.empty()) {
+    seedInitBuffer.shift();
+    std::vector<std::pair<int, int> *> cells =
+        GameOfLifeGrid::createRandomGrid();
+    golGrid->init(cells);
   }
-  for (std::vector<std::pair<int, int> *>::iterator it = ca.begin();
-       it != ca.end(); ++it) {
-    std::pair<int, int> *c = *it;
-    int x = c->first;
-    int y = c->second;
-    grid[x][y] = true;
-  }
-  return grid;
 }
 
 json_t *Mitosis::dataToJson() {
@@ -249,17 +239,12 @@ json_t *Mitosis::dataToJson() {
   json_t *gridJ = json_array();
   json_t *grid1J = json_array();
   json_t *grid2J = json_array();
-  json_t *grid3J = json_array();
   json_t *gridLLJ = json_array();
   json_t *colAudibleJ = json_array();
   json_t *rowAudibleJ = json_array();
   json_t *miscValuesJ = json_array();
   // json_t *gridParams = json_array();
   // json_array_append_new(gridParams, json_boolean(loop));
-
-  //
-
-  std::vector<std::vector<bool>> gridLL = ca2grid(lastLoadedData);
   std::vector<std::pair<int, int> *> ca = golGrid->getCurrentlyAlive();
   for (std::vector<std::pair<int, int> *>::iterator it = ca.begin();
        it != ca.end(); ++it) {
@@ -281,13 +266,6 @@ json_t *Mitosis::dataToJson() {
     json_array_append_new(grid2J, json_integer(c->first));
     json_array_append_new(grid2J, json_integer(c->second));
   }
-  ca = saves[2];
-  for (std::vector<std::pair<int, int> *>::iterator it = ca.begin();
-       it != ca.end(); ++it) {
-    std::pair<int, int> *c = *it;
-    json_array_append_new(grid3J, json_integer(c->first));
-    json_array_append_new(grid3J, json_integer(c->second));
-  }
   ca = lastLoadedData;
   for (std::vector<std::pair<int, int> *>::iterator it = ca.begin();
        it != ca.end(); ++it) {
@@ -306,7 +284,6 @@ json_t *Mitosis::dataToJson() {
   json_object_set_new(rootJ, "golGrid", gridJ);
   json_object_set_new(rootJ, "save1", grid1J);
   json_object_set_new(rootJ, "save2", grid2J);
-  json_object_set_new(rootJ, "save3", grid3J);
   json_object_set_new(rootJ, "last loaded", gridLLJ);
   json_object_set_new(rootJ, "rowAudible", rowAudibleJ);
   json_object_set_new(rootJ, "colAudible", colAudibleJ);
@@ -319,7 +296,6 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   json_t *gridJ = json_object_get(rootJ, "golGrid");
   json_t *grid1J = json_object_get(rootJ, "save1");
   json_t *grid2J = json_object_get(rootJ, "save2");
-  json_t *grid3J = json_object_get(rootJ, "save3");
   json_t *gridLLJ = json_object_get(rootJ, "last loaded");
   json_t *rowAudibleJ = json_object_get(rootJ, "rowAudible");
   json_t *colAudibleJ = json_object_get(rootJ, "colAudible");
@@ -327,12 +303,10 @@ void Mitosis::dataFromJson(json_t *rootJ) {
   golGrid->setLoop(json_is_true(json_array_get(switchesJ, 0)));
   lastLoaded = json_integer_value(json_array_get(switchesJ, 1));
   saves.clear();
-  for (int i = 0; i < 3; i++) {
-    saves.push_back(std::vector<std::pair<int, int> *>());
-  }
+  saves.push_back(std::vector<std::pair<int, int> *>());
+  saves.push_back(std::vector<std::pair<int, int> *>());
   lastLoadedData.clear();
-  if (gridJ && rowAudibleJ && colAudibleJ && grid1J && grid2J && grid3J &&
-      gridLLJ) {
+  if (gridJ && rowAudibleJ && colAudibleJ && grid1J && grid2J && gridLLJ) {
     int x;
     int y;
     for (unsigned int i = 0; i < json_array_size(gridJ) / 2; i++) {
@@ -349,11 +323,6 @@ void Mitosis::dataFromJson(json_t *rootJ) {
       x = json_integer_value(json_array_get(grid2J, i * 2));
       y = json_integer_value(json_array_get(grid2J, i * 2 + 1));
       saves[1].push_back(GameOfLifeGrid::getCell(x, y));
-    }
-    for (unsigned int i = 0; i < json_array_size(grid3J) / 2; i++) {
-      x = json_integer_value(json_array_get(grid3J, i * 2));
-      y = json_integer_value(json_array_get(grid3J, i * 2 + 1));
-      saves[2].push_back(GameOfLifeGrid::getCell(x, y));
     }
     for (unsigned int i = 0; i < json_array_size(gridLLJ) / 2; i++) {
       x = json_integer_value(json_array_get(gridLLJ, i * 2));
@@ -385,6 +354,12 @@ struct MitosisWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
+    auto knob = createParamCentered<RoundSmallBlackKnob>(
+        mm2px(Vec(28.6, 23.332)), module, Mitosis::DEAD_PARAM);
+    knob->snap = true;
+    knob->snapValue = 0.1f;
+    addParam(knob);
+
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(59.591, 9.0)), module,
                                              Mitosis::CLOCK_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.602, 9.0)), module,
@@ -393,20 +368,16 @@ struct MitosisWidget : ModuleWidget {
                                              Mitosis::ROW_VOCT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(195.326, 9.0)), module,
                                              Mitosis::COL_VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.585, 21.5)), module,
-                                             Mitosis::INIT_RND_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.6, 97.5)), module,
-                                             Mitosis::SAVE_3_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 98.0)), module,
                                              Mitosis::SAVE_1_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 98.0)), module,
                                              Mitosis::LOAD_1_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.6, 99.75)), module,
+                                             Mitosis::SEED_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 114.0)), module,
                                              Mitosis::SAVE_2_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 114.0)), module,
                                              Mitosis::LOAD_2_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33.6, 118.5)), module,
-                                             Mitosis::LOAD_3_INPUT));
 
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(119.865, 9.0)), module,
                                                Mitosis::DEAD_OUTPUT));
@@ -531,14 +502,34 @@ struct MitosisWidget : ModuleWidget {
         mm2px(Vec(194.1, 21.0)), module, Mitosis::COL_8_LIGHT));
     addChild(createLightCentered<MediumLight<GreenLight>>(
         mm2px(Vec(198.1, 21.0)), module, Mitosis::COL_10_LIGHT));
-    addChild(createLightCentered<SmallLight<GreenLight>>(
-        mm2px(Vec(33.585, 31.5)), module, Mitosis::INIT_RND_LIGHT));
+
     addChild(createLightCentered<SmallLight<GreenLight>>(
         mm2px(Vec(15.1, 100.0)), module, Mitosis::LS_1_LIGHT));
     addChild(createLightCentered<SmallLight<GreenLight>>(
-        mm2px(Vec(33.6, 108.0)), module, Mitosis::LS_3_LIGHT));
-    addChild(createLightCentered<SmallLight<GreenLight>>(
         mm2px(Vec(15.1, 116.0)), module, Mitosis::LS_2_LIGHT));
+    addChild(createLightCentered<SmallLight<GreenLight>>(
+        mm2px(Vec(33.6, 108.0)), module, Mitosis::SEED_LIGHT));
+
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(23.637, 22.722)), module, Mitosis::DEAD_3_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(33.563, 22.722)), module, Mitosis::DEAD_8_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(24.114, 25.539)), module, Mitosis::DEAD_2_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(33.086, 25.54)), module, Mitosis::DEAD_9_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(26.055, 27.636)), module, Mitosis::DEAD_1_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(31.145, 27.636)), module, Mitosis::DEAD_10_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(27.172, 18.54)), module, Mitosis::DEAD_5_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(30.028, 18.54)), module, Mitosis::DEAD_6_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(24.781, 20.105)), module, Mitosis::DEAD_4_LIGHT));
+    addChild(createLightCentered<SmallLight<RedLight>>(
+        mm2px(Vec(32.419, 20.105)), module, Mitosis::DEAD_7_LIGHT));
 
     // mute rows
     std::vector<float> xs;
@@ -597,7 +588,21 @@ struct MitosisWidget : ModuleWidget {
     lpWidget->box.pos = mm2px(Vec(146.428, 7.1));
     lpWidget->box.size = mm2px(Vec(7.8, 3.8));
     addChild(lpWidget);
+
+    SeedButton *seedButton = new SeedButton();
+    seedButton->box.pos = mm2px(Vec(30.6, 113.25));
+    seedButton->box.size = mm2px(Vec(6, 6));
+    seedButton->circular = true;
+    seedButton->color = COLOR_GREEN_BUTTON_O;
+    seedButton->rb = &(module->seedInitBuffer);
+    addChild(seedButton);
   }
 };
+
+void SeedButton::buttonReleased() {
+  if (!rb->full()) {
+    rb->push(1);
+  }
+}
 
 Model *modelMitosis = createModel<Mitosis, MitosisWidget>("Mitosis");

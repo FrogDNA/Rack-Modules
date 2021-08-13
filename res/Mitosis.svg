@@ -40,11 +40,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.1529515"
-     inkscape:cx="81.510927"
-     inkscape:cy="127.65816"
+     inkscape:zoom="2.2294734"
+     inkscape:cx="161.02457"
+     inkscape:cy="314.64829"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer3"
      showgrid="false"
      units="mm"
      inkscape:snap-bbox="true"
@@ -434,6 +434,13 @@
        height="4"
        x="146.328"
        y="7" />
+    <circle
+       r="4"
+       cy="116.25"
+       cx="33.600002"
+       id="circle4956-9-36-5-9-9-7-1-6-2"
+       style="display:inline;vector-effect:none;fill:#2d3855;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+       inkscape:label="seed_button" />
   </g>
   <g
      inkscape:label="Texts"
@@ -1069,7 +1076,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="components"
-     style="display:inline">
+     style="display:none">
     <rect
        id="rect4181"
        width="116"
@@ -1628,13 +1635,6 @@
        id="circle4956-9-36-5-9-9-7-1-6"
        style="display:inline;vector-effect:none;fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        inkscape:label="seed" />
-    <circle
-       r="4"
-       cy="116.25"
-       cx="33.600002"
-       id="circle4956-9-36-5-9-9-7-1-6-2"
-       style="display:inline;vector-effect:none;fill:#feff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
-       inkscape:label="seed_button" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
