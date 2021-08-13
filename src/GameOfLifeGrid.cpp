@@ -33,6 +33,7 @@ GameOfLifeGrid::GameOfLifeGrid() {
     neighbours.push_back(n);
     aliveMap.push_back(a);
   }
+  oldAlive.push_back(std::unordered_set<std::pair<int, int> *>());
 }
 
 std::vector<std::pair<int, int> *> GameOfLifeGrid::getDefaultInit() {
@@ -140,7 +141,8 @@ void GameOfLifeGrid::update() {
   std::unordered_set<std::pair<int, int> *> wl = watchList;
   std::unordered_set<std::pair<int, int> *> ca = currentlyAlive;
   std::vector<std::vector<int>> neigh = neighbours;
-  oldAlive = currentlyAlive;
+  oldAlive[oldCounter] = currentlyAlive;
+  oldCounter = (oldCounter + 1) % oldAliveLength;
   watchList.clear();
   for (std::unordered_set<std::pair<int, int> *>::iterator it = wl.begin();
        it != wl.end(); ++it) {
@@ -229,7 +231,24 @@ bool GameOfLifeGrid::isHasCAChanged() { return hasCAChanged; }
 
 bool GameOfLifeGrid::isEmpty() { return currentlyAlive.empty(); }
 
-bool GameOfLifeGrid::isStillEvolving() { return !(currentlyAlive == oldAlive); }
+void GameOfLifeGrid::setStillEvolvingLength(int value) {
+  if (value != oldAliveLength) {
+    oldAlive.clear();
+    for (int i = 0; i < value; i++) {
+      oldAlive.push_back(std::unordered_set<std::pair<int, int> *>());
+    }
+    oldAliveLength = value;
+  }
+}
+
+bool GameOfLifeGrid::isStillEvolving() {
+  for (int i = 0; i < oldAliveLength; i++) {
+    if (currentlyAlive == oldAlive[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 bool GameOfLifeGrid::isAlive(int x, int y) { return aliveMap[x][y] == 1; }
 bool GameOfLifeGrid::isAlive(std::pair<int, int> *cell) {

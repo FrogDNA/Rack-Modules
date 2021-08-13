@@ -72,6 +72,15 @@ void Mitosis::process(const ProcessArgs &args) {
     lastLoadedData = cells;
     golGrid->init(cells);
   }
+  // dead param
+  int deadValueInt = 0;
+  for (int i = 1; i < 11; i++) {
+    if (isNear(deadValue, 1.0f * i)) {
+      deadValueInt = i;
+      break;
+    }
+  }
+  golGrid->setStillEvolvingLength(deadValueInt);
   // clock
   bool risingEdge = false;
   if (clock > 3.5f) {
@@ -106,16 +115,16 @@ void Mitosis::process(const ProcessArgs &args) {
   lights[LS_1_LIGHT].setBrightness(lastLoaded == 1 ? 1.f : 0.f);
   lights[LS_2_LIGHT].setBrightness(lastLoaded == 2 ? 1.f : 0.f);
   lights[SEED_LIGHT].setBrightness(lastLoaded == 3 ? 1.f : 0.f);
-  lights[DEAD_1_LIGHT].setBrightness(isNear(deadValue, 1.0f) ? 1.f : 0.f);
-  lights[DEAD_2_LIGHT].setBrightness(isNear(deadValue, 2.0f) ? 1.f : 0.f);
-  lights[DEAD_3_LIGHT].setBrightness(isNear(deadValue, 3.0f) ? 1.f : 0.f);
-  lights[DEAD_4_LIGHT].setBrightness(isNear(deadValue, 4.0f) ? 1.f : 0.f);
-  lights[DEAD_5_LIGHT].setBrightness(isNear(deadValue, 5.0f) ? 1.f : 0.f);
-  lights[DEAD_6_LIGHT].setBrightness(isNear(deadValue, 6.0f) ? 1.f : 0.f);
-  lights[DEAD_7_LIGHT].setBrightness(isNear(deadValue, 7.0f) ? 1.f : 0.f);
-  lights[DEAD_8_LIGHT].setBrightness(isNear(deadValue, 8.0f) ? 1.f : 0.f);
-  lights[DEAD_9_LIGHT].setBrightness(isNear(deadValue, 9.0f) ? 1.f : 0.f);
-  lights[DEAD_10_LIGHT].setBrightness(isNear(deadValue, 10.0f) ? 1.f : 0.f);
+  lights[DEAD_1_LIGHT].setBrightness(deadValueInt == 1 ? 1.f : 0.f);
+  lights[DEAD_2_LIGHT].setBrightness(deadValueInt == 2 ? 1.f : 0.f);
+  lights[DEAD_3_LIGHT].setBrightness(deadValueInt == 3 ? 1.f : 0.f);
+  lights[DEAD_4_LIGHT].setBrightness(deadValueInt == 4 ? 1.f : 0.f);
+  lights[DEAD_5_LIGHT].setBrightness(deadValueInt == 5 ? 1.f : 0.f);
+  lights[DEAD_6_LIGHT].setBrightness(deadValueInt == 6 ? 1.f : 0.f);
+  lights[DEAD_7_LIGHT].setBrightness(deadValueInt == 7 ? 1.f : 0.f);
+  lights[DEAD_8_LIGHT].setBrightness(deadValueInt == 8 ? 1.f : 0.f);
+  lights[DEAD_9_LIGHT].setBrightness(deadValueInt == 9 ? 1.f : 0.f);
+  lights[DEAD_10_LIGHT].setBrightness(deadValueInt == 10 ? 1.f : 0.f);
 
   // outputs rows
   outputs[ROW_1_OUTPUT].setVoltage(out.yOutputs[0]);

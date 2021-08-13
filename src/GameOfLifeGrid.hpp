@@ -14,7 +14,9 @@ class GameOfLifeGrid {
   int numCellsY = NUMCELLS_Y;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
-  std::unordered_set<std::pair<int, int> *> oldAlive;
+  int oldAliveLength = 1;
+  int oldCounter = 0;
+  std::vector<std::unordered_set<std::pair<int, int> *>> oldAlive;
   std::unordered_set<std::pair<int, int> *> watchList;
   std::unordered_set<std::pair<int, int> *> currentlyAlive;
   void updateNeighboursAndWatchlist(int x, int y, int val);
@@ -40,6 +42,7 @@ public:
   bool isAlive(int x, int y);
   bool isAlive(std::pair<int, int> *);
   bool isEmpty();
+  void setStillEvolvingLength(int value);
   bool isStillEvolving(); // return false if old is same as current
 };
 
