@@ -373,9 +373,9 @@ struct MitosisWidget : ModuleWidget {
                                              Mitosis::CLOCK_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.602, 9.0)), module,
                                              Mitosis::RESET_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(174.326, 9.0)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(171.903, 9.0)), module,
                                              Mitosis::ROW_VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(195.326, 9.0)), module,
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(192.903, 9.0)), module,
                                              Mitosis::COL_VOCT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 98.0)), module,
                                              Mitosis::SAVE_1_INPUT));
