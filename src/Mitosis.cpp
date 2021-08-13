@@ -10,7 +10,7 @@
 
 Mitosis::Mitosis() {
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-  configParam(DEAD_PARAM, 1.f, 10.f, 1.f,
+  configParam(DEAD_PARAM, 1.f, 10.f, 4.f,
               "Number of cycles taken into account for DEAD output");
   golGrid = new GameOfLifeGrid();
   for (int i = 0; i < 3; i++) {
