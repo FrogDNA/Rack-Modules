@@ -6,7 +6,9 @@ Chaotic sequencer based on James Conway's Game of Life
 
 ## Introduction, or "What this module does"
 
-...
+This module is a sequencer. Its main outputs, on the big right panel, deliver 1V/Oct outputs from -4V to +5V. The reference point is assumed to be 0V = C4, but you are obviously free to use any other reference. Those outputs are determined by the state of the grid. Rows and columns are processed independantly from one another. Pink-background panels and buttons modify row outputs, and olive-background panel and buttons modify column outputs.
+
+The grid is comprised of 108 rows and 108 columns. Each row and column corresponds to 1 semitone. The outputs are assigned in ascending order, each row containing at least 1 living cell will generate an output corresponding to its number. For instance, if row 0 contains at least 1 living cell, first output will hold the value -4V. If row 1-10 contain no living cell, and row 11 contains at least one, output 2 will hold the value -3V.
 
 ## The grid
 
