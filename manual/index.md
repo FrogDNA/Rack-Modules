@@ -17,9 +17,9 @@ The grid is comprised of 108 rows and 108 columns. Each row and column correspon
 This is the grid. Each darker cell is dead, and each lighter cell is alive. You can find more info about the game of life [there](https://www.conwaylife.com/wiki/Conway%27s_Game_of_Life).
 Click on a dead cell to make it alive, click on a living cell to kill it.
 
-You can click the row and column headers to "mute" a whole row or column. Muting individual cells is not possible, and it would not have much sense given how this module outputs (more info on that [here](later). When muting a line, you will notice the header becoming darker, and the line will have a distinctive color.
+You can click the row and column headers to "mute" a whole row or column. Muting individual cells is not possible, and it would not have much sense given how this module outputs. When muting a line, you will notice the header becoming darker, and the line will have a distinctive color.
 
-When a line is muted, you will also notice a change in the scale box.
+When a line is muted, you will also notice a change in the scale box. Note that muting a line does not affect the game of life evolution. Muted living cells continue to behave like other living cells to this respect, and the same is true for muted dead cells.
 
 ## The scale box
 
@@ -27,5 +27,15 @@ When a line is muted, you will also notice a change in the scale box.
 
 This box lets you mute all rows or columns producing a certain tone. When all such lines are muted, the button turns green. When only some of them are muted, the button is yellow.
 
+## The output area
 
+![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/output_area.png "The output area")
+
+The pink panel corresponds to row outputs. The olive panel to column outputs. They work the same way. In each panel, there are 10 rows of outputs. Each row has 2 ports. The leftmost port holds the 1V/Oct output. The rightmost port holds 10 V if the port is holding an actual output, 0V if not. This is especially important in a very sparse grid or if many cells are muted. In that case, it could be that less than 10 lines are holding at least 1 living cell. In that case, less than 10 outputs will be holding a 1V/oct.
+
+The lights panel on top indicate how many outputs actually hold a meaningful voltage. If 3 lights are on, it means for instance that the 3 top outputs hold a meaningful voltage, which is 1V/Oct on the left port and 10V on the right port. The other outputs will have 0V on the left port and 0V on the right port.
+
+## The top bar
+
+![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/top_bar.png "The top bar")
 
