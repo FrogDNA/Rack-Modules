@@ -62,7 +62,7 @@ Trigger this to reset the grid to the last loaded or saved state.
 ### Dead output
 
 This output will hold 10V if the grid has reached an already reached state, within the step limit defined by the Dead parameter.
-!#alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/dead_parameter.png "The dead parameter")
+!#alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/dead_panel.png "The dead parameter panel")
 
 ### Loop switch
 
