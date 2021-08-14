@@ -21,6 +21,18 @@ You can click the row and column headers to "mute" a whole row or column. Muting
 
 When a line is muted, you will also notice a change in the scale box. Note that muting a line does not affect the game of life evolution. Muted living cells continue to behave like other living cells to this respect, and the same is true for muted dead cells.
 
+## The seed
+
+![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/seed.png "The seed")
+
+Push the button or trigger the input to load the grid with a random pattern. The light turns on to indicate that this is the last loaded state.
+
+## The saves
+
+![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/save_space.png "The save/load space")
+
+Trigger the input with the save icon to save the current grid state, or trigger the other input to load previously saved state. The light turns on to indicate the last save/load space used.
+
 ## The scale box
 
 ![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/scale_box.png "The scale box")
@@ -38,4 +50,25 @@ The lights panel on top indicate how many outputs actually hold a meaningful vol
 ## The top bar
 
 ![alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/top_bar.png "The top bar")
+
+### Clock input
+
+Trigger this to update the grid according to the game of life rules
+
+### Reset input
+
+Trigger this to reset the grid to the last loaded or saved state.
+
+### Dead output
+
+This output will hold 10V if the grid has reached an already reached state, within the step limit defined by the Dead parameter.
+!#alt_text](https://github.com/FrogDNA/Rack-Modules/blob/main/manual/dead_parameter.png "The dead parameter")
+
+### Loop switch
+
+If off (default), the grid is limited by its edges. If on, left and right edges communicate, the same for top and bottom edges.
+
+### CV inputs
+
+These outputs offset the first line/column to be taken into account for the vOct output. For instance, if sending 1V in the CV input for rows, the first row to be checked for a living cell will be row 12.
 
