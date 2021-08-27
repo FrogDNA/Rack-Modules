@@ -28,24 +28,11 @@ DSP::DSP() {
     yFrequencies[i] = (i - REFERENCE_POS) / 12.0f;
   }
 }
-void DSP::update(float rowVoct, float colVoct) {
-  int rowOffset = floor(rowVoct * 12.f);
-  int colOffset = floor(colVoct * 12.f);
-  if (colOffset != offsetX) {
-    offsetX = colOffset;
-    outputChanged = true;
-  }
-  if (rowOffset != offsetY) {
-    offsetY = rowOffset;
-    outputChanged = true;
-  }
-}
 
-void DSP::update(std::vector<std::pair<int, int> *> state, float rowVoct,
-                 float colVoct) {
-  update(rowVoct, colVoct);
+void DSP::update(std::vector<std::pair<int, int> *> state) {
   usableX.clear();
   usableY.clear();
+  int counter = 0;
   for (std::vector<std::pair<int, int> *>::iterator it = state.begin();
        it != state.end(); ++it) {
     std::pair<int, int> *c = *it;
@@ -54,6 +41,10 @@ void DSP::update(std::vector<std::pair<int, int> *> state, float rowVoct,
     if (isCellAudible(c)) {
       usableX.insert(x);
       usableY.insert(y);
+      counter++;
+      if (counter == 10) {
+        break;
+      }
     }
   }
   outputChanged = true;
@@ -61,46 +52,18 @@ void DSP::update(std::vector<std::pair<int, int> *> state, float rowVoct,
 
 Outputs DSP::getOutputs() {
   Outputs out;
-  std::set<int>::iterator it;
-  std::set<int>::iterator startX = usableX.lower_bound(offsetX);
-  if (usableX.begin() != usableX.end()) {
-    if (startX == usableX.end()) {
-      startX == usableX.begin();
-    }
-    it = startX;
-    int xCounter = 0;
-    do {
-      out.xOutputs[xCounter] = xFrequencies[*it];
-      out.xPresents[xCounter] = 10.0f;
-      xCounter++;
-      if (xCounter == 10) {
-        break;
-      }
-      it++;
-      if (it == usableX.end()) {
-        it = usableX.begin();
-      }
-    } while (it != startX);
+  int counter = 0;
+  for (std::set<int>::iterator it = usableX.begin(); it != usableX.end();
+       ++it) {
+    out.xOutputs[counter] = xFrequencies[*it];
+    out.xPresents[counter] = 10.0f;
+    counter++;
   }
-  if (usableY.begin() != usableY.end()) {
-    std::set<int>::iterator startY = usableY.lower_bound(offsetY);
-    if (startY == usableY.end()) {
-      startY == usableY.begin();
-    }
-    it = startY;
-    int yCounter = 0;
-    do {
-      out.yOutputs[yCounter] = yFrequencies[*it];
-      out.yPresents[yCounter] = 10.0f;
-      yCounter++;
-      if (yCounter == 10) {
-        break;
-      }
-      it++;
-      if (it == usableY.end()) {
-        it = usableY.begin();
-      }
-    } while (it != startY);
+  counter = 0;
+  for (std::set<int>::iterator it = usableY.begin(); it != usableY.end();
+       ++it) {
+    out.yOutputs[counter] = yFrequencies[*it];
+    out.yPresents[counter] = 10.0f;
   }
   return out;
 }

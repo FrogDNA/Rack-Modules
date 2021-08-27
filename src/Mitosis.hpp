@@ -38,12 +38,23 @@ struct Mitosis : Module {
   dsp::RingBuffer<int, 64> unmuteRowsBuffer;
   dsp::RingBuffer<int, 64> muteColsBuffer;
   dsp::RingBuffer<int, 64> unmuteColsBuffer;
+  // limits
+  int colSize = DEFAULT_CELLS_DISPLAYED_X;
+  int rowSize = DEFAULT_CELLS_DISPLAYED_Y;
+  int colStart = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
+  int rowStart = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
+  dsp::RingBuffer<int, 16> colStartBuffer;
+  dsp::RingBuffer<int, 16> colSizeBuffer;
+  dsp::RingBuffer<int, 16> rowStartBuffer;
+  dsp::RingBuffer<int, 16> rowSizeBuffer;
+  bool colLimitUp = false;
+  bool rowLimitUp = false;
   enum ParamIds { DEAD_PARAM, NUM_PARAMS };
   enum InputIds {
     CLOCK_INPUT,
     RESET_INPUT,
-    ROW_VOCT_INPUT,
-    COL_VOCT_INPUT,
+    ROW_LIMIT_INPUT,
+    COL_LIMIT_INPUT,
     SAVE_1_INPUT,
     LOAD_1_INPUT,
     SEED_INPUT,

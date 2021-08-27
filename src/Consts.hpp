@@ -2,6 +2,9 @@
 
 #include "plugin.hpp"
 
+// display at default zoom level
+static const int DEFAULT_CELLS_DISPLAYED_X = 40;
+static const int DEFAULT_CELLS_DISPLAYED_Y = 40;
 // depends on how many octaves you want to represent.
 // 9 is good to me, so 9 * 12
 // square grid to facilitate evolution

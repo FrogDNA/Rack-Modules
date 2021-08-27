@@ -260,3 +260,36 @@ bool GameOfLifeGrid::isInGrid(int x, int y) {
   }
   return false;
 }
+
+void GameOfLifeGrid::setColLimit(int start, int size) {
+  startX = start;
+  numCellsX = size;
+  killOutsideLimits();
+}
+
+void GameOfLifeGrid::setRowLimit(int start, int size) {
+  startY = start;
+  numCellsY = size;
+  killOutsideLimits();
+}
+
+void GameOfLifeGrid::killOutsideLimits() {
+  for (int i = 0; i < startX; i++) {
+    for (int j = 0; j < NUMCELLS_Y; j++) {
+      setCellState(i, j, false);
+    }
+  }
+  for (int i = startX + numCellsX; i < NUMCELLS_X; i++) {
+    for (int j = 0; j < NUMCELLS_Y; j++) {
+      setCellState(i, j, false);
+    }
+  }
+  for (int i = startX; i < numCellsX; i++) {
+    for (int j = 0; j < startY; j++) {
+      setCellState(i, j, false);
+    }
+    for (int j = startY + numCellsY; j < NUMCELLS_Y; j++) {
+      setCellState(i, j, false);
+    }
+  }
+}

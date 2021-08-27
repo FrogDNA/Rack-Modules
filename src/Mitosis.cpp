@@ -25,8 +25,8 @@ Mitosis::Mitosis() {
 void Mitosis::process(const ProcessArgs &args) {
   float deadValue = params[DEAD_PARAM].getValue();
   float clock = inputs[CLOCK_INPUT].getVoltage();
-  float rowVoct = inputs[ROW_VOCT_INPUT].getVoltage();
-  float colVoct = inputs[COL_VOCT_INPUT].getVoltage();
+  float rowLimit = inputs[ROW_LIMIT_INPUT].getVoltage();
+  float colLimit = inputs[COL_LIMIT_INPUT].getVoltage();
   float load1 = inputs[LOAD_1_INPUT].getVoltage();
   float load2 = inputs[LOAD_2_INPUT].getVoltage();
   float save1 = inputs[SAVE_1_INPUT].getVoltage();
@@ -81,6 +81,21 @@ void Mitosis::process(const ProcessArgs &args) {
     }
   }
   golGrid->setStillEvolvingLength(deadValueInt);
+  // col and row limits
+  if (rowLimit > 3.5f && !rowLimitUp) {
+    rowLimitUp = true;
+    golGrid->setRowLimit(rowStart, rowSize);
+  } else if (rowLimit < 1.5f && rowLimitUp) {
+    rowLimitUp = false;
+    golGrid->setRowLimit(0, NUMCELLS_Y);
+  }
+  if (colLimit > 3.5f && !colLimitUp) {
+    colLimitUp = true;
+    golGrid->setColLimit(colStart, colSize);
+  } else if (colLimit < 1.5f && colLimitUp) {
+    colLimitUp = false;
+    golGrid->setColLimit(0, NUMCELLS_X);
+  }
   // clock
   bool risingEdge = false;
   if (clock > 3.5f) {
@@ -100,10 +115,8 @@ void Mitosis::process(const ProcessArgs &args) {
   if (hasCAChanged || audibilityChanged) {
     std::vector<std::pair<int, int> *> state =
         golGrid->getCurrentlyAliveRegister();
-    dsp->update(state, rowVoct, colVoct);
+    dsp->update(state);
     audibilityChanged = false;
-  } else {
-    dsp->update(rowVoct, colVoct);
   }
   if (dsp->isOutputChanged()) {
     out = dsp->getOutputs();
@@ -240,6 +253,20 @@ void Mitosis::processBuffers() {
         GameOfLifeGrid::createRandomGrid();
     golGrid->init(cells);
   }
+  while (!colStartBuffer.empty() && !colSizeBuffer.empty()) {
+    colStart = colStartBuffer.shift();
+    colSize = colSizeBuffer.shift();
+    if (colLimitUp) {
+      golGrid->setColLimit(colStart, colSize);
+    }
+  }
+  while (!rowStartBuffer.empty() && !rowSizeBuffer.empty()) {
+    rowStart = rowStartBuffer.shift();
+    rowSize = rowSizeBuffer.shift();
+    if (rowLimitUp) {
+      golGrid->setRowLimit(rowStart, rowSize);
+    }
+  }
 }
 
 json_t *Mitosis::dataToJson() {
@@ -373,10 +400,10 @@ struct MitosisWidget : ModuleWidget {
                                              Mitosis::CLOCK_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(90.602, 9.0)), module,
                                              Mitosis::RESET_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(171.903, 9.0)), module,
-                                             Mitosis::ROW_VOCT_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(192.903, 9.0)), module,
-                                             Mitosis::COL_VOCT_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(173.116, 9.0)), module,
+                                             Mitosis::ROW_LIMIT_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(194.116, 9.0)), module,
+                                             Mitosis::COL_LIMIT_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.1, 98.0)), module,
                                              Mitosis::SAVE_1_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(21.1, 98.0)), module,

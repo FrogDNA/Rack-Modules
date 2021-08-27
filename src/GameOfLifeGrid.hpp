@@ -12,6 +12,8 @@ class GameOfLifeGrid {
   bool loop = false;
   int numCellsX = NUMCELLS_X;
   int numCellsY = NUMCELLS_Y;
+  int startX = 0;
+  int startY = 0;
   std::vector<std::vector<int>> aliveMap;
   std::vector<std::vector<int>> neighbours;
   int oldAliveLength = 1;
@@ -21,6 +23,7 @@ class GameOfLifeGrid {
   std::unordered_set<std::pair<int, int> *> currentlyAlive;
   void updateNeighboursAndWatchlist(int x, int y, int val);
   void emptyGrid();
+  void killOutsideLimits();
 
 public:
   static std::vector<std::pair<int, int> *> createRandomGrid();
@@ -44,6 +47,8 @@ public:
   bool isEmpty();
   void setStillEvolvingLength(int value);
   bool isStillEvolving(); // return false if old is same as current
+  void setColLimit(int start, int size);
+  void setRowLimit(int start, int size);
 };
 
 #endif

@@ -1,14 +1,11 @@
 #pragma once
 
+#include "Consts.hpp"
 #include "GameOfLifeGrid.hpp"
 #include "InterfaceButton.hpp"
 #include "Mitosis.hpp"
 #include "plugin.hpp"
 
-// display at default zoom level
-static const int DEFAULT_CELLS_DISPLAYED_X = 40;
-static const int DEFAULT_CELLS_DISPLAYED_Y = 40;
-static const int DEFAULT_CENTER = 54;
 // proportion of the cell size between cell
 static const float CELL_PADDING = 0.2f;
 // zoom and scroll line params in mm
@@ -65,6 +62,7 @@ struct GridDisplay : OpaqueWidget {
   void changeZoomLevel(int zoomChange);
   void scroll(int scrollQuantity, bool vertical);
   void resetView();
+  void viewUpdated();
 };
 
 struct GridScrollButton : InterfaceButton {

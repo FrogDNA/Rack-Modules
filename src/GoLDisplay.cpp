@@ -60,6 +60,7 @@ void GridDisplay::changeZoomLevel(int zoomChange) {
       std::max(MIN_CELLS_ON_SCREEN, std::min(spotsY + zoomChange, NUMCELLS_Y));
   scroll((oldSx - spotsX) / 2, false);
   scroll((oldSy - spotsY) / 2, true);
+  viewUpdated();
   clearChildren();
   firstDraw = true;
 }
@@ -72,6 +73,7 @@ void GridDisplay::scroll(int scrollQuantity, bool vertical) {
     display_x0 =
         std::max(0, std::min(display_x0 + scrollQuantity, NUMCELLS_X - spotsX));
   }
+  viewUpdated();
   clearChildren();
   firstDraw = true;
 }
@@ -81,8 +83,17 @@ void GridDisplay::resetView() {
   spotsY = DEFAULT_CELLS_DISPLAYED_Y;
   display_x0 = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
   display_y0 = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
+  viewUpdated();
   clearChildren();
   firstDraw = true;
+  // goldisplay resetView to set scrollPossible = true
+}
+
+void GridDisplay::viewUpdated() {
+  module->colStartBuffer.push(display_x0);
+  module->rowStartBuffer.push(display_y0);
+  module->colSizeBuffer.push(spotsX);
+  module->rowSizeBuffer.push(spotsY);
 }
 
 /// LINEHEADER ///
