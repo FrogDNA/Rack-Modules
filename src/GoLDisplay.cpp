@@ -302,6 +302,7 @@ void GridScrollBar::onDragHover(const event::DragHover &e) {
     e.consume(this);
     Widget::onDragHover(e);
     gd->clearChildren();
+    gd->viewUpdated();
     gd->firstDraw = true;
   }
 }
