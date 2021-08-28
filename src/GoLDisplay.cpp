@@ -65,6 +65,12 @@ void GridDisplay::changeZoomLevel(int zoomChange) {
   firstDraw = true;
 }
 
+void GridDisplay::setZoomLevel(int zoomLevelX, int zoomLevelY) {
+  int new_x0 = display_x0 + (spotsX - zoomLevelX) / 2;
+  int new_y0 = display_y0 + (spotsY - zoomLevelY) / 2;
+  setView(new_x0, new_y0, zoomLevelX, zoomLevelY);
+}
+
 void GridDisplay::scroll(int scrollQuantity, bool vertical) {
   if (vertical) {
     display_y0 =
@@ -101,6 +107,10 @@ void GridDisplay::viewUpdated() {
   module->rowSizeBuffer.push(spotsY);
 }
 
+int GridDisplay::getX0() { return display_x0; }
+int GridDisplay::getY0() { return display_y0; }
+int GridDisplay::getSpotsX() { return spotsX; }
+int GridDisplay::getSpotsY() { return spotsY; }
 /// LINEHEADER ///
 
 LineHeader::LineHeader(int coordinate, bool isLine) {
@@ -237,10 +247,10 @@ void GridScrollBar::draw(const DrawArgs &args) {
   // circle to materialize position
   if (gd) {
     float percent =
-        vertical ? (float)(gd->display_y0) / (float)(NUMCELLS_Y - gd->spotsY)
-                 : (float)(gd->display_x0) / (float)(NUMCELLS_X - gd->spotsX);
+        vertical ? (float)(gd->getY0()) / (float)(NUMCELLS_Y - gd->getSpotsY())
+                 : (float)(gd->getX0()) / (float)(NUMCELLS_X - gd->getSpotsX());
     if (vertical) {
-      if (gd->spotsY != NUMCELLS_Y) {
+      if (gd->getSpotsY() != NUMCELLS_Y) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.y - r - barSize);
         nvgFillColor(args.vg, OPAQUE_C1_DARK);
@@ -248,7 +258,7 @@ void GridScrollBar::draw(const DrawArgs &args) {
         nvgFill(args.vg);
       }
     } else {
-      if (gd->spotsX != NUMCELLS_X) {
+      if (gd->getSpotsX() != NUMCELLS_X) {
         float position = (1 - percent) * (r + barSize) +
                          percent * (box.size.x - r - barSize);
         nvgFillColor(args.vg, OPAQUE_C1_DARK);
@@ -282,33 +292,21 @@ void GridScrollBar::onDragHover(const event::DragHover &e) {
     float supLimit = vertical ? box.size.y : box.size.x;
     supLimit -= (r + barSize);
     float position = vertical ? e.pos.y : e.pos.x;
+    float percent = 0.f;
     if (position <= infLimit) {
-      if (vertical) {
-        gd->display_y0 = 0;
-      } else {
-        gd->display_x0 = 0;
-      }
+      percent = 0.f;
     } else if (position >= supLimit) {
-      if (vertical) {
-        gd->display_y0 = NUMCELLS_Y - gd->spotsY;
-      } else {
-        gd->display_x0 = NUMCELLS_X - gd->spotsX;
-      }
+      percent = 1.f;
     } else {
-      float percent = (position - infLimit) / (supLimit - infLimit);
-      float max = vertical ? NUMCELLS_Y - gd->spotsY : NUMCELLS_X - gd->spotsX;
-      int val = floor(percent * max);
-      if (vertical) {
-        gd->display_y0 = val;
-      } else {
-        gd->display_x0 = val;
-      }
+      percent = (position - infLimit) / (supLimit - infLimit);
     }
+    float max =
+        vertical ? NUMCELLS_Y - gd->getSpotsY() : NUMCELLS_X - gd->getSpotsX();
+    int val = floor(percent * max);
+    int oldVal = vertical ? gd->getY0() : gd->getX0();
+    gd->scroll(val - oldVal, vertical);
     e.consume(this);
     Widget::onDragHover(e);
-    gd->clearChildren();
-    gd->viewUpdated();
-    gd->firstDraw = true;
   }
 }
 
@@ -413,7 +411,7 @@ void GridZoomBar::draw(const DrawArgs &args) {
   nvgBeginPath(args.vg);
   // circle to materialize position
   if (gd) {
-    float percent = (float)(gd->spotsX - MIN_CELLS_ON_SCREEN) /
+    float percent = (float)(gd->getSpotsX() - MIN_CELLS_ON_SCREEN) /
                     (float)(NUMCELLS_X - MIN_CELLS_ON_SCREEN);
     float position =
         (1 - percent) * (r + barSize) + percent * (box.size.y - r - barSize);
@@ -458,11 +456,7 @@ void GridZoomBar::onDragHover(const event::DragHover &e) {
                       percent * (NUMCELLS_X - MIN_CELLS_ON_SCREEN));
     int ysize = floor(MIN_CELLS_ON_SCREEN +
                       percent * (NUMCELLS_X - MIN_CELLS_ON_SCREEN));
-    int oldx = gd->spotsX;
-    int oldy = gd->spotsY;
-    int new_x0 = gd->display_x0 + (oldx - xsize) / 2;
-    int new_y0 = gd->display_y0 + (oldy - ysize) / 2;
-    gd->setView(new_x0, new_y0, xsize, ysize);
+    gd->setZoomLevel(xsize, ysize);
     e.consume(this);
     Widget::onDragHover(e);
   }
@@ -473,12 +467,12 @@ GoLDisplay::GoLDisplay() { firstDraw = true; }
 
 void GoLDisplay::changeZoomLevel(int zoomChange) {
   gridDisplay->changeZoomLevel(zoomChange);
-  if (gridDisplay->spotsX == NUMCELLS_X) {
+  if (gridDisplay->getSpotsX() == NUMCELLS_X) {
     hScrollPane->scrollPossible = false;
   } else {
     hScrollPane->scrollPossible = true;
   }
-  if (gridDisplay->spotsY == NUMCELLS_Y) {
+  if (gridDisplay->getSpotsY() == NUMCELLS_Y) {
     vScrollPane->scrollPossible = false;
   } else {
     vScrollPane->scrollPossible = true;

@@ -42,24 +42,31 @@ struct LineHeader : Widget {
 };
 
 struct GridDisplay : OpaqueWidget {
-  Mitosis *module = NULL;
+private:
   float sizeX = 0.f;
   float sizeY = 0.f;
   float cellSizeX = 0.f;
   float cellSizeY = 0.f;
   float cellSpaceX = 0.f;
   float cellSpaceY = 0.f;
+  bool firstDraw = true;
   int spotsX = DEFAULT_CELLS_DISPLAYED_X;
   int spotsY = DEFAULT_CELLS_DISPLAYED_Y;
-  bool firstDraw = true;
   // first x displayed
   int display_x0 = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
   // first y displayed
   int display_y0 = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
 
+public:
+  Mitosis *module = NULL;
   GridDisplay();
+  int getX0();
+  int getY0();
+  int getSpotsX();
+  int getSpotsY();
   void draw(const DrawArgs &args) override;
   void changeZoomLevel(int zoomChange);
+  void setZoomLevel(int zoomLevelX, int zoomLevelY);
   void scroll(int scrollQuantity, bool vertical);
   void setView(int startX, int startY, int sizeX, int sizeY);
   void resetView();
