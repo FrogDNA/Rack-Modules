@@ -79,14 +79,19 @@ void GridDisplay::scroll(int scrollQuantity, bool vertical) {
 }
 
 void GridDisplay::resetView() {
-  spotsX = DEFAULT_CELLS_DISPLAYED_X;
-  spotsY = DEFAULT_CELLS_DISPLAYED_Y;
-  display_x0 = (NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2;
-  display_y0 = (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2;
+  setView((NUMCELLS_X - DEFAULT_CELLS_DISPLAYED_X) / 2,
+          (NUMCELLS_Y - DEFAULT_CELLS_DISPLAYED_Y) / 2,
+          DEFAULT_CELLS_DISPLAYED_X, DEFAULT_CELLS_DISPLAYED_Y);
+}
+
+void GridDisplay::setView(int startX, int startY, int sizeX, int sizeY) {
+  spotsX = std::max(0, std::min(sizeX, NUMCELLS_X));
+  spotsY = std::max(0, std::min(sizeY, NUMCELLS_Y));
+  display_x0 = std::max(0, std::min(startX, NUMCELLS_X - spotsX));
+  display_y0 = std::max(0, std::min(startY, NUMCELLS_Y - spotsY));
   viewUpdated();
   clearChildren();
   firstDraw = true;
-  // goldisplay resetView to set scrollPossible = true
 }
 
 void GridDisplay::viewUpdated() {
@@ -383,6 +388,85 @@ void ZoomButton::whileHovering() {
   zoomFramesCount++;
 }
 
+/// ZOOM BAR ///
+
+GridZoomBar::GridZoomBar() { r = (mm2px(ICON_SIZE) - 4 * barSize) / 2; }
+
+void GridZoomBar::draw(const DrawArgs &args) {
+  if (getAncestorOfType<GoLDisplay>()) {
+    gd = getAncestorOfType<GoLDisplay>()->gridDisplay;
+  }
+  // rectangles to materialize scroll area
+  nvgFillColor(args.vg, OPAQUE_C1_LIGHT);
+  nvgBeginPath(args.vg);
+  nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+  nvgFill(args.vg);
+  nvgFillColor(args.vg, OPAQUE_C1_DARK);
+  nvgBeginPath(args.vg);
+
+  nvgRect(args.vg, 0, 0, barSize, box.size.y);
+  nvgRect(args.vg, box.size.x - barSize, 0, barSize, this->box.size.y);
+  nvgRect(args.vg, 0, 0, box.size.x, barSize);
+  nvgRect(args.vg, 0, box.size.y - barSize, box.size.x, barSize);
+
+  nvgFill(args.vg);
+  nvgBeginPath(args.vg);
+  // circle to materialize position
+  if (gd) {
+    float percent = (float)(gd->spotsX - MIN_CELLS_ON_SCREEN) /
+                    (float)(NUMCELLS_X - MIN_CELLS_ON_SCREEN);
+    float position =
+        (1 - percent) * (r + barSize) + percent * (box.size.y - r - barSize);
+    nvgFillColor(args.vg, OPAQUE_C1_DARK);
+    nvgCircle(args.vg, box.size.x / 2.0f, position, r);
+    nvgFill(args.vg);
+  }
+}
+
+void GridZoomBar::onButton(const event::Button &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+    if (e.action == GLFW_PRESS) {
+      dragging = true;
+    } else if (e.action == GLFW_RELEASE) {
+      dragging = false;
+    }
+    e.consume(this);
+    Widget::onButton(e);
+  }
+}
+
+void GridZoomBar::onDragLeave(const event::DragLeave &e) {
+  dragging = false;
+  e.consume(this);
+}
+
+void GridZoomBar::onDragHover(const event::DragHover &e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT && dragging) {
+    float infLimit = r + barSize;
+    float supLimit = box.size.y;
+    supLimit -= (r + barSize);
+    float position = e.pos.y;
+    float percent = 0.f;
+    if (position <= infLimit) {
+      percent = 0.f;
+    } else if (position >= supLimit) {
+      percent = 1.f;
+    } else {
+      percent = (position - infLimit) / (supLimit - infLimit);
+    }
+    int xsize = floor(MIN_CELLS_ON_SCREEN +
+                      percent * (NUMCELLS_X - MIN_CELLS_ON_SCREEN));
+    int ysize = floor(MIN_CELLS_ON_SCREEN +
+                      percent * (NUMCELLS_X - MIN_CELLS_ON_SCREEN));
+    int oldx = gd->spotsX;
+    int oldy = gd->spotsY;
+    int new_x0 = gd->display_x0 + (oldx - xsize) / 2;
+    int new_y0 = gd->display_y0 + (oldy - ysize) / 2;
+    gd->setView(new_x0, new_y0, xsize, ysize);
+    e.consume(this);
+    Widget::onDragHover(e);
+  }
+}
 /// GOLDISPLAY ///
 
 GoLDisplay::GoLDisplay() { firstDraw = true; }
@@ -426,23 +510,29 @@ void GoLDisplay::draw(const DrawArgs &args) {
     hScrollPane->box.pos =
         Vec(iconSizePx + iconPaddingPx, gridSizeY + iconPaddingPx);
     addChild(hScrollPane);
-    // center grid button (or center zoom ? At least extra button)
+    // reset grid button
     CenterButton *centerButton = new CenterButton();
     centerButton->box.size = Vec(iconSizePx, iconSizePx);
-    centerButton->box.pos = Vec(0.f, 0.f);
+    centerButton->box.pos = Vec(0.f, gridSizeY + iconPaddingPx);
     addChild(centerButton);
     // zoom button +
     ZoomButton *zoomPlus = new ZoomButton();
     zoomPlus->baseZoom = -1;
     zoomPlus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomPlus->box.pos = Vec(0.f, iconSizePx + iconPaddingPx);
+    zoomPlus->box.pos = Vec(0.f, 0.f);
     addChild(zoomPlus);
     // zoom button -
     ZoomButton *zoomMinus = new ZoomButton();
     zoomMinus->baseZoom = 1;
     zoomMinus->box.size = Vec(iconSizePx, iconSizePx);
-    zoomMinus->box.pos = Vec(0.f, 2 * (iconSizePx + iconPaddingPx));
+    zoomMinus->box.pos = Vec(0.f, gridSizeY - iconSizePx);
     addChild(zoomMinus);
+    // zoom bar
+    GridZoomBar *zBar = new GridZoomBar();
+    zBar->box.size =
+        Vec(iconSizePx, gridSizeY - 2 * (iconSizePx + iconPaddingPx));
+    zBar->box.pos = Vec(0.f, iconSizePx + iconPaddingPx);
+    addChild(zBar);
     // dont do this cursed part ever again
     firstDraw = false;
   }

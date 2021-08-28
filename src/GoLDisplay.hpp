@@ -61,6 +61,7 @@ struct GridDisplay : OpaqueWidget {
   void draw(const DrawArgs &args) override;
   void changeZoomLevel(int zoomChange);
   void scroll(int scrollQuantity, bool vertical);
+  void setView(int startX, int startY, int sizeX, int sizeY);
   void resetView();
   void viewUpdated();
 };
@@ -105,6 +106,19 @@ struct ZoomButton : InterfaceButton {
   int baseZoom = 1;
   void buttonReleased() override;
   void whileHovering() override;
+};
+
+struct GridZoomBar : Widget {
+  GridDisplay *gd = NULL;
+  float barSize = mm2px(0.5f);
+  float r = (mm2px(ICON_SIZE) - 4 * barSize) / 2;
+  float pos = 0.5f;
+  bool dragging = false;
+  GridZoomBar();
+  void draw(const DrawArgs &args) override;
+  void onButton(const event::Button &e) override;
+  void onDragHover(const event::DragHover &e) override;
+  void onDragLeave(const event::DragLeave &e) override;
 };
 
 struct CenterButton : InterfaceButton {
