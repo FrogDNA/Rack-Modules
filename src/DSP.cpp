@@ -32,7 +32,6 @@ DSP::DSP() {
 void DSP::update(std::vector<std::pair<int, int> *> state) {
   usableX.clear();
   usableY.clear();
-  int counter = 0;
   for (std::vector<std::pair<int, int> *>::iterator it = state.begin();
        it != state.end(); ++it) {
     std::pair<int, int> *c = *it;
@@ -41,10 +40,6 @@ void DSP::update(std::vector<std::pair<int, int> *> state) {
     if (isCellAudible(c)) {
       usableX.insert(x);
       usableY.insert(y);
-      counter++;
-      if (counter == 10) {
-        break;
-      }
     }
   }
   outputChanged = true;
@@ -58,12 +53,17 @@ Outputs DSP::getOutputs() {
     out.xOutputs[counter] = xFrequencies[*it];
     out.xPresents[counter] = 10.0f;
     counter++;
+    if (counter == 10)
+      break;
   }
   counter = 0;
   for (std::set<int>::iterator it = usableY.begin(); it != usableY.end();
        ++it) {
     out.yOutputs[counter] = yFrequencies[*it];
     out.yPresents[counter] = 10.0f;
+    counter++;
+    if (counter == 10)
+      break;
   }
   return out;
 }
