@@ -68,7 +68,7 @@ This output will hold 10V if the grid has reached an already reached state, with
 
 If off (default), the grid is limited by its edges. If on, left and right edges communicate, the same for top and bottom edges.
 
-### CV inputs
+### Lim inputs
 
-These outputs offset the first line/column to be taken into account for the vOct output. For instance, if sending 1V in the CV input for rows, the first row to be checked for a living cell will be row 12.
+These outputs, when UP (> 3.5V) effectively limit the grid to the part visible in the display. All cells outside this area are killed.
 
