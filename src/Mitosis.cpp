@@ -252,6 +252,8 @@ void Mitosis::processBuffers() {
     std::vector<std::pair<int, int> *> cells =
         GameOfLifeGrid::createRandomGrid();
     golGrid->init(cells);
+    lastLoaded = 3;
+    lastLoadedData = cells;
   }
   while (!colStartBuffer.empty() && !colSizeBuffer.empty()) {
     colStart = colStartBuffer.shift();
