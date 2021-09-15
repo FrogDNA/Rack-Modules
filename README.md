@@ -2,4 +2,4 @@
 
 A VCV Rack module that revolve around James Conway's "Game of Life".
 
-Manual will be updated soon...
+Manual to be found in the manual/ folder
